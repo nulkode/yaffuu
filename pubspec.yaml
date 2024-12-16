@@ -1,0 +1,34 @@
+name: yaffuu
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.2
+
+dependencies:
+  desktop_drop: ^0.5.0
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.1.6
+  flutter_svg: ^2.0.16
+  go_router: ^14.6.2
+  google_fonts: ^6.2.1
+  logger: ^2.5.0
+  open_file: ^3.5.10
+  shared_preferences: ^2.3.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: RobotoFlex
+      fonts:
+        - asset: assets/fonts/roboto_flex.ttf
+  assets:
+    - assets/
+    - assets/images/
