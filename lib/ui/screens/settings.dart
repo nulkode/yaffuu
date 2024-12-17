@@ -54,64 +54,34 @@ class _SettingsPageState extends State<SettingsPage> {
                   builder: (context, themeMode) {
                     return Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: Row(
-                            children: [
-                              Radio<ThemeMode>(
-                                value: ThemeMode.system,
-                                groupValue: themeMode,
-                                onChanged: (value) {
-                                  context
-                                      .read<ThemeBloc>()
-                                      .add(ThemeEvent.system);
-                                },
-                              ),
-                              const Icon(Icons.settings),
-                              const SizedBox(width: 8),
-                              const Text('System Theme'),
-                            ],
-                          ),
+                        ThemeRadio(
+                          value: ThemeMode.system,
+                          groupValue: themeMode,
+                          icon: Icons.settings,
+                          text: 'System Theme',
+                          onChanged: (value) {
+                            context.read<ThemeBloc>().add(ThemeEvent.system);
+                          },
                         ),
                         const SizedBox(height: 16),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: Row(
-                            children: [
-                              Radio<ThemeMode>(
-                                value: ThemeMode.light,
-                                groupValue: themeMode,
-                                onChanged: (value) {
-                                  context
-                                      .read<ThemeBloc>()
-                                      .add(ThemeEvent.light);
-                                },
-                              ),
-                              const Icon(Icons.wb_sunny),
-                              const SizedBox(width: 8),
-                              const Text('Light Theme'),
-                            ],
-                          ),
+                        ThemeRadio(
+                          value: ThemeMode.light,
+                          groupValue: themeMode,
+                          icon: Icons.wb_sunny,
+                          text: 'Light Theme',
+                          onChanged: (value) {
+                            context.read<ThemeBloc>().add(ThemeEvent.light);
+                          },
                         ),
                         const SizedBox(height: 16),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: Row(
-                            children: [
-                              Radio<ThemeMode>(
-                                value: ThemeMode.dark,
-                                groupValue: themeMode,
-                                onChanged: (value) {
-                                  context
-                                      .read<ThemeBloc>()
-                                      .add(ThemeEvent.dark);
-                                },
-                              ),
-                              const Icon(Icons.nights_stay),
-                              const SizedBox(width: 8),
-                              const Text('Dark Theme'),
-                            ],
-                          ),
+                        ThemeRadio(
+                          value: ThemeMode.dark,
+                          groupValue: themeMode,
+                          icon: Icons.nights_stay,
+                          text: 'Dark Theme',
+                          onChanged: (value) {
+                            context.read<ThemeBloc>().add(ThemeEvent.dark);
+                          },
                         ),
                       ],
                     );
@@ -179,6 +149,42 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ThemeRadio extends StatelessWidget {
+  final ThemeMode value;
+  final ThemeMode groupValue;
+  final IconData icon;
+  final String text;
+  final ValueChanged<ThemeMode?> onChanged;
+
+  const ThemeRadio({
+    super.key,
+    required this.value,
+    required this.groupValue,
+    required this.icon,
+    required this.text,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: Row(
+        children: [
+          Radio<ThemeMode>(
+            value: value,
+            groupValue: groupValue,
+            onChanged: onChanged,
+          ),
+          Icon(icon),
+          const SizedBox(width: 8),
+          Text(text),
+        ],
       ),
     );
   }
