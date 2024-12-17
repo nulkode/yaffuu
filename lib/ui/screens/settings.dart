@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yaffuu/logic/bloc/app.dart';
+import 'package:yaffuu/logic/bloc/theme.dart';
 import 'package:yaffuu/logic/ffmpeg.dart';
 import 'package:yaffuu/logic/logger.dart';
 import 'package:yaffuu/logic/user_preferences.dart';
