@@ -5,7 +5,7 @@ class FFmpegInfo {
   final String buildWith;
   final String configuration;
   final Map<String, String> libraryVersions;
-  final Map<String, String> hardwareAccelerations; // Map of ID to friendly name
+  final Map<String, String> hardwareAccelerations;
 
   FFmpegInfo({
     required this.version,
