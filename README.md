@@ -1,6 +1,6 @@
 # yaffuu
 
-`yaffuu` (Yet Another (Very Easy To Use) FFmpeg Wrapper) is a simple and easy-to-use UI for FFmpeg.
+`yaffuu` (Yet Another FFmpeg Wrapper) is a simple and easy-to-use UI for FFmpeg.
 
 ## Features
 
