@@ -86,19 +86,37 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 enum ThemeEvent { light, dark, system }
 
 class ThemeBloc extends Bloc<ThemeEvent, ThemeMode> {
-  ThemeBloc(super.initialState) {
+  final UserPreferences _prefs;
+
+  ThemeBloc(this._prefs) : super(_getInitialThemeMode(_prefs)) {
     on<ThemeEvent>((event, emit) {
+      ThemeMode newMode;
       switch (event) {
         case ThemeEvent.light:
-          emit(ThemeMode.light);
+          newMode = ThemeMode.light;
+          _prefs.themeMode = 'light';
           break;
         case ThemeEvent.dark:
-          emit(ThemeMode.dark);
+          newMode = ThemeMode.dark;
+          _prefs.themeMode = 'dark';
           break;
         case ThemeEvent.system:
-          emit(ThemeMode.system);
+          newMode = ThemeMode.system;
+          _prefs.themeMode = 'system';
           break;
       }
+      emit(newMode);
     });
+  }
+
+  static ThemeMode _getInitialThemeMode(UserPreferences prefs) {
+    switch (prefs.themeMode) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      default:
+        return ThemeMode.system;
+    }
   }
 }

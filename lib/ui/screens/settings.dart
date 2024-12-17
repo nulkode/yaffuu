@@ -181,8 +181,13 @@ class ThemeRadio extends StatelessWidget {
             groupValue: groupValue,
             onChanged: onChanged,
           ),
+          const SizedBox(
+            width: 8,
+          ),
           Icon(icon),
-          const SizedBox(width: 8),
+          const SizedBox(
+            width: 8,
+          ),
           Text(text),
         ],
       ),

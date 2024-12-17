@@ -19,7 +19,7 @@ void main() async {
           create: (context) => AppBloc()..add(StartApp()),
         ),
         BlocProvider(
-          create: (context) => ThemeBloc(userPreferences.isDarkTheme ? ThemeMode.dark : ThemeMode.light),
+          create: (context) => ThemeBloc(userPreferences),
         ),
       ],
       child: MainApp(userPreferences: userPreferences),
