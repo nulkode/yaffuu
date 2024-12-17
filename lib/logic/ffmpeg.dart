@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:yaffuu/logic/classes/exception.dart';
+
 class FFmpegInfo {
   final String version;
   final String buildWith;
   final String configuration;
   final Map<String, String> libraryVersions;
-  final Map<String, String> hardwareAccelerations; // Map of ID to friendly name
+  final Map<String, String> hardwareAccelerations;
 
   FFmpegInfo({
     required this.version,
@@ -91,26 +93,6 @@ class FFmpegInfo {
   String toString() {
     return 'FFmpegInfo(version: $version, buildWith: $buildWith, configuration: $configuration, libraryVersions: $libraryVersions, hardwareAccelerations: $hardwareAccelerations)';
   }
-}
-
-class FFmpegException implements Exception {
-  final String message;
-  FFmpegException(this.message);
-
-  @override
-  String toString() => 'FFmpegException: $message';
-}
-
-class FFmpegNotFoundException extends FFmpegException {
-  FFmpegNotFoundException() : super('FFmpeg is not installed or not found in the system path.');
-}
-
-class FFmpegNotCompatibleException extends FFmpegException {
-  FFmpegNotCompatibleException() : super('FFmpeg version is not compatible.');
-}
-
-class FFmpegNotAccessibleException extends FFmpegException {
-  FFmpegNotAccessibleException() : super('FFmpeg is not accessible.');
 }
 
 Future<FFmpegInfo?> checkFFmpegInstallation() async {
