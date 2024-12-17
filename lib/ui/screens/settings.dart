@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yaffuu/logic/bloc/app.dart';
+import 'package:yaffuu/logic/ffmpeg.dart';
+import 'package:yaffuu/logic/logger.dart';
 import 'package:yaffuu/logic/user_preferences.dart';
 import 'package:yaffuu/styles/text.dart';
 import 'package:yaffuu/ui/components/appbar.dart';
@@ -16,6 +18,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   UserPreferences? _prefs;
+  FFmpegInfo? _ffmpegInfo;
 
   @override
   void initState() {
@@ -25,6 +28,18 @@ class _SettingsPageState extends State<SettingsPage> {
         _prefs = prefs;
       });
     });
+    _fetchFFmpegInfo();
+  }
+
+  void _fetchFFmpegInfo() async {
+    try {
+      final info = await checkFFmpegInstallation();
+      setState(() {
+        _ffmpegInfo = info;
+      });
+    } catch (e) {
+      logger.e('Failed to fetch FFmpeg information, $e');
+    }
   }
 
   @override
@@ -145,6 +160,27 @@ class _SettingsPageState extends State<SettingsPage> {
                     }
                   },
                 ),
+                const SizedBox(height: 32),
+                const Text('FFmpeg Information', style: titleStyle),
+                const SizedBox(height: 8),
+                if (_ffmpegInfo != null) ...[
+                  Text('Version: ${_ffmpegInfo!.version}'),
+                  const SizedBox(height: 8),
+                  Text('Build with: ${_ffmpegInfo!.buildWith}'),
+                  const SizedBox(height: 8),
+                  Text('Configuration: ${_ffmpegInfo!.configuration}'),
+                  const SizedBox(height: 8),
+                  const Text('Libraries', style: subtitleStyle),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _ffmpegInfo!.libraryVersions.entries.map((entry) {
+                      return Text('${entry.key}: ${entry.value}');
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 8),
+                ] else ...[
+                  const Text('Fetching FFmpeg information...'),
+                ],
               ],
             ),
           ),

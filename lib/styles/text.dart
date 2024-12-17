@@ -7,6 +7,13 @@ const titleStyle = TextStyle(
   fontVariations: [FontVariation.width(150.0)],
 );
 
+const subtitleStyle = TextStyle(
+  fontFamily: 'RobotoFlex',
+  fontWeight: FontWeight.w500,
+  fontSize: 18,
+  fontVariations: [FontVariation.width(150.0)],
+);
+
 const contentStyle = TextStyle(
   fontFamily: 'Roboto',
   fontWeight: FontWeight.w400,
