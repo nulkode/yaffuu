@@ -5,7 +5,7 @@ class FFmpegInfo {
   final String buildWith;
   final String configuration;
   final Map<String, String> libraryVersions;
-  final List<String> hardwareAccelerations;
+  final Map<String, String> hardwareAccelerations; // Map of ID to friendly name
 
   FFmpegInfo({
     required this.version,
@@ -59,6 +59,7 @@ class FFmpegInfo {
     }
 
     final accelDescriptions = {
+      'none': 'None',
       'cuda': 'NVIDIA CUDA (GPU)',
       'dxva2': 'DirectX Video Acceleration 2 (Windows)',
       'qsv': 'Intel Quick Sync Video',
@@ -71,14 +72,18 @@ class FFmpegInfo {
       'd3d12va': 'Direct3D 12 Video Acceleration',
     };
 
-    final friendlyHwAccels = hwAccels.map((accel) => accelDescriptions[accel] ?? accel).toList();
+    final hardwareAccelerations = <String, String>{};
+    for (var accel in hwAccels) {
+      final friendlyName = accelDescriptions[accel] ?? accel;
+      hardwareAccelerations[accel] = friendlyName;
+    }
 
     return FFmpegInfo(
       version: version,
       buildWith: buildWith,
       configuration: configuration,
       libraryVersions: libraryVersions,
-      hardwareAccelerations: friendlyHwAccels,
+      hardwareAccelerations: hardwareAccelerations,
     );
   }
 

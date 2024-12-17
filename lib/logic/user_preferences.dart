@@ -23,8 +23,8 @@ class UserPreferences {
   String get themeMode => _prefs.getString(_keyThemeMode) ?? 'system';
   set themeMode(String value) => _prefs.setString(_keyThemeMode, value);
 
-  String? get selectedHardwareAcceleration {
-    return _prefs.getString('selectedHardwareAcceleration');
+  String get selectedHardwareAcceleration {
+    return _prefs.getString('selectedHardwareAcceleration') ?? 'none';
   }
 
   Future<void> setSelectedHardwareAcceleration(String method) async {

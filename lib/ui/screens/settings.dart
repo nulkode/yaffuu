@@ -106,31 +106,32 @@ class _SettingsPageState extends State<SettingsPage> {
                       if (_prefs == null) {
                         return const CircularProgressIndicator();
                       }
-                      final hardwareMethods =
-                          state.ffmpegInfo.hardwareAccelerations;
-                      final selectedMethod =
-                          _prefs!.selectedHardwareAcceleration;
+                      final hardwareAccelerations = {
+                        'none': 'None', // Ensure 'none' is included
+                        ...state.ffmpegInfo.hardwareAccelerations,
+                      };
+                      final selectedMethod = _prefs!.selectedHardwareAcceleration;
+
                       return Column(
-                        children: hardwareMethods.map((method) {
+                        children: hardwareAccelerations.entries.map((entry) {
+                          final id = entry.key;
+                          final friendlyName = entry.value;
                           return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 4.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
                             child: Column(
                               children: [
                                 Row(
                                   children: [
                                     Radio<String>(
-                                      value: method,
+                                      value: id,
                                       groupValue: selectedMethod,
                                       onChanged: (value) async {
-                                        await _prefs!
-                                            .setSelectedHardwareAcceleration(
-                                                value!);
+                                        await _prefs!.setSelectedHardwareAcceleration(value!);
                                         setState(() {});
                                       },
                                     ),
                                     const SizedBox(width: 8),
-                                    Text(method),
+                                    Text(friendlyName),
                                   ],
                                 ),
                                 const SizedBox(height: 16),
@@ -140,8 +141,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         }).toList(),
                       );
                     } else {
-                      return const Text(
-                          'Loading hardware acceleration options...');
+                      return const Text('Loading hardware acceleration options...');
                     }
                   },
                 ),
