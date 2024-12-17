@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yaffuu/logic/bloc/app.dart';
-import 'package:yaffuu/ui/components/appbar.dart'; // Import AppErrorType
+import 'package:yaffuu/ui/components/appbar.dart';
 
 class ErrorPage extends StatelessWidget {
   final AppErrorType errorType;
@@ -22,7 +22,6 @@ class ErrorPage extends StatelessWidget {
         errorMessage = 'FFmpeg is not accessible.';
         break;
       case AppErrorType.other:
-      default:
         errorMessage = 'An unknown error occurred.';
     }
 

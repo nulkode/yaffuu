@@ -121,7 +121,7 @@ Future<FFmpegInfo?> checkFFmpegInstallation() async {
       if (majorVersion < 4) {
         throw FFmpegNotCompatibleException();
       }
-      return info; // Return FFmpegInfo
+      return info;
     } else if (versionResult.exitCode != 0) {
       throw FFmpegNotCompatibleException();
     } else if (hwAccelResult.exitCode != 0) {
