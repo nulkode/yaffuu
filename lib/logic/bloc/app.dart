@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yaffuu/logic/classes/exception.dart';
-import 'package:yaffuu/logic/ffmpeg.dart';
+import 'package:yaffuu/logic/parsing.dart';
 import 'package:yaffuu/logic/logger.dart';
 import 'package:yaffuu/logic/user_preferences.dart';
 

@@ -2,17 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yaffuu/logic/bloc/app.dart';
-import 'package:yaffuu/logic/bloc/theme.dart';
-import 'package:yaffuu/logic/user_preferences.dart';
 import 'package:yaffuu/ui/screens/error.dart';
 import 'package:yaffuu/ui/screens/ffmpeg_missing.dart';
 import 'package:yaffuu/ui/screens/loading_screen.dart';
 import 'package:yaffuu/ui/screens/home_page.dart';
 import 'package:yaffuu/ui/screens/settings.dart';
+import 'package:yaffuu/logic/bloc/user_preferences_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final userPreferences = await UserPreferences.getInstance();
   runApp(
     MultiBlocProvider(
       providers: [
@@ -20,10 +18,10 @@ void main() async {
           create: (context) => AppBloc()..add(StartApp()),
         ),
         BlocProvider(
-          create: (context) => ThemeBloc(userPreferences),
+          create: (context) => UserPreferencesBloc()..add(LoadUserPreferences()),
         ),
       ],
-      child: MainApp(userPreferences: userPreferences),
+      child: const MainApp(),
     ),
   );
 }
@@ -57,14 +55,25 @@ final GoRouter router = GoRouter(
 );
 
 class MainApp extends StatelessWidget {
-  final UserPreferences userPreferences;
-
-  const MainApp({super.key, required this.userPreferences});
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ThemeBloc, ThemeMode>(
-      builder: (context, themeMode) {
+    return BlocBuilder<UserPreferencesBloc, UserPreferencesState>(
+      builder: (context, state) {
+        final themeModeString = state.preferences?.themeMode ?? 'system';
+        ThemeMode themeMode;
+        switch (themeModeString) {
+          case 'light':
+            themeMode = ThemeMode.light;
+            break;
+          case 'dark':
+            themeMode = ThemeMode.dark;
+            break;
+          default:
+            themeMode = ThemeMode.system;
+            break;
+        }
         return MaterialApp.router(
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(

@@ -14,8 +14,21 @@ const subtitleStyle = TextStyle(
   fontVariations: [FontVariation.width(150.0)],
 );
 
+const subsubtitleStyle = TextStyle(
+  fontFamily: 'RobotoFlex',
+  fontWeight: FontWeight.w400,
+  fontSize: 16,
+  fontVariations: [FontVariation.width(150.0)],
+);
+
 const contentStyle = TextStyle(
   fontFamily: 'Roboto',
+  fontWeight: FontWeight.w400,
+  fontSize: 16,
+);
+
+const codeStyle = TextStyle(
+  fontFamily: 'RobotoMono',
   fontWeight: FontWeight.w400,
   fontSize: 16,
 );

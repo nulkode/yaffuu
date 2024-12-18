@@ -1,16 +1,29 @@
+// ignore_for_file: prefer_final_fields
+
 import 'dart:collection';
 
 import 'package:yaffuu/logic/classes/exception.dart';
-import 'package:yaffuu/logic/ffmpeg.dart';
-import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
+import 'package:yaffuu/logic/parsing.dart';
+
+abstract class BaseFFmpegManager {
+  // ignore: unused_field
+  FFmpegInfo _ffmpegInfo;
+  Queue<Operation> _operations = Queue<Operation>();
+
+  BaseFFmpegManager(this._ffmpegInfo);
+
+  Stream<double> get progress;
+
+  bool isCompatible();
+
+  bool isOperationCompatible(Operation operation);
+
+  void addOperation(Operation operation);
+}
 
 class FFmpegManager extends BaseFFmpegManager {
-  final Queue<Operation> _operations = Queue<Operation>();
-  // ignore: unused_field
-  final FFmpegInfo _ffmpegInfo;
-
-  FFmpegManager(this._ffmpegInfo) {
+  FFmpegManager(FFmpegInfo ffmpegInfo) : super(ffmpegInfo) {
     if (!isCompatible()) {
       throw FFmpegNotCompatibleException();
     }

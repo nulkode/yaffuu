@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:yaffuu/logic/ffmpeg.dart';
+import 'package:yaffuu/logic/parsing.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
 

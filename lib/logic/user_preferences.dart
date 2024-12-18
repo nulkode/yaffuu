@@ -21,7 +21,9 @@ class UserPreferences {
   set preferredHardwareAcceleration(String value) => _prefs.setString(_keyPreferredHardwareAcceleration, value);
 
   String get themeMode => _prefs.getString(_keyThemeMode) ?? 'system';
-  set themeMode(String value) => _prefs.setString(_keyThemeMode, value);
+  set themeMode(String value) {
+    _prefs.setString(_keyThemeMode, value);
+  }
 
   String get selectedHardwareAcceleration {
     return _prefs.getString('selectedHardwareAcceleration') ?? 'none';

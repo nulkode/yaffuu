@@ -29,6 +29,10 @@ flutter:
     - family: RobotoFlex
       fonts:
         - asset: assets/fonts/roboto_flex.ttf
+    - family: RobotoMono
+      fonts:
+        - asset: assets/fonts/roboto_mono.ttf
+        - asset: assets/fonts/roboto_mono_italic.ttf
   assets:
     - assets/
     - assets/images/
