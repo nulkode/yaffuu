@@ -1,20 +1,22 @@
 import 'dart:collection';
 
-import 'package:yaffuu/logic/classes/exception.dart';
 import 'package:yaffuu/logic/ffmpeg.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
 
-class FFmpegManager extends BaseFFmpegManager {
+class CUDAManager extends BaseFFmpegManager {
+  @override
+  Acceleration get acceleration => Acceleration(
+        id: 'cuda',
+        displayName: 'CUDA',
+        implemented: false,
+      );
+  // ignore: unused_field
   final Queue<Operation> _operations = Queue<Operation>();
   // ignore: unused_field
   final FFmpegInfo _ffmpegInfo;
 
-  FFmpegManager(this._ffmpegInfo) {
-    if (!isCompatible()) {
-      throw FFmpegNotCompatibleException();
-    }
-  }
+  CUDAManager(this._ffmpegInfo);
 
   @override
   Stream<double> get progress async* {
@@ -23,21 +25,16 @@ class FFmpegManager extends BaseFFmpegManager {
 
   @override
   bool isCompatible() {
-    // TODO: check versions, libraries, configurations, etc.
-    return true;
+    throw UnimplementedError();
   }
 
   @override
   bool isOperationCompatible(Operation operation) {
-    return true;
+    throw UnimplementedError();
   }
 
   @override
   void addOperation(Operation operation) {
-    if (isOperationCompatible(operation)) {
-      _operations.add(operation);
-    } else {
-      throw OperationNotCompatibleException('Operation is not compatible');
-    }
+    throw UnimplementedError();
   }
 }

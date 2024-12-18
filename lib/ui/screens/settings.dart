@@ -123,8 +123,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         return const CircularProgressIndicator();
                       }
                       final hardwareAccelerations = {
-                        'none': 'None', // Ensure 'none' is included
-                        ...state.ffmpegInfo.hardwareAccelerations,
+                        'none': 'None',
                       };
                       final selectedMethod = _prefs!.selectedHardwareAcceleration;
 
@@ -179,6 +178,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     }).toList(),
                   ),
                   const SizedBox(height: 8),
+                  const Text('Hardware Acceleration', style: subtitleStyle),
                 ] else ...[
                   const Text('Fetching FFmpeg information...'),
                 ],

@@ -7,7 +7,7 @@ class FFmpegInfo {
   final String buildWith;
   final String configuration;
   final Map<String, String> libraryVersions;
-  final Map<String, String> hardwareAccelerations;
+  final List<String> hardwareAccelerations;
 
   FFmpegInfo({
     required this.version,
@@ -60,25 +60,7 @@ class FFmpegInfo {
       }
     }
 
-    final accelDescriptions = {
-      'none': 'None',
-      'cuda': 'NVIDIA CUDA (GPU)',
-      'dxva2': 'DirectX Video Acceleration 2 (Windows)',
-      'qsv': 'Intel Quick Sync Video',
-      'd3d11va': 'Direct3D 11 Video Acceleration',
-      'vaapi': 'Video Acceleration API',
-      'vdpau': 'Video Decode and Presentation API for Unix',
-      'videotoolbox': 'VideoToolbox',
-      'opencl': 'OpenCL',
-      'vulkan': 'Vulkan',
-      'd3d12va': 'Direct3D 12 Video Acceleration',
-    };
-
-    final hardwareAccelerations = <String, String>{};
-    for (var accel in hwAccels) {
-      final friendlyName = accelDescriptions[accel] ?? accel;
-      hardwareAccelerations[accel] = friendlyName;
-    }
+    final hardwareAccelerations = <String>[];
 
     return FFmpegInfo(
       version: version,
