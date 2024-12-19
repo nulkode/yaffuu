@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:yaffuu/logic/classes/exception.dart';
 import 'package:yaffuu/logic/parsing.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
@@ -16,7 +17,11 @@ class CUDAManager extends BaseFFmpegManager {
   // ignore: unused_field
   final FFmpegInfo _ffmpegInfo;
 
-  CUDAManager(this._ffmpegInfo);
+  CUDAManager(this._ffmpegInfo) {
+    if (!isCompatible()) {
+      throw FFmpegNotCompatibleException();
+    }
+  }
 
   @override
   Stream<double> get progress async* {

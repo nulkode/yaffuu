@@ -1,4 +1,4 @@
-import 'package:yaffuu/logic/managers/ffmpeg.dart';
+import 'package:yaffuu/logic/managers/managers.dart';
 export 'bitrate.dart';
 export 'resolution.dart';
 
@@ -34,6 +34,7 @@ enum OperationType {
 abstract class Operation {
   final OperationType type = OperationType.all;
 
-  List<Argument> toArguments(FFmpegManager manager);
+  bool isCompatible(BaseFFmpegManager manager);
+  List<Argument> toArguments(BaseFFmpegManager manager);
 }
 

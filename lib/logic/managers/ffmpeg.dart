@@ -3,27 +3,17 @@
 import 'dart:collection';
 
 import 'package:yaffuu/logic/classes/exception.dart';
+import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
 import 'package:yaffuu/logic/parsing.dart';
 
-abstract class BaseFFmpegManager {
-  // ignore: unused_field
-  FFmpegInfo _ffmpegInfo;
-  Queue<Operation> _operations = Queue<Operation>();
-
-  BaseFFmpegManager(this._ffmpegInfo);
-
-  Stream<double> get progress;
-
-  bool isCompatible();
-
-  bool isOperationCompatible(Operation operation);
-
-  void addOperation(Operation operation);
-}
-
 class FFmpegManager extends BaseFFmpegManager {
-  FFmpegManager(FFmpegInfo ffmpegInfo) : super(ffmpegInfo) {
+  // ignore: unused_field
+  final Queue<Operation> _operations = Queue<Operation>();
+  // ignore: unused_field
+  final FFmpegInfo _ffmpegInfo;
+
+  FFmpegManager(this._ffmpegInfo) {
     if (!isCompatible()) {
       throw FFmpegNotCompatibleException();
     }
