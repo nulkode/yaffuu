@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yaffuu/logic/bloc/app.dart';
 import 'package:yaffuu/logic/parsing.dart';
 import 'package:yaffuu/logic/logger.dart';
 import 'package:yaffuu/styles/text.dart';
 import 'package:yaffuu/ui/components/appbar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yaffuu/ui/components/help.dart';
-import 'package:yaffuu/logic/bloc/user_preferences_bloc.dart';
+import 'package:yaffuu/logic/bloc/theme.dart';
+import 'package:yaffuu/logic/bloc/hardware_acceleration.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -52,12 +52,8 @@ class _SettingsPageState extends State<SettingsPage> {
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
-          child: BlocBuilder<UserPreferencesBloc, UserPreferencesState>(
-            builder: (context, userPrefsState) {
-              if (userPrefsState.preferences == null) {
-                return const CircularProgressIndicator();
-              }
-              final prefs = userPrefsState.preferences!;
+          child: BlocBuilder<ThemeBloc, ThemeMode>(
+            builder: (context, themeMode) {
               return SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,31 +65,31 @@ class _SettingsPageState extends State<SettingsPage> {
                       children: [
                         ThemeRadio(
                           value: ThemeMode.system,
-                          groupValue: _getThemeMode(prefs.themeMode),
+                          groupValue: themeMode,
                           icon: Icons.settings,
                           text: 'System Theme',
                           onChanged: (value) {
-                            context.read<UserPreferencesBloc>().add(UpdateThemeMode('system'));
+                            context.read<ThemeBloc>().add(ThemeEvent.system);
                           },
                         ),
                         const SizedBox(height: 16),
                         ThemeRadio(
                           value: ThemeMode.light,
-                          groupValue: _getThemeMode(prefs.themeMode),
+                          groupValue: themeMode,
                           icon: Icons.wb_sunny,
                           text: 'Light Theme',
                           onChanged: (value) {
-                            context.read<UserPreferencesBloc>().add(UpdateThemeMode('light'));
+                            context.read<ThemeBloc>().add(ThemeEvent.light);
                           },
                         ),
                         const SizedBox(height: 16),
                         ThemeRadio(
                           value: ThemeMode.dark,
-                          groupValue: _getThemeMode(prefs.themeMode),
+                          groupValue: themeMode,
                           icon: Icons.nights_stay,
                           text: 'Dark Theme',
                           onChanged: (value) {
-                            context.read<UserPreferencesBloc>().add(UpdateThemeMode('dark'));
+                            context.read<ThemeBloc>().add(ThemeEvent.dark);
                           },
                         ),
                       ],
@@ -111,48 +107,40 @@ class _SettingsPageState extends State<SettingsPage> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    BlocBuilder<AppBloc, AppState>(
-                      builder: (context, state) {
-                        if (state is AppStartSuccess) {
-                          final hardwareAccelerations = {
-                            'none': 'None',
-                          };
-                          final selectedMethod =
-                              prefs.selectedHardwareAcceleration;
+                    BlocBuilder<HardwareAccelerationBloc, String>(
+                      builder: (context, selectedMethod) {
+                        final hardwareAccelerations = {
+                          'none': 'None',
+                          // Add other hardware acceleration methods here
+                        };
 
-                          return Column(
-                            children: hardwareAccelerations.entries.map((entry) {
-                              final id = entry.key;
-                              final friendlyName = entry.value;
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4.0),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Radio<String>(
-                                          value: id,
-                                          groupValue: selectedMethod,
-                                          onChanged: (value) {
-                                            context.read<UserPreferencesBloc>().add(
-                                                UpdateHardwareAccelerationMethod(value!));
-                                          },
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(friendlyName),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 16),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          );
-                        } else {
-                          return const Text(
-                              'Loading hardware acceleration options...');
-                        }
+                        return Column(
+                          children: hardwareAccelerations.entries.map((entry) {
+                            final id = entry.key;
+                            final friendlyName = entry.value;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Radio<String>(
+                                        value: id,
+                                        groupValue: selectedMethod,
+                                        onChanged: (value) {
+                                          context.read<HardwareAccelerationBloc>().add(UpdateHardwareAccelerationMethod(value!));
+                                        },
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(friendlyName),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        );
                       },
                     ),
                     const SizedBox(height: 32),
@@ -171,20 +159,24 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: 16),
                       const Text('Hardware Acceleration Methods',
                           style: subtitleStyle),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _ffmpegInfo!.hardwareAccelerationMethods?.map((method) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: Row(
-                            children: [
-                              const Text('• ', style: TextStyle(fontSize: 18)),
-                              Expanded(child: Text(method)),
-                            ],
-                            ),
-                          );
-                          }).toList() ?? [const Text('None')],
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _ffmpegInfo!.hardwareAccelerationMethods
+                                ?.map((method) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 4.0),
+                                child: Row(
+                                  children: [
+                                    const Text('• ',
+                                        style: TextStyle(fontSize: 18)),
+                                    Expanded(child: Text(method)),
+                                  ],
+                                ),
+                              );
+                            }).toList() ??
+                            [const Text('None')],
+                      ),
                     ] else ...[
                       const Text('Fetching FFmpeg information...'),
                     ],
@@ -197,17 +189,6 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
     );
-  }
-
-  ThemeMode _getThemeMode(String themeMode) {
-    switch (themeMode) {
-      case 'light':
-        return ThemeMode.light;
-      case 'dark':
-        return ThemeMode.dark;
-      default:
-        return ThemeMode.system;
-    }
   }
 }
 
