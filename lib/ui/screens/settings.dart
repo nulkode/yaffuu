@@ -55,133 +55,137 @@ class _SettingsPageState extends State<SettingsPage> {
           child: BlocBuilder<ThemeBloc, ThemeMode>(
             builder: (context, themeMode) {
               return SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 16),
-                    const Text('App Theme', style: titleStyle),
-                    const SizedBox(height: 8),
-                    Column(
-                      children: [
-                        ThemeRadio(
-                          value: ThemeMode.system,
-                          groupValue: themeMode,
-                          icon: Icons.settings,
-                          text: 'System Theme',
-                          onChanged: (value) {
-                            context.read<ThemeBloc>().add(ThemeEvent.system);
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        ThemeRadio(
-                          value: ThemeMode.light,
-                          groupValue: themeMode,
-                          icon: Icons.wb_sunny,
-                          text: 'Light Theme',
-                          onChanged: (value) {
-                            context.read<ThemeBloc>().add(ThemeEvent.light);
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        ThemeRadio(
-                          value: ThemeMode.dark,
-                          groupValue: themeMode,
-                          icon: Icons.nights_stay,
-                          text: 'Dark Theme',
-                          onChanged: (value) {
-                            context.read<ThemeBloc>().add(ThemeEvent.dark);
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-                    const Row(
-                      children: [
-                        Text('Hardware Acceleration', style: titleStyle),
-                        SizedBox(width: 8),
-                        HelpButton(
-                          title: 'Hardware Acceleration',
-                          content:
-                              'Hardware acceleration is like activating some special parts that are specialized in video processing. For example, if you have a dedicated graphics card, you can use it to speed up video processing. Beware that only some codecs are available for hardware acceleration.',
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    BlocBuilder<HardwareAccelerationBloc, String>(
-                      builder: (context, selectedMethod) {
-                        final hardwareAccelerations = {
-                          'none': 'None',
-                          // Add other hardware acceleration methods here
-                        };
-
-                        return Column(
-                          children: hardwareAccelerations.entries.map((entry) {
-                            final id = entry.key;
-                            final friendlyName = entry.value;
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Radio<String>(
-                                        value: id,
-                                        groupValue: selectedMethod,
-                                        onChanged: (value) {
-                                          context.read<HardwareAccelerationBloc>().add(UpdateHardwareAccelerationMethod(value!));
-                                        },
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(friendlyName),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 32),
-                    const Text('FFmpeg Information', style: titleStyle),
-                    const SizedBox(height: 8),
-                    if (_ffmpegInfo != null) ...[
-                      Text('Version: ${_ffmpegInfo!.version}'),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16),
+                      const Text('App Theme', style: titleStyle),
                       const SizedBox(height: 8),
-                      Text(_ffmpegInfo!.copyright.replaceAll('(c)', '©')),
-                      const SizedBox(height: 8),
-                      Text('Built With: ${_ffmpegInfo!.builtWith}'),
-                      const SizedBox(height: 16),
-                      ConfigurationSection(ffmpegInfo: _ffmpegInfo),
-                      const SizedBox(height: 16),
-                      LibrariesSection(ffmpegInfo: _ffmpegInfo),
-                      const SizedBox(height: 16),
-                      const Text('Hardware Acceleration Methods',
-                          style: subtitleStyle),
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _ffmpegInfo!.hardwareAccelerationMethods
-                                ?.map((method) {
+                        children: [
+                          ThemeRadio(
+                            value: ThemeMode.system,
+                            groupValue: themeMode,
+                            icon: Icons.settings,
+                            text: 'System Theme',
+                            onChanged: (value) {
+                              context.read<ThemeBloc>().add(ThemeEvent.system);
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          ThemeRadio(
+                            value: ThemeMode.light,
+                            groupValue: themeMode,
+                            icon: Icons.wb_sunny,
+                            text: 'Light Theme',
+                            onChanged: (value) {
+                              context.read<ThemeBloc>().add(ThemeEvent.light);
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          ThemeRadio(
+                            value: ThemeMode.dark,
+                            groupValue: themeMode,
+                            icon: Icons.nights_stay,
+                            text: 'Dark Theme',
+                            onChanged: (value) {
+                              context.read<ThemeBloc>().add(ThemeEvent.dark);
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 32),
+                      const Row(
+                        children: [
+                          Text('Hardware Acceleration', style: titleStyle),
+                          SizedBox(width: 8),
+                          HelpButton(
+                            title: 'Hardware Acceleration',
+                            content:
+                                'Hardware acceleration is like activating some special parts that are specialized in video processing. For example, if you have a dedicated graphics card, you can use it to speed up video processing. Beware that only some codecs are available for hardware acceleration.',
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      BlocBuilder<HardwareAccelerationBloc, String>(
+                        builder: (context, selectedMethod) {
+                          final hardwareAccelerations = {
+                            'none': 'None',
+                            // Add other hardware acceleration methods here
+                          };
+                  
+                          return Column(
+                            children: hardwareAccelerations.entries.map((entry) {
+                              final id = entry.key;
+                              final friendlyName = entry.value;
                               return Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 4.0),
-                                child: Row(
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                child: Column(
                                   children: [
-                                    const Text('• ',
-                                        style: TextStyle(fontSize: 18)),
-                                    Expanded(child: Text(method)),
+                                    Row(
+                                      children: [
+                                        Radio<String>(
+                                          value: id,
+                                          groupValue: selectedMethod,
+                                          onChanged: (value) {
+                                            context
+                                                .read<HardwareAccelerationBloc>()
+                                                .add(
+                                                    UpdateHardwareAccelerationMethod(
+                                                        value!));
+                                          },
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(friendlyName),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
                                   ],
                                 ),
                               );
-                            }).toList() ??
-                            [const Text('None')],
+                            }).toList(),
+                          );
+                        },
                       ),
-                    ] else ...[
-                      const Text('Fetching FFmpeg information...'),
+                      const SizedBox(height: 32),
+                      const Text('FFmpeg Information', style: titleStyle),
+                      const SizedBox(height: 8),
+                      if (_ffmpegInfo != null) ...[
+                        Text('Version: ${_ffmpegInfo!.version}'),
+                        const SizedBox(height: 8),
+                        Text(_ffmpegInfo!.copyright.replaceAll('(c)', '©')),
+                        const SizedBox(height: 8),
+                        Text('Built With: ${_ffmpegInfo!.builtWith}'),
+                        const SizedBox(height: 16),
+                        ConfigurationSection(ffmpegInfo: _ffmpegInfo),
+                        const SizedBox(height: 16),
+                        LibrariesSection(ffmpegInfo: _ffmpegInfo),
+                        const SizedBox(height: 16),
+                        const Text('Hardware Acceleration Methods',
+                            style: subtitleStyle),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 4.0,
+                          runSpacing: 4.0,
+                          children: _ffmpegInfo!.hardwareAccelerationMethods!
+                              .map((config) {
+                            return Chip(
+                              label: Text(
+                                config,
+                              ),
+                              padding: const EdgeInsets.all(0),
+                            );
+                          }).toList(),
+                        ),
+                      ] else ...[
+                        const Text('Fetching FFmpeg information...'),
+                      ],
+                      const SizedBox(height: 32),
                     ],
-                    const SizedBox(height: 32),
-                  ],
+                  ),
                 ),
               );
             },
@@ -318,13 +322,13 @@ class _ConfigurationSectionState extends State<ConfigurationSection>
         SizeTransition(
           sizeFactor: _heightFactor,
           child: Wrap(
-            spacing: 2.0, // gap between adjacent chips
-            runSpacing: 2.0, // gap between lines
+            spacing: 2.0,
+            runSpacing: 2.0,
             children: widget._ffmpegInfo!.configuration.map((config) {
               return Chip(
                 label: Text(
                   config,
-                  style: const TextStyle(fontSize: 10.0), // smaller text
+                  style: const TextStyle(fontSize: 10.0),
                 ),
                 padding: const EdgeInsets.all(0),
               );
