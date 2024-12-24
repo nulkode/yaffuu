@@ -158,7 +158,8 @@ class _WindowsFfmpegInstallerState extends State<WindowsFfmpegInstaller> {
           onPressed: isInstalling ? null : _startInstallation,
           child: const Text('Install FFmpeg'),
         ),
-        if (!isInstalling && hasError) ...[ // not tested
+        if (!isInstalling && hasError) ...[
+          // not tested
           const SizedBox(height: 16),
           const Text(
             'Oops! An error occurred during installation.',

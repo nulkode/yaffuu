@@ -13,7 +13,8 @@ class ErrorPage extends StatelessWidget {
 
     switch (errorType) {
       case AppErrorType.ffmpegMissing:
-        errorMessage = 'FFmpeg is not installed or not found in the system path.';
+        errorMessage =
+            'FFmpeg is not installed or not found in the system path.';
         break;
       case AppErrorType.ffmpegOutdated:
         errorMessage = 'FFmpeg version is not compatible.';

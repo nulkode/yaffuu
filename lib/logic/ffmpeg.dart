@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:yaffuu/logic/classes/exception.dart';
+import 'package:yaffuu/logic/classes/media.dart';
 import 'package:yaffuu/logic/logger.dart';
 
 class FFmpegInfo {
@@ -29,8 +30,8 @@ class FFmpegInfo {
     final versionRegex = RegExp(r'^ffmpeg version (\S+) (Copyright .+)$');
     final builtWithRegex = RegExp(r'^built with (.+)$');
     final configRegex = RegExp(r'^configuration: (.+)$');
-    final libraryRegex = RegExp(
-      r'^(\S+)\s+(\d+\.\s*\d+\.\s*\d+)\s*/\s*(\d+\.\s*\d+\.\s*\d+)$');
+    final libraryRegex =
+        RegExp(r'^(\S+)\s+(\d+\.\s*\d+\.\s*\d+)\s*/\s*(\d+\.\s*\d+\.\s*\d+)$');
 
     String version = '';
     String copyright = '';
@@ -41,9 +42,9 @@ class FFmpegInfo {
     for (var i = 0; i < headerLines.length; i++) {
       final line = headerLines[i].trim();
       if (version.isEmpty && versionRegex.hasMatch(line)) {
-      final match = versionRegex.firstMatch(line)!;
-      version = match.group(1)!;
-      copyright = match.group(2)!;
+        final match = versionRegex.firstMatch(line)!;
+        version = match.group(1)!;
+        copyright = match.group(2)!;
       } else if (builtWith.isEmpty && builtWithRegex.hasMatch(line)) {
         builtWith = builtWithRegex.firstMatch(line)!.group(1)!.trim();
       } else if (configRegex.hasMatch(line)) {
@@ -69,7 +70,8 @@ class FFmpegInfo {
     List<String>? hardwareMethods;
     if (hardwareAccelerationMethods != null) {
       hardwareMethods ??= [];
-      final hwaccelLines = hardwareAccelerationMethods.split('\n');
+      final hwaccelLines =
+          hardwareAccelerationMethods.split('\n').map((e) => e.trim()).toList();
       final hwaccelRegex = RegExp(r'^Hardware acceleration methods:');
 
       for (var i = 0; i < hwaccelLines.length; i++) {
@@ -79,7 +81,7 @@ class FFmpegInfo {
         }
 
         if (line.isNotEmpty) {
-          hardwareMethods.add(line.trim());
+          hardwareMethods.add(line);
         }
       }
     }
@@ -120,43 +122,63 @@ class FFmpegInfo {
       hardwareAccelerationMethods,
     );
   }
-
-  @override
-  String toString() {
-    return '''
-FFmpeg Version: $version
-Copyright: $copyright
-Built With: $builtWith
-Configuration: ${configuration.join(', ')}
-Libraries:
-${libraries.entries.map((e) => '  ${e.key}: ${e.value}').join('\n')}
-Hardware Acceleration Methods: ${hardwareAccelerationMethods?.join(', ') ?? 'None'}
-''';
-  }
 }
 
-Future<FFmpegInfo?> checkFFmpegInstallation() async {
-  try {
-    final versionResult = await Process.run('ffmpeg', ['-version']);
-    final hwAccelResult = await Process.run('ffmpeg', ['-hwaccels']);
-    if (versionResult.exitCode == 0 && hwAccelResult.exitCode == 0) {
-      final info = FFmpegInfo.parse(
-        versionResult.stdout,
-        hardwareAccelerationMethods: hwAccelResult.stdout,
-      );
+const quietVerbose = ['-v', 'quiet'];
 
-      return info;
-    } else if (versionResult.exitCode != 0) {
-      throw FFmpegNotCompatibleException();
-    } else if (hwAccelResult.exitCode != 0) {
-      throw FFmpegNotAccessibleException();
-    } else {
-      return null;
+abstract class FFService {
+  static Future<FFmpegInfo?> getFFmpegInfo() async {
+    try {
+      final versionResult = await Process.run('ffmpeg', ['-version']);
+      final hwAccelResult =
+          await Process.run('ffmpeg', [...quietVerbose, '-hwaccels']);
+      if (versionResult.exitCode == 0 && hwAccelResult.exitCode == 0) {
+        final info = FFmpegInfo.parse(
+          versionResult.stdout,
+          hardwareAccelerationMethods: hwAccelResult.stdout,
+        );
+
+        return info;
+      } else if (versionResult.exitCode != 0) {
+        throw FFmpegNotCompatibleException();
+      } else if (hwAccelResult.exitCode != 0) {
+        throw FFmpegNotAccessibleException();
+      } else {
+        return null;
+      }
+    } on ProcessException catch (_) {
+      throw FFmpegNotFoundException();
+    } on Exception catch (e) {
+      logger.e('An unknown error occurred: $e');
+      throw FFmpegException('An unknown error occurred: $e');
     }
-  } on ProcessException catch (_) {
-    throw FFmpegNotFoundException();
-  } on Exception catch (e) {
-    logger.e('An unknown error occurred: $e');
-    throw FFmpegException('An unknown error occurred: $e');
+  }
+
+  static Future<MediaFile> probeFile(String path) async {
+    try {
+      final result = await Process.run('ffprobe', [
+        ...quietVerbose,
+        '-output_format',
+        'json',
+        '-show_format',
+        '-show_streams',
+        path,
+      ]);
+
+      if (result.exitCode == 0) {
+        return result.stdout;
+      } else if (result.exitCode > 0) {
+        throw MultimediaNotFoundOrNotRecognizedException();
+      }
+
+      return MediaFile.fromJson(result.stdout);
+    } on JsonParsingException {
+      rethrow;
+    } on MultimediaNotFoundOrNotRecognizedException {
+      rethrow;
+    } catch (e) {
+      logger.e('An unknown error occurred: $e');
+      throw FFmpegException('An unknown error occurred: $e');
+    }
   }
 }

@@ -6,10 +6,12 @@ class UpdateHardwareAccelerationMethod {
   UpdateHardwareAccelerationMethod(this.method);
 }
 
-class HardwareAccelerationBloc extends Bloc<UpdateHardwareAccelerationMethod, String> {
+class HardwareAccelerationBloc
+    extends Bloc<UpdateHardwareAccelerationMethod, String> {
   final UserPreferences _prefs;
 
-  HardwareAccelerationBloc(this._prefs) : super(_prefs.selectedHardwareAcceleration) {
+  HardwareAccelerationBloc(this._prefs)
+      : super(_prefs.selectedHardwareAcceleration) {
     on<UpdateHardwareAccelerationMethod>((event, emit) {
       _prefs.setSelectedHardwareAcceleration(event.method);
       emit(event.method);

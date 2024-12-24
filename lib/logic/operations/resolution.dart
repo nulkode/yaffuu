@@ -1,10 +1,11 @@
-import 'package:yaffuu/logic/classes/exception.dart';
-import 'package:yaffuu/logic/managers/managers.dart';
+import 'package:yaffuu/logic/classes/compatibility.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
 
 class ResolutionChangeOperation implements Operation {
   @override
   final OperationType type = OperationType.visual;
+  @override
+  final List<OperationTag> tags = [OperationTag.image];
   final int width;
   final int height;
 
@@ -14,16 +15,12 @@ class ResolutionChangeOperation implements Operation {
   });
 
   @override
-  bool isCompatible(BaseFFmpegManager manager) {
+  bool isCompatible(CompatibilityContext context) {
     return true;
   }
 
   @override
-  List<Argument> toArguments(BaseFFmpegManager manager) {
-    if (!isCompatible(manager)) {
-      throw OperationNotCompatibleException('Resolution change operation is not compatible with ${manager.acceleration.displayName}.');
-    }
-    
+  List<Argument> toArguments() {
     return [
       Argument(
         type: ArgumentType.videoFilter,

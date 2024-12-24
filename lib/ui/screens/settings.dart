@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yaffuu/logic/parsing.dart';
-import 'package:yaffuu/logic/logger.dart';
+import 'package:yaffuu/logic/bloc/app.dart';
+import 'package:yaffuu/logic/ffmpeg.dart';
 import 'package:yaffuu/styles/text.dart';
 import 'package:yaffuu/ui/components/appbar.dart';
 import 'package:go_router/go_router.dart';
@@ -17,23 +17,18 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  FFmpegInfo? _ffmpegInfo;
+  FFmpegInfo? get _ffmpegInfo {
+    final state = context.read<AppBloc>().state;
+    if (state is AppStartSuccess) {
+      return state.ffmpegInfo;
+    }
+    return null;
+  }
 
   @override
   void initState() {
     super.initState();
-    _fetchFFmpegInfo();
-  }
-
-  void _fetchFFmpegInfo() async {
-    try {
-      final info = await checkFFmpegInstallation();
-      setState(() {
-        _ffmpegInfo = info;
-      });
-    } catch (e) {
-      logger.e('Failed to fetch FFmpeg information, $e');
-    }
+    // No need to fetch FFmpegInfo here
   }
 
   @override
@@ -115,9 +110,10 @@ class _SettingsPageState extends State<SettingsPage> {
                             'none': 'None',
                             // Add other hardware acceleration methods here
                           };
-                  
+
                           return Column(
-                            children: hardwareAccelerations.entries.map((entry) {
+                            children:
+                                hardwareAccelerations.entries.map((entry) {
                               final id = entry.key;
                               final friendlyName = entry.value;
                               return Padding(
@@ -132,7 +128,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                           groupValue: selectedMethod,
                                           onChanged: (value) {
                                             context
-                                                .read<HardwareAccelerationBloc>()
+                                                .read<
+                                                    HardwareAccelerationBloc>()
                                                 .add(
                                                     UpdateHardwareAccelerationMethod(
                                                         value!));
@@ -153,37 +150,50 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: 32),
                       const Text('FFmpeg Information', style: titleStyle),
                       const SizedBox(height: 8),
-                      if (_ffmpegInfo != null) ...[
-                        Text('Version: ${_ffmpegInfo!.version}'),
-                        const SizedBox(height: 8),
-                        Text(_ffmpegInfo!.copyright.replaceAll('(c)', '©')),
-                        const SizedBox(height: 8),
-                        Text('Built With: ${_ffmpegInfo!.builtWith}'),
-                        const SizedBox(height: 16),
-                        ConfigurationSection(ffmpegInfo: _ffmpegInfo),
-                        const SizedBox(height: 16),
-                        LibrariesSection(ffmpegInfo: _ffmpegInfo),
-                        const SizedBox(height: 16),
-                        const Text('Hardware Acceleration Methods',
-                            style: subtitleStyle),
-                        const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 4.0,
-                          runSpacing: 4.0,
-                          children: _ffmpegInfo!.hardwareAccelerationMethods!
-                              .map((config) {
-                            return Chip(
-                              label: Text(
-                                config,
-                              ),
-                              padding: const EdgeInsets.all(0),
-                            );
-                          }).toList(),
-                        ),
-                      ] else ...[
-                        const Text('Fetching FFmpeg information...'),
-                      ],
-                      const SizedBox(height: 32),
+                      BlocBuilder<AppBloc, AppState>(
+                        builder: (context, state) {
+                          return SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (_ffmpegInfo != null) ...[
+                                  Text('Version: ${_ffmpegInfo!.version}'),
+                                  const SizedBox(height: 8),
+                                  Text(_ffmpegInfo!.copyright
+                                      .replaceAll('(c)', '©')),
+                                  const SizedBox(height: 8),
+                                  Text('Built With: ${_ffmpegInfo!.builtWith}'),
+                                  const SizedBox(height: 16),
+                                  ConfigurationSection(ffmpegInfo: _ffmpegInfo),
+                                  const SizedBox(height: 16),
+                                  LibrariesSection(ffmpegInfo: _ffmpegInfo),
+                                  const SizedBox(height: 16),
+                                  const Text('Hardware Acceleration Methods',
+                                      style: subtitleStyle),
+                                  const SizedBox(height: 8),
+                                  Wrap(
+                                    spacing: 4.0,
+                                    runSpacing: 4.0,
+                                    children: _ffmpegInfo!
+                                        .hardwareAccelerationMethods!
+                                        .map((config) {
+                                      return Chip(
+                                        label: Text(
+                                          config,
+                                        ),
+                                        padding: const EdgeInsets.all(0),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ] else ...[
+                                  const Text('Fetching FFmpeg information...'),
+                                ],
+                                const SizedBox(height: 32),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),

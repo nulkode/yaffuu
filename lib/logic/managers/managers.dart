@@ -25,7 +25,7 @@ abstract class BaseFFmpegManager {
 
   bool isCompatible();
 
-  bool isOperationCompatible(Operation operation);
+  Future<bool> isOperationCompatible(Operation operation);
 
   void addOperation(Operation operation);
 }

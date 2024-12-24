@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:yaffuu/logic/classes/exception.dart';
-import 'package:yaffuu/logic/parsing.dart';
+import 'package:yaffuu/logic/ffmpeg.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
 
@@ -34,7 +34,7 @@ class CUDAManager extends BaseFFmpegManager {
   }
 
   @override
-  bool isOperationCompatible(Operation operation) {
+  Future<bool> isOperationCompatible(Operation operation) {
     throw UnimplementedError();
   }
 

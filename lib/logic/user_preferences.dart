@@ -3,7 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UserPreferences {
   static const _keyHasSeenTutorial = 'hasSeenTutorial';
-  static const _keyPreferredHardwareAcceleration = 'preferredHardwareAcceleration';
+  static const _keyPreferredHardwareAcceleration =
+      'preferredHardwareAcceleration';
   static const _keyThemeMode = 'themeMode';
 
   final SharedPreferences _prefs;
@@ -18,8 +19,10 @@ class UserPreferences {
   bool get hasSeenTutorial => _prefs.getBool(_keyHasSeenTutorial) ?? false;
   set hasSeenTutorial(bool value) => _prefs.setBool(_keyHasSeenTutorial, value);
 
-  String get preferredHardwareAcceleration => _prefs.getString(_keyPreferredHardwareAcceleration) ?? 'none';
-  set preferredHardwareAcceleration(String value) => _prefs.setString(_keyPreferredHardwareAcceleration, value);
+  String get preferredHardwareAcceleration =>
+      _prefs.getString(_keyPreferredHardwareAcceleration) ?? 'none';
+  set preferredHardwareAcceleration(String value) =>
+      _prefs.setString(_keyPreferredHardwareAcceleration, value);
 
   ThemeMode get themeMode {
     final themeString = _prefs.getString(_keyThemeMode) ?? 'system';
@@ -33,6 +36,7 @@ class UserPreferences {
         return ThemeMode.system;
     }
   }
+
   set themeMode(ThemeMode value) {
     switch (value) {
       case ThemeMode.light:

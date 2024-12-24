@@ -1,4 +1,4 @@
-import 'package:yaffuu/logic/managers/managers.dart';
+import 'package:yaffuu/logic/classes/compatibility.dart';
 export 'bitrate.dart';
 export 'resolution.dart';
 
@@ -7,7 +7,7 @@ enum ArgumentType {
   input,
   inputFile,
   output,
-  outputFile,
+  outputFormat,
   videoFilter,
   audioFilter,
 }
@@ -31,10 +31,23 @@ enum OperationType {
   all
 }
 
-abstract class Operation {
-  final OperationType type = OperationType.all;
+enum OperationTag {
+  image('Image'),
+  video('Video'),
+  audio('Audio'),
+  format('Format'),
+  other('Other');
 
-  bool isCompatible(BaseFFmpegManager manager);
-  List<Argument> toArguments(BaseFFmpegManager manager);
+  final String displayName;
+
+  const OperationTag(this.displayName);
 }
 
+abstract class Operation {
+  final OperationType type = OperationType.all;
+  final List<OperationTag> tags = const [OperationTag.other];
+
+  bool isCompatible(CompatibilityContext context);
+
+  List<Argument> toArguments();
+}

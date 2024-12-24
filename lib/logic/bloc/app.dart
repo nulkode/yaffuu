@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yaffuu/logic/classes/exception.dart';
-import 'package:yaffuu/logic/parsing.dart';
+import 'package:yaffuu/logic/ffmpeg.dart';
 import 'package:yaffuu/logic/logger.dart';
 import 'package:yaffuu/logic/user_preferences.dart';
 
@@ -56,7 +56,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final prefs = await UserPreferences.getInstance();
       final hasSeenTutorial = prefs.hasSeenTutorial;
 
-      final ffmpegInfo = await checkFFmpegInstallation();
+      final ffmpegInfo = await FFService.getFFmpegInfo();
       final logFilePath = fileLogOutput.logFilePath;
 
       final Directory appDocDir = await getApplicationDocumentsDirectory();

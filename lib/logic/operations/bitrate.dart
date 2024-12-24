@@ -1,12 +1,13 @@
 import 'dart:math';
 
-import 'package:yaffuu/logic/classes/exception.dart';
-import 'package:yaffuu/logic/managers/managers.dart';
+import 'package:yaffuu/logic/classes/compatibility.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
 
 class BitrateOperation implements Operation {
   @override
   final OperationType type = OperationType.moving;
+  @override
+  final List<OperationTag> tags = [OperationTag.audio, OperationTag.video];  
   final int? video;
   final int? audio;
 
@@ -16,16 +17,12 @@ class BitrateOperation implements Operation {
   });
 
   @override
-  bool isCompatible(BaseFFmpegManager manager) {
+  bool isCompatible(CompatibilityContext context) {
     return true;
   }
 
   @override
-  List<Argument> toArguments(BaseFFmpegManager manager) {
-    if (!isCompatible(manager)) {
-      throw OperationNotCompatibleException('Bitrate operation is not compatible with ${manager.acceleration.displayName}.');
-    }
-
+  List<Argument> toArguments() {
     return [
       if (video != null)
         Argument(
@@ -42,14 +39,13 @@ class BitrateOperation implements Operation {
 
   @override
   String toString() {
-    return 
-      video != null && audio != null ?
-        'Change video bitrate to ${formatBytes(video!)}/s and audio bitrate to ${formatBytes(audio!)}/s.' :
-      video != null ?
-        'Change video bitrate to ${formatBytes(video!)}/s.' :
-      audio != null ?
-        'Change audio bitrate to ${formatBytes(audio!)}/s.' :
-        '';
+    return video != null && audio != null
+        ? 'Change video bitrate to ${formatBytes(video!)}/s and audio bitrate to ${formatBytes(audio!)}/s.'
+        : video != null
+            ? 'Change video bitrate to ${formatBytes(video!)}/s.'
+            : audio != null
+                ? 'Change audio bitrate to ${formatBytes(audio!)}/s.'
+                : '';
   }
 }
 

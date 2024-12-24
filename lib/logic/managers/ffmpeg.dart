@@ -5,7 +5,7 @@ import 'dart:collection';
 import 'package:yaffuu/logic/classes/exception.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
-import 'package:yaffuu/logic/parsing.dart';
+import 'package:yaffuu/logic/ffmpeg.dart';
 
 class FFmpegManager extends BaseFFmpegManager {
   // ignore: unused_field
@@ -31,13 +31,13 @@ class FFmpegManager extends BaseFFmpegManager {
   }
 
   @override
-  bool isOperationCompatible(Operation operation) {
-    return true;
+  Future<bool> isOperationCompatible(Operation operation) {
+    return Future.value(true);
   }
 
   @override
-  void addOperation(Operation operation) {
-    if (isOperationCompatible(operation)) {
+  void addOperation(Operation operation) async {
+    if (await isOperationCompatible(operation)) {
       _operations.add(operation);
     } else {
       throw OperationNotCompatibleException('Operation is not compatible');
