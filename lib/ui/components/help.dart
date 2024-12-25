@@ -32,7 +32,7 @@ class HelpDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 300),
+        constraints: const BoxConstraints(maxWidth: 500),
         child: SingleChildScrollView(
           child: AlertDialog(
             title: Text(title),
