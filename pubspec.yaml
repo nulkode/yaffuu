@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   desktop_drop: ^0.5.0
+  dotted_border: ^2.1.0
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.6

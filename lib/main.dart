@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yaffuu/logic/bloc/app.dart';
+import 'package:yaffuu/logic/bloc/dnd.dart';
 import 'package:yaffuu/logic/bloc/hardware_acceleration.dart';
 import 'package:yaffuu/logic/user_preferences.dart';
 import 'package:yaffuu/ui/screens/error.dart';
@@ -10,6 +11,7 @@ import 'package:yaffuu/ui/screens/loading_screen.dart';
 import 'package:yaffuu/ui/screens/home_page.dart';
 import 'package:yaffuu/ui/screens/settings.dart';
 import 'package:yaffuu/logic/bloc/theme.dart';
+import 'package:yaffuu/ui/components/drop_overlay.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +29,7 @@ void main() async {
         BlocProvider(
           create: (context) => HardwareAccelerationBloc(userPreferences),
         ),
+        BlocProvider(create: (context) => DragAndDropBloc()),
       ],
       child: const MainApp(),
     ),
@@ -83,6 +86,14 @@ class MainApp extends StatelessWidget {
           ),
           themeMode: themeMode,
           routerConfig: router,
+          builder: (context, child) {
+            return Stack(
+              children: [
+                child!,
+                const DropOverlay(),
+              ],
+            );
+          },
         );
       },
     );
