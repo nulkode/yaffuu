@@ -29,6 +29,10 @@ class VideoToImageOperation implements Operation {
         type: ArgumentType.output,
         value: '-vframes 1',
       ),
+      Argument(
+        type: ArgumentType.outputFormat,
+        value: 'image2',
+      )
     ];
   }
 
