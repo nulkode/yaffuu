@@ -28,7 +28,6 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    // No need to fetch FFmpegInfo here
   }
 
   @override
@@ -108,8 +107,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         builder: (context, selectedMethod) {
                           final hardwareAccelerations = {
                             'none': 'None',
-                            // Add other hardware acceleration methods here
-                          };
+                          }; // TODO: make this dynamic
 
                           return Column(
                             children:
