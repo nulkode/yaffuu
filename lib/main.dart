@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yaffuu/logic/bloc/app.dart';
-import 'package:yaffuu/logic/bloc/dnd.dart';
+import 'package:yaffuu/logic/bloc/files.dart';
 import 'package:yaffuu/logic/bloc/hardware_acceleration.dart';
 import 'package:yaffuu/logic/user_preferences.dart';
 import 'package:yaffuu/ui/screens/error.dart';
@@ -29,7 +29,7 @@ void main() async {
         BlocProvider(
           create: (context) => HardwareAccelerationBloc(userPreferences),
         ),
-        BlocProvider(create: (context) => DragAndDropBloc()),
+        BlocProvider(create: (context) => FilesBloc()),
       ],
       child: const MainApp(),
     ),
@@ -55,7 +55,7 @@ final GoRouter router = GoRouter(
     ),
     GoRoute(
       path: '/error/ffmpeg-missing',
-      builder: (context, state) => const FfmpegMissingScreen(),
+      builder: (context, state) => const FFmpegMissingScreen(),
     ),
     GoRoute(
       path: '/settings',

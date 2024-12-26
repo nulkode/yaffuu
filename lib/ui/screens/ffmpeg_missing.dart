@@ -8,8 +8,8 @@ import 'package:yaffuu/ui/components/appbar.dart';
 
 // TODO: fix when ffmpeg is successfully installed by winget but it's detected as an error
 
-class FfmpegMissingScreen extends StatelessWidget {
-  const FfmpegMissingScreen({super.key});
+class FFmpegMissingScreen extends StatelessWidget {
+  const FFmpegMissingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

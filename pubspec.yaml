@@ -7,8 +7,10 @@ environment:
   sdk: ^3.5.2
 
 dependencies:
+  cross_file: ^0.3.4+2
   desktop_drop: ^0.5.0
   dotted_border: ^2.1.0
+  file_picker: ^8.1.6
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.6

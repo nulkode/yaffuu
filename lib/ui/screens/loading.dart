@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yaffuu/logic/bloc/app.dart';
+import 'package:yaffuu/logic/bloc/files.dart';
 import 'package:yaffuu/ui/components/logos.dart';
 
 class LoadingScreen extends StatelessWidget {
@@ -16,6 +17,7 @@ class LoadingScreen extends StatelessWidget {
           listener: (context, state) {
             if (state is AppStartSuccess) {
               context.push('/home');
+              context.read<FilesBloc>().add(AcceptFilesEvent());
             } else if (state is AppStartFailure) {
               if (state.errorType == AppErrorType.ffmpegMissing) {
                 context.push('/error/ffmpeg-missing');

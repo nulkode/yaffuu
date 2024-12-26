@@ -1,9 +1,8 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yaffuu/logic/bloc/dnd.dart';
+import 'package:yaffuu/logic/bloc/files.dart';
 import 'package:desktop_drop/desktop_drop.dart';
-import 'package:yaffuu/logic/logger.dart';
 
 class DropOverlay extends StatefulWidget {
   const DropOverlay({super.key});
@@ -20,30 +19,43 @@ class _DropOverlayState extends State<DropOverlay> {
     return IgnorePointer(
       child: DropTarget(
         onDragEntered: (detail) {
-          logger.d('Drag entered');
           setState(() {
             _dragging = true;
           });
         },
         onDragExited: (detail) {
-          logger.d('Drag exited');
           setState(() {
             _dragging = false;
           });
         },
         onDragDone: (detail) {
-          logger.d('Drag done');
           setState(() {
             _dragging = false;
           });
+
+          if (detail.files.isNotEmpty) {
+            if (detail.files.length > 1) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Only one file at a time (for now)'),
+                ),
+              );
+
+              return;
+            }
+
+            context.read<FilesBloc>().add(SubmitFilesEvent(detail.files.first));
+          }
         },
         child: Opacity(
           opacity: _dragging ? 1.0 : 0.0,
-          child: BlocBuilder<DragAndDropBloc, DragAndDropState>(
+          child: BlocBuilder<FilesBloc, FilesState>(
             builder: (context, state) {
+              final canDrop = state is AcceptingFilesState;
+
               return Container(
                 decoration: BoxDecoration(
-                  color: state.canDrop
+                  color: canDrop
                       ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
                       : Colors.red.withOpacity(0.5),
                 ),
@@ -55,7 +67,7 @@ class _DropOverlayState extends State<DropOverlay> {
                   borderType: BorderType.RRect,
                   child: Center(
                     child: Icon(
-                      state.canDrop ? Icons.add : Icons.block,
+                      canDrop ? Icons.add : Icons.block,
                       color: Colors.white,
                       size: 100.0,
                     ),
