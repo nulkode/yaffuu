@@ -1,20 +1,24 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yaffuu/logic/user_preferences.dart';
 
-class UpdateHardwareAccelerationMethod {
+class HardwareAccelerationEvent {
   final String method;
-  UpdateHardwareAccelerationMethod(this.method);
+  HardwareAccelerationEvent(this.method);
+}
+
+class HardwareAccelerationState {
+  final String method;
+  HardwareAccelerationState(this.method);
 }
 
 class HardwareAccelerationBloc
-    extends Bloc<UpdateHardwareAccelerationMethod, String> {
-  final UserPreferences _prefs;
-
-  HardwareAccelerationBloc(this._prefs)
-      : super(_prefs.selectedHardwareAcceleration) {
-    on<UpdateHardwareAccelerationMethod>((event, emit) {
-      _prefs.setSelectedHardwareAcceleration(event.method);
-      emit(event.method);
+    extends Bloc<HardwareAccelerationEvent, HardwareAccelerationState> {
+  HardwareAccelerationBloc(UserPreferences userPreferences)
+      : super(HardwareAccelerationState(
+            userPreferences.preferredHardwareAcceleration)) {
+    on<HardwareAccelerationEvent>((event, emit) {
+      userPreferences.preferredHardwareAcceleration = event.method;
+      emit(HardwareAccelerationState(event.method));
     });
   }
 }

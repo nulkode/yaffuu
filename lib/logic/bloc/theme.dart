@@ -5,24 +5,23 @@ import 'package:yaffuu/logic/user_preferences.dart';
 enum ThemeEvent { light, dark, system }
 
 class ThemeBloc extends Bloc<ThemeEvent, ThemeMode> {
-  final UserPreferences _prefs;
-
-  ThemeBloc(this._prefs) : super(_prefs.themeMode) {
+  ThemeBloc(UserPreferences userPreferences)
+      : super(userPreferences.themeMode) {
     on<ThemeEvent>((event, emit) {
-      ThemeMode newMode;
       switch (event) {
         case ThemeEvent.light:
-          newMode = ThemeMode.light;
+          userPreferences.themeMode = ThemeMode.light;
+          emit(ThemeMode.light);
           break;
         case ThemeEvent.dark:
-          newMode = ThemeMode.dark;
+          userPreferences.themeMode = ThemeMode.dark;
+          emit(ThemeMode.dark);
           break;
         case ThemeEvent.system:
-          newMode = ThemeMode.system;
+          userPreferences.themeMode = ThemeMode.system;
+          emit(ThemeMode.system);
           break;
       }
-      _prefs.themeMode = newMode;
-      emit(newMode);
     });
   }
 }
