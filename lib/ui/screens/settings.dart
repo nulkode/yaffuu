@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yaffuu/logic/bloc/app.dart';
 import 'package:yaffuu/logic/ffmpeg.dart';
+import 'package:yaffuu/main.dart';
 import 'package:yaffuu/styles/text.dart';
 import 'package:yaffuu/ui/components/appbar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yaffuu/ui/components/help.dart';
 import 'package:yaffuu/logic/bloc/theme.dart';
 import 'package:yaffuu/logic/bloc/hardware_acceleration.dart';
+import 'package:yaffuu/ui/screens/loading.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -17,12 +18,8 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  FFmpegInfo? get _ffmpegInfo {
-    final state = context.read<AppBloc>().state;
-    if (state is AppStartSuccess) {
-      return state.ffmpegInfo;
-    }
-    return null;
+  FFmpegInfo get _ffmpegInfo {
+    return getIt<AppInfo>().ffmpegInfo;
   }
 
   @override
@@ -47,7 +44,7 @@ class _SettingsPageState extends State<SettingsPage> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
           child: BlocBuilder<ThemeBloc, ThemeMode>(
-            builder: (context, themeMode) {
+            builder: (context, theme) {
               return SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -61,7 +58,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         children: [
                           ThemeRadio(
                             value: ThemeMode.system,
-                            groupValue: themeMode,
+                            groupValue: theme,
                             icon: Icons.settings,
                             text: 'System Theme',
                             onChanged: (value) {
@@ -71,7 +68,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           const SizedBox(height: 16),
                           ThemeRadio(
                             value: ThemeMode.light,
-                            groupValue: themeMode,
+                            groupValue: theme,
                             icon: Icons.wb_sunny,
                             text: 'Light Theme',
                             onChanged: (value) {
@@ -81,7 +78,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           const SizedBox(height: 16),
                           ThemeRadio(
                             value: ThemeMode.dark,
-                            groupValue: themeMode,
+                            groupValue: theme,
                             icon: Icons.nights_stay,
                             text: 'Dark Theme',
                             onChanged: (value) {
@@ -103,7 +100,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      BlocBuilder<HardwareAccelerationBloc, String>(
+                      BlocBuilder<HardwareAccelerationBloc, HardwareAccelerationState>(
                         builder: (context, selectedMethod) {
                           final hardwareAccelerations = {
                             'none': 'None',
@@ -123,13 +120,13 @@ class _SettingsPageState extends State<SettingsPage> {
                                       children: [
                                         Radio<String>(
                                           value: id,
-                                          groupValue: selectedMethod,
+                                          groupValue: selectedMethod.method,
                                           onChanged: (value) {
                                             context
                                                 .read<
                                                     HardwareAccelerationBloc>()
                                                 .add(
-                                                    UpdateHardwareAccelerationMethod(
+                                                    HardwareAccelerationEvent(
                                                         value!));
                                           },
                                         ),
@@ -148,49 +145,43 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: 32),
                       const Text('FFmpeg Information', style: titleStyle),
                       const SizedBox(height: 8),
-                      BlocBuilder<AppBloc, AppState>(
-                        builder: (context, state) {
-                          return SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (_ffmpegInfo != null) ...[
-                                  Text('Version: ${_ffmpegInfo!.version}'),
-                                  const SizedBox(height: 8),
-                                  Text(_ffmpegInfo!.copyright
-                                      .replaceAll('(c)', '©')),
-                                  const SizedBox(height: 8),
-                                  Text('Built With: ${_ffmpegInfo!.builtWith}'),
-                                  const SizedBox(height: 16),
-                                  ConfigurationSection(ffmpegInfo: _ffmpegInfo),
-                                  const SizedBox(height: 16),
-                                  LibrariesSection(ffmpegInfo: _ffmpegInfo),
-                                  const SizedBox(height: 16),
-                                  const Text('Hardware Acceleration Methods',
-                                      style: subtitleStyle),
-                                  const SizedBox(height: 8),
-                                  Wrap(
-                                    spacing: 4.0,
-                                    runSpacing: 4.0,
-                                    children: _ffmpegInfo!
-                                        .hardwareAccelerationMethods!
-                                        .map((config) {
-                                      return Chip(
-                                        label: Text(
-                                          config,
-                                        ),
-                                        padding: const EdgeInsets.all(0),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ] else ...[
-                                  const Text('Fetching FFmpeg information...'),
-                                ],
-                                const SizedBox(height: 32),
-                              ],
-                            ),
-                          );
-                        },
+                      SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+
+                              Text('Version: ${_ffmpegInfo.version}'),
+                              const SizedBox(height: 8),
+                              Text(_ffmpegInfo.copyright
+                                  .replaceAll('(c)', '©')),
+                              const SizedBox(height: 8),
+                              Text('Built With: ${_ffmpegInfo.builtWith}'),
+                              const SizedBox(height: 16),
+                              ConfigurationSection(ffmpegInfo: _ffmpegInfo),
+                              const SizedBox(height: 16),
+                              LibrariesSection(ffmpegInfo: _ffmpegInfo),
+                              const SizedBox(height: 16),
+                              const Text('Hardware Acceleration Methods',
+                                  style: subtitleStyle),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 4.0,
+                                runSpacing: 4.0,
+                                children: _ffmpegInfo
+                                    .hardwareAccelerationMethods!
+                                    .map((config) {
+                                  return Chip(
+                                    label: Text(
+                                      config,
+                                    ),
+                                    padding: const EdgeInsets.all(0),
+                                  );
+                                }).toList(),
+                              ),
+
+                            const SizedBox(height: 32),
+                          ],
+                        ),
                       ),
                     ],
                   ),

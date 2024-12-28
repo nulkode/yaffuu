@@ -1,28 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:yaffuu/logic/bloc/app.dart';
 import 'package:yaffuu/ui/components/appbar.dart';
 
-class ErrorPage extends StatelessWidget {
-  final AppErrorType errorType;
+enum AppErrorType {
+  ffmpegMissing(0),
+  ffmpegNotCompatible(1),
+  ffmpegNotAccessible(2),
+  other(3);
 
-  const ErrorPage({super.key, required this.errorType});
+  final int id;
+  const AppErrorType(this.id);
+}
+
+class ErrorPage extends StatelessWidget {
+  final int errorId;
+  final String? extra;
+
+  const ErrorPage({super.key, required this.errorId, this.extra});
 
   @override
   Widget build(BuildContext context) {
     String errorMessage;
 
+    final errorType = AppErrorType.values.firstWhere(
+      (errorType) => errorType.id == errorId,
+      orElse: () => AppErrorType.other,
+    );
+
     switch (errorType) {
       case AppErrorType.ffmpegMissing:
-        errorMessage =
-            'FFmpeg is not installed or not found in the system path.';
+        errorMessage = 'FFmpeg is missing.';
         break;
-      case AppErrorType.ffmpegOutdated:
-        errorMessage = 'FFmpeg version is not compatible.';
+      case AppErrorType.ffmpegNotCompatible:
+        errorMessage = 'FFmpeg is outdated.';
         break;
       case AppErrorType.ffmpegNotAccessible:
         errorMessage = 'FFmpeg is not accessible.';
         break;
       case AppErrorType.other:
+        errorMessage = 'An unknown error occurred.';
+        break;
+      default:
         errorMessage = 'An unknown error occurred.';
     }
 

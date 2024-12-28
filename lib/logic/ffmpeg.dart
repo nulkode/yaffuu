@@ -127,11 +127,12 @@ class FFmpegInfo {
 const quietVerbose = ['-v', 'quiet'];
 
 abstract class FFService {
-  static Future<FFmpegInfo?> getFFmpegInfo() async {
+  static Future<FFmpegInfo> getFFmpegInfo() async {
     try {
       final versionResult = await Process.run('ffmpeg', ['-version']);
       final hwAccelResult =
           await Process.run('ffmpeg', [...quietVerbose, '-hwaccels']);
+      
       if (versionResult.exitCode == 0 && hwAccelResult.exitCode == 0) {
         final info = FFmpegInfo.parse(
           versionResult.stdout,
@@ -139,14 +140,10 @@ abstract class FFService {
         );
 
         return info;
-      } else if (versionResult.exitCode != 0) {
-        throw FFmpegNotCompatibleException();
-      } else if (hwAccelResult.exitCode != 0) {
-        throw FFmpegNotAccessibleException();
       } else {
-        return null;
+        throw FFmpegException('An unknown error occurred.');
       }
-    } on ProcessException catch (_) {
+    } on ProcessException {
       throw FFmpegNotFoundException();
     } on Exception catch (e) {
       logger.e('An unknown error occurred: $e');
