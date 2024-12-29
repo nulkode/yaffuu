@@ -50,12 +50,4 @@ class UserPreferences {
         break;
     }
   }
-
-  String get selectedHardwareAcceleration {
-    return _prefs.getString('selectedHardwareAcceleration') ?? 'none';
-  }
-
-  Future<void> setSelectedHardwareAcceleration(String method) async {
-    await _prefs.setString('selectedHardwareAcceleration', method);
-  }
 }
