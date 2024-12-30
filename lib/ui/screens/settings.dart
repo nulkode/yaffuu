@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:yaffuu/logic/bloc/queue.dart';
 import 'package:yaffuu/logic/ffmpeg.dart';
+import 'package:yaffuu/logic/managers/cuda.dart';
+import 'package:yaffuu/logic/managers/ffmpeg.dart';
 import 'package:yaffuu/main.dart';
 import 'package:yaffuu/styles/text.dart';
 import 'package:yaffuu/ui/components/appbar.dart';
@@ -100,7 +103,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      BlocBuilder<HardwareAccelerationBloc, HardwareAccelerationState>(
+                      BlocBuilder<HardwareAccelerationBloc,
+                          HardwareAccelerationState>(
                         builder: (context, selectedMethod) {
                           final hardwareAccelerations = {
                             'none': 'None',
@@ -125,9 +129,26 @@ class _SettingsPageState extends State<SettingsPage> {
                                             context
                                                 .read<
                                                     HardwareAccelerationBloc>()
-                                                .add(
-                                                    HardwareAccelerationEvent(
-                                                        value!));
+                                                .add(HardwareAccelerationEvent(
+                                                    value!));
+
+                                            if (value == 'none') {
+                                              context.read<QueueBloc>().add(
+                                                    SetManagerEvent(
+                                                      FFmpegManager(
+                                                          getIt<AppInfo>()
+                                                              .ffmpegInfo),
+                                                    ),
+                                                  );
+                                            } else if (value == 'cuda') {
+                                              context.read<QueueBloc>().add(
+                                                    SetManagerEvent(
+                                                      CUDAManager(
+                                                          getIt<AppInfo>()
+                                                              .ffmpegInfo),
+                                                    ),
+                                                  );
+                                            }
                                           },
                                         ),
                                         const SizedBox(width: 8),
@@ -149,36 +170,32 @@ class _SettingsPageState extends State<SettingsPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-
-                              Text('Version: ${_ffmpegInfo.version}'),
-                              const SizedBox(height: 8),
-                              Text(_ffmpegInfo.copyright
-                                  .replaceAll('(c)', '©')),
-                              const SizedBox(height: 8),
-                              Text('Built With: ${_ffmpegInfo.builtWith}'),
-                              const SizedBox(height: 16),
-                              ConfigurationSection(ffmpegInfo: _ffmpegInfo),
-                              const SizedBox(height: 16),
-                              LibrariesSection(ffmpegInfo: _ffmpegInfo),
-                              const SizedBox(height: 16),
-                              const Text('Hardware Acceleration Methods',
-                                  style: subtitleStyle),
-                              const SizedBox(height: 8),
-                              Wrap(
-                                spacing: 4.0,
-                                runSpacing: 4.0,
-                                children: _ffmpegInfo
-                                    .hardwareAccelerationMethods!
-                                    .map((config) {
-                                  return Chip(
-                                    label: Text(
-                                      config,
-                                    ),
-                                    padding: const EdgeInsets.all(0),
-                                  );
-                                }).toList(),
-                              ),
-
+                            Text('Version: ${_ffmpegInfo.version}'),
+                            const SizedBox(height: 8),
+                            Text(_ffmpegInfo.copyright.replaceAll('(c)', '©')),
+                            const SizedBox(height: 8),
+                            Text('Built With: ${_ffmpegInfo.builtWith}'),
+                            const SizedBox(height: 16),
+                            ConfigurationSection(ffmpegInfo: _ffmpegInfo),
+                            const SizedBox(height: 16),
+                            LibrariesSection(ffmpegInfo: _ffmpegInfo),
+                            const SizedBox(height: 16),
+                            const Text('Hardware Acceleration Methods',
+                                style: subtitleStyle),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 4.0,
+                              runSpacing: 4.0,
+                              children: _ffmpegInfo.hardwareAccelerationMethods!
+                                  .map((config) {
+                                return Chip(
+                                  label: Text(
+                                    config,
+                                  ),
+                                  padding: const EdgeInsets.all(0),
+                                );
+                              }).toList(),
+                            ),
                             const SizedBox(height: 32),
                           ],
                         ),

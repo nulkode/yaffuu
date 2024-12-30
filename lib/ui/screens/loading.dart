@@ -1,11 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:yaffuu/logic/bloc/queue.dart';
 import 'package:yaffuu/logic/classes/exception.dart';
 import 'package:yaffuu/logic/ffmpeg.dart';
 import 'package:yaffuu/logic/logger.dart';
+import 'package:yaffuu/logic/managers/cuda.dart';
+import 'package:yaffuu/logic/managers/ffmpeg.dart';
+import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/user_preferences.dart';
 import 'package:yaffuu/main.dart';
 import 'package:yaffuu/ui/components/logos.dart';
@@ -35,11 +40,14 @@ class _LoadingScreenState extends State<LoadingScreen> {
   int _error = -1;
   bool _toTutorial = false;
   String? extra;
+  late BaseFFmpegManager _manager;
 
   @override
   void initState() {
     super.initState();
     _init(() {
+      context.read<QueueBloc>().add(SetManagerEvent(_manager));
+
       if (_initialized) {
         context.go('/home');
       } else if (_error == 4) {
@@ -71,6 +79,16 @@ class _LoadingScreenState extends State<LoadingScreen> {
       );
 
       getIt.registerSingleton<AppInfo>(appInfo);
+
+      if (prefs.preferredHardwareAcceleration == 'none') {
+        _manager = FFmpegManager(ffmpegInfo);
+      } else if (prefs.preferredHardwareAcceleration == 'cuda') {
+        _manager = CUDAManager(ffmpegInfo);
+      }
+
+      if (!(await _manager.isCompatible())) {
+        throw FFmpegNotCompatibleException();
+      }
 
       // ignore: dead_code
       if (/* !hasSeenTutorial */ false) { // TODO: build tutorial
