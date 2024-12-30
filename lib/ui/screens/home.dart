@@ -76,7 +76,7 @@ class QueueStatus extends StatelessWidget {
                             : state is QueueLoadingState
                                 ? Colors.blue
                                 : Colors.grey;
-                
+
                 final text = state is QueueReadyState
                     ? 'Ready'
                     : state is QueueBusyState
@@ -123,69 +123,59 @@ class FilePickerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<QueueBloc, QueueState>(
-      listener: (context, state) {
-        if (state is QueueReadyState) {
-          context.read<FilesBloc>().add(AcceptFilesEvent());
-        }
-      },
-      child: BlocBuilder<FilesBloc, FilesState>(
-        builder: (context, state) {
-          final disabled =
-              state is BlockedFilesState || state is LoadingFilesState;
-          final loading = state is LoadingFilesState;
-          final showFiles = state is AcceptedFilesState;
+    return BlocBuilder<FilesBloc, FilesState>(builder: (context, state) {
+      final disabled = state is BlockedFilesState || state is LoadingFilesState;
+      final loading = state is LoadingFilesState;
+      final showFiles = state is AcceptedFilesState;
 
-          return Card.outlined(
-            clipBehavior: Clip.hardEdge,
-            child: InkWell(
-              onTap: !disabled
-                  ? () async {
-                      FilePickerResult? result =
-                          await FilePicker.platform.pickFiles(
-                        type: FileType.custom,
-                        allowMultiple: false,
-                        allowedExtensions: ['mp4'],
-                        allowCompression: false,
-                        lockParentWindow: true,
-                      );
+      return Card.outlined(
+        clipBehavior: Clip.hardEdge,
+        child: InkWell(
+          onTap: !disabled
+              ? () async {
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles(
+                    type: FileType.custom,
+                    allowMultiple: false,
+                    allowedExtensions: ['mp4'],
+                    allowCompression: false,
+                    lockParentWindow: true,
+                  );
 
-                      if (result != null && context.mounted) {
-                        context
-                            .read<FilesBloc>()
-                            .add(SubmitFilesEvent(result.xFiles.first));
-                      }
-                    }
-                  : null,
-              child: SizedBox(
-                height: 150,
-                child: Center(
-                  child: !loading
-                      ? (!showFiles
-                          ? const Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.add, size: 48),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Add a new media file',
-                                ),
-                                Text(
-                                  'or drop it here.',
-                                ),
-                              ],
-                            )
-                          : const Text('Not implemented'))
-                      : CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(
-                              Theme.of(context).colorScheme.primary),
-                        ),
-                ),
-              ),
+                  if (result != null && context.mounted) {
+                    context
+                        .read<FilesBloc>()
+                        .add(SubmitFilesEvent(result.xFiles.first));
+                  }
+                }
+              : null,
+          child: SizedBox(
+            height: 150,
+            child: Center(
+              child: !loading
+                  ? (!showFiles
+                      ? const Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.add, size: 48),
+                            SizedBox(height: 8),
+                            Text(
+                              'Add a new media file',
+                            ),
+                            Text(
+                              'or drop it here.',
+                            ),
+                          ],
+                        )
+                      : const Text('Not implemented'))
+                  : CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation(
+                          Theme.of(context).colorScheme.primary),
+                    ),
             ),
-          );
-        },
-      ),
-    );
+          ),
+        ),
+      );
+    });
   }
 }

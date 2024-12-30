@@ -96,6 +96,20 @@ class MainApp extends StatelessWidget {
               children: [
                 child!,
                 const DropOverlay(),
+                BlocBuilder<QueueBloc, QueueState> (
+                  builder: (context, state) {
+                    return ValueListenableBuilder<RouteInformation>(
+                      valueListenable: router.routeInformationProvider,
+                      builder: (context, route, child) {
+                        if (state is QueueReadyState && route.uri.path == '/home') {
+                          context.read<FilesBloc>().add(AcceptFilesEvent());
+                        }
+
+                        return const SizedBox.shrink();
+                      },
+                    );
+                  },
+                ),
               ],
             );
           },
