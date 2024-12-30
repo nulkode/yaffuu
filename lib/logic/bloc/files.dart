@@ -43,6 +43,10 @@ class FilesBloc extends Bloc<FilesEvent, FilesState> {
   }
 
   void _onSubmitFiles(SubmitFilesEvent event, Emitter<FilesState> emit) {
+    if (state is! AcceptingFilesState) {
+      return;
+    }
+
     emit(LoadingFilesState());
 
     // TODO: generate a thumbnail
