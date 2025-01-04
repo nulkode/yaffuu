@@ -6,10 +6,8 @@ import 'package:yaffuu/logic/operations/operations.dart';
 class BitrateOperation implements Operation {
   @override
   final OperationType type = OperationType.moving;
-  @override
-  final List<OperationTag> tags = [OperationTag.audio, OperationTag.video];  
-  final int? video;
-  final int? audio;
+  int? video;
+  int? audio;
 
   BitrateOperation({
     this.video,

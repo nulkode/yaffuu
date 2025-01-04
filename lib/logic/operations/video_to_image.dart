@@ -4,9 +4,7 @@ import 'package:yaffuu/logic/operations/operations.dart';
 class VideoToImageOperation implements Operation {
   @override
   final OperationType type = OperationType.video;
-  @override
-  final List<OperationTag> tags = [OperationTag.video];  
-  final Duration? position;
+  Duration? position;
 
   VideoToImageOperation({
     this.position,
@@ -23,7 +21,8 @@ class VideoToImageOperation implements Operation {
       if (position != null)
         Argument(
           type: ArgumentType.output,
-          value: '-ss ${position!.inSeconds}', // TODO: check how decimals are handled
+          value:
+              '-ss ${position!.inSeconds}', // TODO: check how decimals are handled
         ),
       Argument(
         type: ArgumentType.output,
@@ -43,7 +42,8 @@ class VideoToImageOperation implements Operation {
       final hours = position!.inHours.toString().padLeft(2, '0');
       final minutes = (position!.inMinutes % 60).toString().padLeft(2, '0');
       final seconds = (position!.inSeconds % 60).toString().padLeft(2, '0');
-      final milliseconds = (position!.inMilliseconds % 1000).toString().padLeft(3, '0');
+      final milliseconds =
+          (position!.inMilliseconds % 1000).toString().padLeft(3, '0');
       return 'Video to image at $hours:$minutes:$seconds.$milliseconds';
     } else {
       return 'Video to image';

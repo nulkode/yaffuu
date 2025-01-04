@@ -4,10 +4,8 @@ import 'package:yaffuu/logic/operations/operations.dart';
 class ResolutionChangeOperation implements Operation {
   @override
   final OperationType type = OperationType.visual;
-  @override
-  final List<OperationTag> tags = [OperationTag.image];
-  final int width;
-  final int height;
+  int width;
+  int height;
 
   ResolutionChangeOperation({
     required this.width,

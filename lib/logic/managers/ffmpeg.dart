@@ -2,7 +2,6 @@
 
 import 'dart:collection';
 
-import 'package:yaffuu/logic/classes/exception.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
 import 'package:yaffuu/logic/ffmpeg.dart';
@@ -13,11 +12,7 @@ class FFmpegManager extends BaseFFmpegManager {
   // ignore: unused_field
   final FFmpegInfo _ffmpegInfo;
 
-  FFmpegManager(this._ffmpegInfo) {
-    if (!isCompatible()) {
-      throw FFmpegNotCompatibleException();
-    }
-  }
+  FFmpegManager(this._ffmpegInfo);
 
   @override
   Stream<double> get progress async* {
@@ -25,9 +20,9 @@ class FFmpegManager extends BaseFFmpegManager {
   }
 
   @override
-  bool isCompatible() {
+  Future<bool> isCompatible() {
     // TODO: check versions, libraries, configurations, etc.
-    return true;
+    return Future.value(true);
   }
 
   @override
@@ -37,10 +32,6 @@ class FFmpegManager extends BaseFFmpegManager {
 
   @override
   void addOperation(Operation operation) async {
-    if (await isOperationCompatible(operation)) {
-      _operations.add(operation);
-    } else {
-      throw OperationNotCompatibleException('Operation is not compatible');
-    }
+    _operations.add(operation);
   }
 }
