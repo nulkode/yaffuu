@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yaffuu/ui/components/help.dart';
 import 'package:yaffuu/logic/bloc/theme.dart';
 import 'package:yaffuu/logic/bloc/hardware_acceleration.dart';
+import 'package:yaffuu/ui/components/logos.dart';
 import 'package:yaffuu/ui/screens/loading.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -23,6 +24,14 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   FFmpegInfo get _ffmpegInfo {
     return getIt<AppInfo>().ffmpegInfo;
+  }
+
+  bool _isCopyrightExpanded = false;
+
+  void _toggleCopyrightExpand() {
+    setState(() {
+      _isCopyrightExpanded = !_isCopyrightExpanded;
+    });
   }
 
   @override
@@ -192,6 +201,63 @@ class _SettingsPageState extends State<SettingsPage> {
                           );
                         }).toList(),
                       ),
+                      const SizedBox(height: 32),
+                      const Stack(
+                        children: [
+                          YaffuuLogo(width: 250),
+                          Positioned(
+                            bottom: 0,
+                            left: 35,
+                            child: Text('by nulkode'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              // Add your donation link or functionality here
+                            },
+                            icon: const Icon(Icons.favorite, color: Colors.red),
+                            label: const Text('Donate'),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text('Half of the donations will be donated to ffmpeg.'),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      const Text('yet another ffmpeg wrapper, version 0.1.0.'),
+                      const SizedBox(height: 8),
+                        const Text(
+                          '''
+Copyright © 2025 nulkode
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+                            ''',
+                          style: const TextStyle(fontSize: 12.0),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text('FFmpeg is a trademark of Fabrice Bellard. yaffuu is not affiliated with FFmpeg.'),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            showLicensePage(
+                              context: context,
+                            );
+                          },
+                          child: const Text('Show Licenses'),
+                        ),
+
+                      
                       const SizedBox(height: 32),
                     ],
                   ),
