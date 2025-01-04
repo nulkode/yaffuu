@@ -23,7 +23,7 @@ abstract class BaseFFmpegManager {
 
   Stream<double> get progress;
 
-  bool isCompatible();
+  Future<bool> isCompatible();
 
   Future<bool> isOperationCompatible(Operation operation);
 

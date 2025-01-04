@@ -31,21 +31,8 @@ enum OperationType {
   all
 }
 
-enum OperationTag {
-  image('Image'),
-  video('Video'),
-  audio('Audio'),
-  format('Format'),
-  other('Other');
-
-  final String displayName;
-
-  const OperationTag(this.displayName);
-}
-
 abstract class Operation {
   final OperationType type = OperationType.all;
-  final List<OperationTag> tags = const [OperationTag.other];
 
   bool isCompatible(CompatibilityContext context);
 
