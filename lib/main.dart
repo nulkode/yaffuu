@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yaffuu/logic/bloc/files.dart';
 import 'package:yaffuu/logic/bloc/hardware_acceleration.dart';
 import 'package:yaffuu/logic/bloc/queue.dart';
 import 'package:yaffuu/logic/user_preferences.dart';
@@ -29,7 +28,6 @@ void main() async {
         BlocProvider(
           create: (context) => HardwareAccelerationBloc(userPreferences),
         ),
-        BlocProvider(create: (context) => FilesBloc()),
         BlocProvider(create: (context) => QueueBloc()),
       ],
       child: const MainApp(),
@@ -96,20 +94,6 @@ class MainApp extends StatelessWidget {
               children: [
                 child!,
                 const DropOverlay(),
-                BlocBuilder<QueueBloc, QueueState> (
-                  builder: (context, state) {
-                    return ValueListenableBuilder<RouteInformation>(
-                      valueListenable: router.routeInformationProvider,
-                      builder: (context, route, child) {
-                        if (state is QueueReadyState && route.uri.path == '/home') {
-                          context.read<FilesBloc>().add(AcceptFilesEvent());
-                        }
-
-                        return const SizedBox.shrink();
-                      },
-                    );
-                  },
-                ),
               ],
             );
           },

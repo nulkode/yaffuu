@@ -1,7 +1,7 @@
+import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yaffuu/logic/bloc/files.dart';
 import 'package:yaffuu/logic/bloc/queue.dart';
 import 'package:yaffuu/styles/text.dart';
 import 'package:yaffuu/ui/components/appbar.dart';
@@ -123,10 +123,10 @@ class FilePickerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FilesBloc, FilesState>(builder: (context, state) {
-      final disabled = state is BlockedFilesState || state is LoadingFilesState;
-      final loading = state is LoadingFilesState;
-      final showFiles = state is AcceptedFilesState;
+    return BlocBuilder<QueueBloc, QueueState>(builder: (context, state) {
+      final disabled = state is! QueueReadyState;
+      final loading = state is QueueLoadingState;
+      final showFiles = state is QueueReadyState && state.file is XFile;
 
       return Card.outlined(
         clipBehavior: Clip.hardEdge,
@@ -144,8 +144,8 @@ class FilePickerCard extends StatelessWidget {
 
                   if (result != null && context.mounted) {
                     context
-                        .read<FilesBloc>()
-                        .add(SubmitFilesEvent(result.xFiles.first));
+                        .read<QueueBloc>()
+                        .add(AddFileEvent(result.xFiles.first));
                   }
                 }
               : null,
