@@ -166,40 +166,33 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: 32),
                       const Text('FFmpeg Information', style: titleStyle),
                       const SizedBox(height: 8),
-                      SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Version: ${_ffmpegInfo.version}'),
-                            const SizedBox(height: 8),
-                            Text(_ffmpegInfo.copyright.replaceAll('(c)', '©')),
-                            const SizedBox(height: 8),
-                            Text('Built With: ${_ffmpegInfo.builtWith}'),
-                            const SizedBox(height: 16),
-                            ConfigurationSection(ffmpegInfo: _ffmpegInfo),
-                            const SizedBox(height: 16),
-                            LibrariesSection(ffmpegInfo: _ffmpegInfo),
-                            const SizedBox(height: 16),
-                            const Text('Hardware Acceleration Methods',
-                                style: subtitleStyle),
-                            const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 4.0,
-                              runSpacing: 4.0,
-                              children: _ffmpegInfo.hardwareAccelerationMethods!
-                                  .map((config) {
-                                return Chip(
-                                  label: Text(
-                                    config,
-                                  ),
-                                  padding: const EdgeInsets.all(0),
-                                );
-                              }).toList(),
+                      Text('Version: ${_ffmpegInfo.version}'),
+                      const SizedBox(height: 8),
+                      Text(_ffmpegInfo.copyright.replaceAll('(c)', '©')),
+                      const SizedBox(height: 8),
+                      Text('Built With: ${_ffmpegInfo.builtWith}'),
+                      const SizedBox(height: 16),
+                      ConfigurationSection(ffmpegInfo: _ffmpegInfo),
+                      const SizedBox(height: 16),
+                      LibrariesSection(ffmpegInfo: _ffmpegInfo),
+                      const SizedBox(height: 16),
+                      const Text('Hardware Acceleration Methods',
+                          style: subtitleStyle),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 4.0,
+                        runSpacing: 4.0,
+                        children: _ffmpegInfo.hardwareAccelerationMethods!
+                            .map((config) {
+                          return Chip(
+                            label: Text(
+                              config,
                             ),
-                            const SizedBox(height: 32),
-                          ],
-                        ),
+                            padding: const EdgeInsets.all(0),
+                          );
+                        }).toList(),
                       ),
+                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
