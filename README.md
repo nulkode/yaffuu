@@ -1,4 +1,4 @@
-# yaffuu
+![](assets/images/yaffuu_dark.svg)
 
 `yaffuu` (Yet Another FFmpeg Wrapper) is a simple and easy-to-use UI for FFmpeg.
 
