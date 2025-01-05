@@ -26,14 +26,6 @@ class _SettingsPageState extends State<SettingsPage> {
     return getIt<AppInfo>().ffmpegInfo;
   }
 
-  bool _isCopyrightExpanded = false;
-
-  void _toggleCopyrightExpand() {
-    setState(() {
-      _isCopyrightExpanded = !_isCopyrightExpanded;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
