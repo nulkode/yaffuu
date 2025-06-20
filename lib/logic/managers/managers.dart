@@ -1,11 +1,12 @@
+import 'package:cross_file/cross_file.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
 
-class Acceleration {
+class AccelerationInformation {
   final String id;
   final String displayName;
   final bool implemented;
 
-  Acceleration({
+  AccelerationInformation({
     required this.id,
     required this.displayName,
     required this.implemented,
@@ -13,7 +14,7 @@ class Acceleration {
 }
 
 abstract class BaseFFmpegManager {
-  final Acceleration acceleration = Acceleration(
+  final AccelerationInformation acceleration = AccelerationInformation(
     id: 'none',
     displayName: 'None',
     implemented: true,
@@ -27,5 +28,7 @@ abstract class BaseFFmpegManager {
 
   Future<bool> isOperationCompatible(Operation operation);
 
-  void addOperation(Operation operation);
+  void setFile(XFile file);
+
+  void execute(Operation operation);
 }

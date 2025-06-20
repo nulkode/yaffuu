@@ -8,6 +8,7 @@ enum ArgumentType {
   inputFile,
   output,
   outputFormat,
+  outputExtension,
   videoFilter,
   audioFilter,
 }

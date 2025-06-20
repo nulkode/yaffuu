@@ -1,20 +1,19 @@
-import 'dart:collection';
-
+import 'package:cross_file/cross_file.dart';
 import 'package:yaffuu/logic/ffmpeg.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
 
 class CUDAManager extends BaseFFmpegManager {
   @override
-  Acceleration get acceleration => Acceleration(
+  AccelerationInformation get acceleration => AccelerationInformation(
         id: 'cuda',
         displayName: 'CUDA',
         implemented: false,
       );
   // ignore: unused_field
-  final Queue<Operation> _operations = Queue<Operation>();
-  // ignore: unused_field
   final FFmpegInfo _ffmpegInfo;
+  // ignore: unused_field
+  XFile? _file;
 
   CUDAManager(this._ffmpegInfo);
 
@@ -34,7 +33,12 @@ class CUDAManager extends BaseFFmpegManager {
   }
 
   @override
-  void addOperation(Operation operation) {
+  void execute(Operation operation) {
     throw UnimplementedError();
+  }
+
+    @override
+  void setFile(XFile file) {
+    _file = file;
   }
 }

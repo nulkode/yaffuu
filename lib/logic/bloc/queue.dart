@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yaffuu/logic/classes/exception.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
+import 'package:yaffuu/logic/operations/video_to_image.dart';
 
 abstract class QueueEvent {}
 
@@ -46,12 +47,21 @@ class AddFileEvent extends QueueEvent {
 
 class RemoveFileEvent extends QueueEvent {}
 
+class SetThumbnailEvent extends QueueEvent {
+  final String thumbnail;
+
+  SetThumbnailEvent(this.thumbnail);
+}
+
+class RemoveThumbnailEvent extends QueueEvent {}
+
 abstract class QueueState {}
 
 abstract class QueueFileState extends QueueState {
   final XFile? file;
+  final String? thumbnail;
 
-  QueueFileState(this.file);
+  QueueFileState(this.file, this.thumbnail);
 }
 
 class QueueLoadingState extends QueueState {}
@@ -60,7 +70,7 @@ class QueueReadyState extends QueueFileState {
   final BaseFFmpegManager manager;
   final Operation? operation;
 
-  QueueReadyState(this.manager, this.operation, super.file);
+  QueueReadyState(this.manager, this.operation, super.file, [super.thumbnail]);
 }
 
 class QueueBusyState extends QueueFileState {
@@ -68,7 +78,7 @@ class QueueBusyState extends QueueFileState {
   final Operation operation;
   final double progress;
 
-  QueueBusyState(this.manager, this.operation, this.progress, super.file);
+  QueueBusyState(this.manager, this.operation, this.progress, super.file, [super.thumbnail]);
 }
 
 class QueueErrorState extends QueueFileState {
@@ -76,7 +86,7 @@ class QueueErrorState extends QueueFileState {
   final Operation? operation;
   final Exception exception;
 
-  QueueErrorState(this.manager, this.operation, this.exception, super.file);
+  QueueErrorState(this.manager, this.operation, this.exception, super.file, [super.thumbnail]);
 }
 
 class QueueBloc extends Bloc<QueueEvent, QueueState> {
@@ -89,6 +99,8 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
     on<SetManagerEvent>(_onSetManager);
     on<AddFileEvent>(_onAddFile);
     on<RemoveFileEvent>(_onRemoveFile);
+    on<SetThumbnailEvent>(_onSetThumbnail);
+    on<RemoveThumbnailEvent>(_onRemoveThumbnail);
   }
 
   void _onAddOperation(
@@ -101,7 +113,8 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
 
     final manager = (state as QueueReadyState).manager;
     final file = (state as QueueReadyState).file;
-    emit(QueueReadyState(manager, event.operation, file));
+    final thumbnail = (state as QueueReadyState).thumbnail;
+    emit(QueueReadyState(manager, event.operation, file, thumbnail));
   }
 
   void _onRemoveOperation(
@@ -114,7 +127,8 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
 
     final manager = (state as QueueReadyState).manager;
     final file = (state as QueueReadyState).file;
-    emit(QueueReadyState(manager, null, file));
+    final thumbnail = (state as QueueReadyState).thumbnail;
+    emit(QueueReadyState(manager, null, file, thumbnail));
   }
 
   void _onClear(
@@ -127,7 +141,8 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
 
     final manager = (state as QueueErrorState).manager;
     final file = (state as QueueErrorState).file;
-    emit(QueueReadyState(manager, null, file));
+    final thumbnail = (state as QueueErrorState).thumbnail;
+    emit(QueueReadyState(manager, null, file, thumbnail));
   }
 
   void _onStop(
@@ -142,7 +157,8 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
 
     final manager = (state as QueueBusyState).manager;
     final file = (state as QueueBusyState).file;
-    emit(QueueReadyState(manager, null, file));
+    final thumbnail = (state as QueueBusyState).thumbnail;
+    emit(QueueReadyState(manager, null, file, thumbnail));
   }
 
   void _onStart(
@@ -156,14 +172,15 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
     final manager = (state as QueueReadyState).manager;
     final file = (state as QueueReadyState).file;
     final operation = (state as QueueReadyState).operation;
+    final thumbnail = (state as QueueReadyState).thumbnail;
     if (operation == null) {
       return emit(
-          QueueErrorState(manager, null, Exception('No operation'), file));
+          QueueErrorState(manager, null, Exception('No operation'), file, thumbnail));
     }
 
     // TODO: start operation
 
-    emit(QueueBusyState(manager, operation, 0, file));
+    emit(QueueBusyState(manager, operation, 0, file, thumbnail));
   }
 
   void _onSetManager(
@@ -191,8 +208,13 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
     }
 
     final manager = (state as QueueReadyState).manager;
+    
+    emit(QueueLoadingState());
+
     final file = event.file;
-    emit(QueueReadyState(manager, null, file));
+
+    manager.execute(VideoToImageOperation(position: const Duration(seconds: 1)));
+    
   }
 
   void _onRemoveFile(
@@ -204,6 +226,35 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
     }
 
     final manager = (state as QueueReadyState).manager;
-    emit(QueueReadyState(manager, null, null));
+    final thumbnail = (state as QueueReadyState).thumbnail;
+    emit(QueueReadyState(manager, null, null, thumbnail));
+  }
+
+  void _onSetThumbnail(
+    SetThumbnailEvent event,
+    Emitter<QueueState> emit,
+  ) {
+    if (state is! QueueReadyState) {
+      return;
+    }
+
+    final manager = (state as QueueReadyState).manager;
+    final file = (state as QueueReadyState).file;
+    final operation = (state as QueueReadyState).operation;
+    emit(QueueReadyState(manager, operation, file, event.thumbnail));
+  }
+
+  void _onRemoveThumbnail(
+    RemoveThumbnailEvent event,
+    Emitter<QueueState> emit,
+  ) {
+    if (state is! QueueReadyState) {
+      return;
+    }
+
+    final manager = (state as QueueReadyState).manager;
+    final file = (state as QueueReadyState).file;
+    final operation = (state as QueueReadyState).operation;
+    emit(QueueReadyState(manager, operation, file, null));
   }
 }
