@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yaffuu/licenses.dart';
 import 'package:yaffuu/logic/bloc/hardware_acceleration.dart';
 import 'package:yaffuu/logic/bloc/queue.dart';
 import 'package:yaffuu/logic/user_preferences.dart';
@@ -19,8 +18,6 @@ final getIt = GetIt.instance;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final userPreferences = await UserPreferences.getInstance();
-
-  registerAdditionalLicenses();
 
   runApp(
     MultiBlocProvider(
