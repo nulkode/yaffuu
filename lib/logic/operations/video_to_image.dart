@@ -1,5 +1,6 @@
 import 'package:yaffuu/logic/classes/compatibility.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
+import 'package:yaffuu/logic/managers/managers.dart';
 
 class VideoToImageOperation implements Operation {
   @override
@@ -14,10 +15,10 @@ class VideoToImageOperation implements Operation {
   bool isCompatible(CompatibilityContext context) {
     return true;
   }
-
   @override
-  List<Argument> toArguments() {
-    return [
+  List<Argument> toArguments([BaseFFmpegManager? manager]) {
+    // Base arguments that work for all managers
+    List<Argument> baseArgs = [
       if (position != null)
         Argument(
           type: ArgumentType.output,
@@ -37,6 +38,31 @@ class VideoToImageOperation implements Operation {
         value: '.png', // TODO: allow to change output format
       ),
     ];
+
+    // Add manager-specific arguments if manager is provided
+    if (manager != null) {
+      switch (manager.acceleration.id) {
+        case 'cuda':
+          // Add CUDA-specific arguments for hardware acceleration
+          baseArgs.addAll([
+            Argument(
+              type: ArgumentType.global,
+              value: '-hwaccel cuda',
+            ),
+            Argument(
+              type: ArgumentType.global,
+              value: '-hwaccel_output_format cuda',
+            ),
+          ]);
+          break;
+        case 'none':
+        default:
+          // No additional arguments needed for software decoding
+          break;
+      }
+    }
+
+    return baseArgs;
   }
 
   @override

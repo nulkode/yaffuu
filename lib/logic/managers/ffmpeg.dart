@@ -48,7 +48,7 @@ class FFmpegManager extends BaseFFmpegManager {
 
     final appInfo = getIt<AppInfo>();
 
-    final arguments = operation.toArguments();
+    final arguments = operation.toArguments(this);
 
     final outputExtensionArgs = arguments
         .where((element) => element.type == ArgumentType.outputExtension);

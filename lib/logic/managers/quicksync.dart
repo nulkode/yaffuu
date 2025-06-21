@@ -4,11 +4,11 @@ import 'package:yaffuu/logic/ffmpeg.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
 
-class CUDAManager extends BaseFFmpegManager {
+class QuickSyncManager extends BaseFFmpegManager {
   @override
   AccelerationInformation get acceleration => AccelerationInformation(
-        id: 'cuda',
-        displayName: 'NVIDIA CUDA',
+        id: 'quicksync',
+        displayName: 'Intel Quick Sync',
         implemented: false,
       );
       
@@ -18,7 +18,7 @@ class CUDAManager extends BaseFFmpegManager {
   XFile? _file;
   XFile? _lastOutput;
 
-  CUDAManager(this._ffmpegInfo);
+  QuickSyncManager(this._ffmpegInfo);
 
   @override
   XFile? get lastOutput => _lastOutput;
@@ -35,12 +35,11 @@ class CUDAManager extends BaseFFmpegManager {
 
   @override
   Future<bool> isCompatible() async {
-    // TODO: Check if NVIDIA CUDA is available
+    // TODO: Check if Intel Quick Sync is available
     // This would typically involve checking:
-    // 1. NVIDIA GPU presence
-    // 2. CUDA drivers installed
-    // 3. FFmpeg built with NVENC/NVDEC support
-    // 4. Compatible GPU architecture (Pascal or newer for modern codecs)
+    // 1. Intel GPU presence
+    // 2. FFmpeg built with QSV support
+    // 3. Driver compatibility
     return false; // Not implemented yet
   }
 
@@ -48,7 +47,7 @@ class CUDAManager extends BaseFFmpegManager {
   Future<bool> isOperationCompatible(Operation operation) async {
     if (!await isCompatible()) return false;
     
-    // CUDA is mainly for video operations
+    // Quick Sync is mainly for video operations
     return operation.type == OperationType.video || 
            operation.type == OperationType.moving ||
            operation.type == OperationType.visual ||

@@ -1,4 +1,5 @@
 import 'package:yaffuu/logic/classes/compatibility.dart';
+import 'package:yaffuu/logic/managers/managers.dart';
 
 enum ArgumentType {
   global,
@@ -35,5 +36,5 @@ abstract class Operation {
 
   bool isCompatible(CompatibilityContext context);
 
-  List<Argument> toArguments();
+  List<Argument> toArguments([BaseFFmpegManager? manager]);
 }
