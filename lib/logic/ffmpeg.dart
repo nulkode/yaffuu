@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:yaffuu/logic/classes/exception.dart';
-import 'package:yaffuu/logic/classes/media.dart';
 import 'package:yaffuu/logic/classes/progress.dart';
 import 'package:yaffuu/logic/logger.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
@@ -128,7 +127,7 @@ class FFmpegInfo {
   }
 }
 
-const quietVerbose = ['-v', 'quiet'];
+const quietVerbose = ['-v', 'error', '-hide_banner'];
 
 abstract class FFService {
   static Future<FFmpegInfo> getFFmpegInfo() async {
@@ -154,44 +153,17 @@ abstract class FFService {
       throw FFmpegException('An unknown error occurred: $e');
     }
   }
-
-  static Future<MediaFile> probeFile(String path) async {
-    try {
-      final result = await Process.run('ffprobe', [
-        ...quietVerbose,
-        '-output_format',
-        'json',
-        '-show_format',
-        '-show_streams',
-        path,
-      ]);
-
-      if (result.exitCode == 0) {
-        return result.stdout;
-      } else if (result.exitCode > 0) {
-        throw MultimediaNotFoundOrNotRecognizedException();
-      }
-
-      return MediaFile.fromJson(result.stdout);
-    } on JsonParsingException {
-      rethrow;
-    } on MultimediaNotFoundOrNotRecognizedException {
-      rethrow;
-    } catch (e) {
-      logger.e('An unknown error occurred: $e');
-      throw FFmpegException('An unknown error occurred: $e');
-    }
-  }
-
   static Stream<RawProgress> execute(
       List<Argument> arguments, String outputFile) async* {
     final globalArgs = arguments
         .where((arg) => arg.type == ArgumentType.global)
         .map((arg) => arg.value)
+        .expand((value) => value.split(' '))
         .toList();
     final inputArgs = arguments
         .where((arg) => arg.type == ArgumentType.input)
         .map((arg) => arg.value)
+        .expand((value) => value.split(' '))
         .toList();
     final inputFileArgs = arguments
         .where((arg) => arg.type == ArgumentType.inputFile)
@@ -200,6 +172,7 @@ abstract class FFService {
     final outputArgs = arguments
         .where((arg) => arg.type == ArgumentType.output)
         .map((arg) => arg.value)
+        .expand((value) => value.split(' '))
         .toList();
     final outputFormatArgs = arguments
         .where((arg) => arg.type == ArgumentType.outputFormat)
@@ -238,28 +211,105 @@ abstract class FFService {
       '-i',
       inputFileArgs.first,
       if (videoFilterArgs.isNotEmpty) '-vf',
-      videoFilterArgs.join(','),
+      if (videoFilterArgs.isNotEmpty) videoFilterArgs.join(','),
       if (audioFilterArgs.isNotEmpty) '-af',
-      audioFilterArgs.join(','),
+      if (audioFilterArgs.isNotEmpty) audioFilterArgs.join(','),
       ...outputArgs,
       if (outputFormatArgs.isNotEmpty) '-format',
       outputFormatArgs.first,
-      outputFile,
-    ];
+      outputFile,    ];
 
     final process = await Process.start('ffmpeg', processArguments);
     final controller = StreamController<RawProgress>();
 
+    logger.d('Executing FFmpeg with arguments: $processArguments');
+    logger.d('Process started with PID: ${process.pid}');
+
+    // Handle stdout for progress
     process.stdout
         .transform(const SystemEncoding().decoder)
         .transform(const LineSplitter())
-        .listen((event) {
-          final progress = RawProgress.parse(event.split('\n'));
-          controller.add(progress);
-        });
+        .listen(
+          (event) {
+            logger.d('FFmpeg stdout: "$event"');
+            try {
+              if (event.trim().isNotEmpty) {
+                // FFmpeg progress format is usually key=value pairs
+                if (event.contains('frame=') || event.contains('fps=') || event.contains('size=')) {
+                  final progress = RawProgress.parse([event]);
+                  logger.d('Parsed progress: frame=${progress.frame}, fps=${progress.fps}, size=${progress.size}');
+                  controller.add(progress);
+                }
+              }
+            } catch (e) {
+              logger.w('Failed to parse progress from: "$event", error: $e');
+            }
+          },
+          onError: (error) {
+            logger.e('FFmpeg stdout error: $error');
+            controller.addError(error);
+          },
+          onDone: () {
+            logger.d('FFmpeg stdout stream completed');
+          },
+        );
 
-    await for (final progress in controller.stream) {
-      yield progress;
+    // Handle stderr for errors and additional info
+    process.stderr
+        .transform(const SystemEncoding().decoder)
+        .transform(const LineSplitter())
+        .listen(
+          (event) {
+            logger.d('FFmpeg stderr: $event');
+          },
+          onError: (error) {
+            logger.e('FFmpeg stderr error: $error');
+          },
+          onDone: () {
+            logger.d('FFmpeg stderr stream completed');
+          },
+        );
+
+    // Handle process completion
+    process.exitCode.then((exitCode) {
+      logger.d('FFmpeg process completed with exit code: $exitCode');
+      if (exitCode != 0) {
+        controller.addError(FFmpegException('FFmpeg process failed with exit code: $exitCode'));
+      }
+      controller.close();
+    }).catchError((error) {
+      logger.e('FFmpeg process error: $error');
+      controller.addError(error);
+      controller.close();
+    });
+
+    try {
+      await for (final progress in controller.stream) {
+        yield progress;
+      }
+    } catch (e) {
+      logger.e('Stream error: $e');
+      rethrow;    } finally {
+      // Ensure the process is killed if still running
+      try {
+        // Check if process is still running before trying to kill it
+        final isRunning = !await process.exitCode.timeout(
+          const Duration(milliseconds: 1),
+          onTimeout: () => -1, // Still running if timeout occurs
+        ).then((code) => true).catchError((_) => false);
+        
+        if (isRunning && !process.kill()) {
+          logger.w('Failed to kill FFmpeg process');
+        }
+      } catch (e) {
+        // If we can't determine the process state, try to kill anyway
+        logger.d('Could not determine process state, attempting to kill: $e');
+        try {
+          process.kill();
+        } catch (killError) {
+          logger.w('Failed to kill FFmpeg process: $killError');
+        }
+      }
     }
   }
 }
