@@ -99,7 +99,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           HelpButton(
                             title: 'Hardware Acceleration',
                             content:
-                                'Hardware acceleration is like activating some special parts that are specialized in video processing. For example, if you have a dedicated graphics card, you can use it to speed up video processing. Beware that only some codecs are available for hardware acceleration.',
+                              'Hardware acceleration usually makes processing faster by utilizing specialized hardware components, such as dedicated graphics cards (GPUs), to enhance video processing performance. Note that only certain codecs support hardware acceleration.',
                           ),
                         ],
                       ),
@@ -240,7 +240,7 @@ GNU General Public License for more details.
                         const SizedBox(height: 8),
                         const Text('FFmpeg is a trademark of Fabrice Bellard. yaffuu is not affiliated with FFmpeg.'),
                         const SizedBox(height: 16),
-                        ElevatedButton(
+                        OutlinedButton(
                           onPressed: () {
                             showLicensePage(
                               context: context,
