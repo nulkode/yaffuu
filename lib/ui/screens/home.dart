@@ -151,25 +151,34 @@ class FilePickerCard extends StatelessWidget {
                       }
                     }
                   : null,
-              child: SizedBox(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
                 height: showFiles ? 100 : 150,
                 child: Center(
                   child: !loading
-                      ? (!showFiles
-                          ? const Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.add, size: 48),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Add a new media file',
+                      ? AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: !showFiles
+                              ? const Column(
+                                  key: ValueKey('empty'),
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.add, size: 48),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      'Add a new media file',
+                                    ),
+                                    Text(
+                                      'or drop it here.',
+                                    ),
+                                  ],
+                                )
+                              : Container(
+                                  key: ValueKey('file-${state.hashCode}'),
+                                  child: _buildFileDisplay(context, state, thumbnail),
                                 ),
-                                Text(
-                                  'or drop it here.',
-                                ),
-                              ],
-                            )
-                          : _buildFileDisplay(context, state, thumbnail))
+                        )
                       : CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation(
                               Theme.of(context).colorScheme.primary),
@@ -177,26 +186,39 @@ class FilePickerCard extends StatelessWidget {
                 ),
               ),
             ),
-          ),          if (showFiles) ...[
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                OutlinedButton(
-                  onPressed: () {
-                    context.read<QueueBloc>().add(RemoveFileEvent());
-                  },
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.primary,
-                    side: BorderSide(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  child: const Text('Remove File'),
-                ),
-              ],
-            ),
-          ],
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: showFiles
+                ? Column(
+                    children: [
+                      const SizedBox(height: 8),
+                      AnimatedOpacity(
+                        duration: const Duration(milliseconds: 300),
+                        opacity: showFiles ? 1.0 : 0.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            OutlinedButton(
+                              onPressed: () {
+                                context.read<QueueBloc>().add(RemoveFileEvent());
+                              },
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Theme.of(context).colorScheme.primary,
+                                side: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                              child: const Text('Remove File'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       );
     });
