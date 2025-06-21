@@ -31,7 +31,11 @@ class VideoToImageOperation implements Operation {
       Argument(
         type: ArgumentType.outputFormat,
         value: 'image2',
-      )
+      ),
+      Argument(
+        type: ArgumentType.outputExtension,
+        value: '.png', // TODO: allow to change output format
+      ),
     ];
   }
 
