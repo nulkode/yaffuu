@@ -11,6 +11,7 @@ import 'package:yaffuu/logic/logger.dart';
 import 'package:yaffuu/logic/managers/cuda.dart';
 import 'package:yaffuu/logic/managers/ffmpeg.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
+import 'package:yaffuu/logic/managers/output_file.dart';
 import 'package:yaffuu/logic/user_preferences.dart';
 import 'package:yaffuu/main.dart';
 import 'package:yaffuu/ui/components/logos.dart';
@@ -20,11 +21,13 @@ class AppInfo {
   final String logPathInfo;
   final FFmpegInfo ffmpegInfo;
   final Directory dataDir;
+  final OutputFileManager outputFileManager;
 
   AppInfo({
     required this.logPathInfo,
     required this.ffmpegInfo,
     required this.dataDir,
+    required this.outputFileManager,
   });
 }
 
@@ -67,15 +70,23 @@ class _LoadingScreenState extends State<LoadingScreen> {
       final hasSeenTutorial = prefs.hasSeenTutorial;
 
       final ffmpegInfo = await FFService.getFFmpegInfo();
-      final logFilePath = fileLogOutput.logFilePath;
-
-      final Directory dataDir = Directory(
+      final logFilePath = fileLogOutput.logFilePath;      final Directory dataDir = Directory(
           '${(await getApplicationDocumentsDirectory()).absolute.path}/data');
+
+      // Initialize output file manager with configurable limits
+      final outputFileManager = OutputFileManager(
+        dataDir: dataDir,
+        maxSizeBytes: 2 * 1024 * 1024 * 1024, // 2GB limit
+        maxFiles: 150, // Maximum 150 files
+        cleanupStrategy: CleanupStrategy.oldestFirst,
+      );
+      await outputFileManager.initialize();
 
       final appInfo = AppInfo(
         logPathInfo: logFilePath,
         ffmpegInfo: ffmpegInfo,
         dataDir: dataDir,
+        outputFileManager: outputFileManager,
       );
 
       getIt.registerSingleton<AppInfo>(appInfo);

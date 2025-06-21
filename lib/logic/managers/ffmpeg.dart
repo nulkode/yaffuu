@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_final_fields
 
+import 'dart:io';
 import 'package:cross_file/cross_file.dart';
 import 'package:yaffuu/logic/classes/progress.dart';
 import 'package:yaffuu/logic/logger.dart';
@@ -59,20 +60,29 @@ class FFmpegManager extends BaseFFmpegManager {
     final inputFileArg = Argument(
       type: ArgumentType.inputFile,
       value: _file!.path,
-    );
-    if (!arguments.contains(inputFileArg)) {
+    );    if (!arguments.contains(inputFileArg)) {
       arguments.add(inputFileArg);
-    }    final outputPath =
-        '${appInfo.dataDir.path}/${DateTime.now().millisecondsSinceEpoch}_${_file!.name}${outputExtensionArgs.isNotEmpty ? outputExtensionArgs.first.value : ''}';
+    }
+    
+    // Create temporary output path
+    final tempOutputPath =
+        '${appInfo.dataDir.path}/temp_${DateTime.now().millisecondsSinceEpoch}_${_file!.name}${outputExtensionArgs.isNotEmpty ? outputExtensionArgs.first.value : ''}';
 
-    final stream = FFService.execute(arguments, outputPath);
+    final stream = FFService.execute(arguments, tempOutputPath);
 
     await for (final rawProgress in stream) {
       yield Progress.fromRaw(rawProgress);
     }
     
-    // Store the output file after successful completion
-    _lastOutput = XFile(outputPath);
+    // Move the completed file to the managed output directory
+    final tempFile = File(tempOutputPath);
+    if (await tempFile.exists()) {
+      final managedFile = await appInfo.outputFileManager.saveOutputFile(tempFile);
+      _lastOutput = XFile(managedFile.path);
+      
+      // Clean up the temporary file
+      await tempFile.delete();
+    }
   }
 
   @override

@@ -16,14 +16,21 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: YaffuuAppBar(
+    return Scaffold(      appBar: YaffuuAppBar(
         leftChildren: [
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
               context.push('/settings');
             },
+            tooltip: 'Settings',
+          ),
+          IconButton(
+            icon: const Icon(Icons.folder_open),
+            onPressed: () {
+              context.push('/output-files');
+            },
+            tooltip: 'Output Files',
           ),
         ],
       ),

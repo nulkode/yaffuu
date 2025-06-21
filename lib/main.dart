@@ -9,6 +9,7 @@ import 'package:yaffuu/ui/screens/error.dart';
 import 'package:yaffuu/ui/screens/ffmpeg_missing.dart';
 import 'package:yaffuu/ui/screens/loading.dart';
 import 'package:yaffuu/ui/screens/home.dart';
+import 'package:yaffuu/ui/screens/output_files.dart';
 import 'package:yaffuu/ui/screens/settings.dart';
 import 'package:yaffuu/logic/bloc/theme.dart';
 import 'package:yaffuu/ui/components/drop_overlay.dart';
@@ -59,10 +60,13 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/error/ffmpeg-missing',
       builder: (context, state) => const FFmpegMissingScreen(),
-    ),
-    GoRoute(
+    ),    GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsPage(),
+    ),
+    GoRoute(
+      path: '/output-files',
+      builder: (context, state) => const OutputFilesScreen(),
     ),
   ],
 );
