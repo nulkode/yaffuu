@@ -1,4 +1,5 @@
 import 'package:cross_file/cross_file.dart';
+import 'package:yaffuu/logic/classes/progress.dart';
 import 'package:yaffuu/logic/ffmpeg.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
@@ -9,13 +10,19 @@ class CUDAManager extends BaseFFmpegManager {
         id: 'cuda',
         displayName: 'CUDA',
         implemented: false,
-      );
-  // ignore: unused_field
+      );  // ignore: unused_field
   final FFmpegInfo _ffmpegInfo;
   // ignore: unused_field
   XFile? _file;
 
   CUDAManager(this._ffmpegInfo);
+  @override
+  XFile? get lastOutput => null; // Not implemented yet
+
+  @override
+  void clearLastOutput() {
+    // Not implemented yet
+  }
 
   @override
   Stream<double> get progress async* {
@@ -33,7 +40,7 @@ class CUDAManager extends BaseFFmpegManager {
   }
 
   @override
-  void execute(Operation operation) {
+  Stream<Progress> execute(Operation operation) {
     throw UnimplementedError();
   }
 

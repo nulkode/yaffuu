@@ -1,4 +1,5 @@
 import 'package:cross_file/cross_file.dart';
+import 'package:yaffuu/logic/classes/progress.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
 
 class AccelerationInformation {
@@ -25,10 +26,14 @@ abstract class BaseFFmpegManager {
   Stream<double> get progress;
 
   Future<bool> isCompatible();
-
   Future<bool> isOperationCompatible(Operation operation);
 
   void setFile(XFile file);
-
-  void execute(Operation operation);
+  Stream<Progress> execute(Operation operation);
+  
+  /// Gets the last output file from the most recent operation
+  XFile? get lastOutput;
+  
+  /// Clears the last output file reference
+  void clearLastOutput() {}
 }

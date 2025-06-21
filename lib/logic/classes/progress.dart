@@ -38,16 +38,13 @@ class RawProgress {
   }
 }
 
+
 class Progress extends RawProgress {
   Progress._({
-    required frame,
-    required fps,
-    required size,
-  }) : super._(
-          frame: frame,
-          fps: fps,
-          size: size,
-        );
+    required super.frame,
+    required super.fps,
+    required super.size,
+  }) : super._();
 
   factory Progress.fromRaw(RawProgress raw) {
     return Progress._(
