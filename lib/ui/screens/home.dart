@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -121,61 +123,162 @@ class FilePickerCard extends StatelessWidget {
     super.key,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<QueueBloc, QueueState>(builder: (context, state) {
+  @override  Widget build(BuildContext context) {    return BlocBuilder<QueueBloc, QueueState>(builder: (context, state) {
       final disabled = state is! QueueReadyState;
       final loading = state is QueueLoadingState;
       final showFiles = state is QueueReadyState && state.file is XFile;
+      final thumbnail = state is QueueReadyState ? state.thumbnail : null;      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Card.outlined(
+            clipBehavior: Clip.hardEdge,
+            child: InkWell(
+              onTap: !disabled && !showFiles
+                  ? () async {
+                      FilePickerResult? result =
+                          await FilePicker.platform.pickFiles(
+                        type: FileType.custom,
+                        allowMultiple: false,
+                        allowedExtensions: ['mp4'],
+                        compressionQuality: 0,
+                        lockParentWindow: true,
+                      );
 
-      return Card.outlined(
-        clipBehavior: Clip.hardEdge,
-        child: InkWell(
-          onTap: !disabled
-              ? () async {
-                  FilePickerResult? result =
-                      await FilePicker.platform.pickFiles(
-                    type: FileType.custom,
-                    allowMultiple: false,
-                    allowedExtensions: ['mp4'],
-                    allowCompression: false,
-                    lockParentWindow: true,
-                  );
+                      if (result != null && context.mounted) {
+                        context
+                            .read<QueueBloc>()
+                            .add(AddFileEvent(result.xFiles.first));
+                      }
+                    }
+                  : null,
+              child: SizedBox(
+                height: showFiles ? 100 : 150,
+                child: Center(
+                  child: !loading
+                      ? (!showFiles
+                          ? const Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.add, size: 48),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Add a new media file',
+                                ),
+                                Text(
+                                  'or drop it here.',
+                                ),
+                              ],
+                            )
+                          : _buildFileDisplay(context, state, thumbnail))
+                      : CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation(
+                              Theme.of(context).colorScheme.primary),
+                        ),
+                ),
+              ),
+            ),
+          ),          if (showFiles) ...[
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                OutlinedButton(
+                  onPressed: () {
+                    context.read<QueueBloc>().add(RemoveFileEvent());
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.primary,
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  child: const Text('Remove File'),
+                ),
+              ],
+            ),
+          ],
+        ],
+      );
+    });
+  }  Widget _buildFileDisplay(BuildContext context, QueueState state, XFile? thumbnail) {
+    if (state is! QueueReadyState || state.file == null) {
+      return const Text('No file selected');
+    }
 
-                  if (result != null && context.mounted) {
-                    context
-                        .read<QueueBloc>()
-                        .add(AddFileEvent(result.xFiles.first));
-                  }
-                }
-              : null,
-          child: SizedBox(
-            height: 150,
-            child: Center(
-              child: !loading
-                  ? (!showFiles
-                      ? const Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.add, size: 48),
-                            SizedBox(height: 8),
-                            Text(
-                              'Add a new media file',
-                            ),
-                            Text(
-                              'or drop it here.',
-                            ),
-                          ],
-                        )
-                      : const Text('Not implemented'))
-                  : CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(
-                          Theme.of(context).colorScheme.primary),
+    final file = state.file!;
+    
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        children: [
+          // Thumbnail or placeholder
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: SizedBox(
+              width: 80,
+              height: 60,
+              child: thumbnail != null
+                  ? Image.file(
+                      File(thumbnail.path),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade300,
+                          child: const Icon(Icons.broken_image, color: Colors.grey),
+                        );
+                      },
+                    )
+                  : Container(
+                      color: Colors.grey.shade200,
+                      child: const Icon(Icons.video_file, size: 30, color: Colors.grey),
                     ),
             ),
           ),
-        ),
-      );
-    });
+          const SizedBox(width: 12),
+          // File information
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  file.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                FutureBuilder<int>(
+                  future: file.length(),
+                  builder: (context, snapshot) {
+                    final size = snapshot.data;
+                    final sizeText = size != null 
+                        ? _formatFileSize(size)
+                        : 'Unknown size';
+                    return Text(
+                      sizeText,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatFileSize(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 }
