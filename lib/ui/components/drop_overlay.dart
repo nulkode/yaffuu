@@ -68,8 +68,8 @@ class _DropOverlayState extends State<DropOverlay> {
                           ? Theme.of(context)
                               .colorScheme
                               .primary
-                              .withOpacity(0.5)
-                          : Colors.red.withOpacity(0.5),
+                              .withValues(alpha: 0.5)
+                          : Colors.red.withValues(alpha: 0.5),
                     ),
                     padding: const EdgeInsets.all(48.0),
                     child: Center(
