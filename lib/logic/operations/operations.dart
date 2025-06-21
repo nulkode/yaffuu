@@ -1,6 +1,4 @@
 import 'package:yaffuu/logic/classes/compatibility.dart';
-export 'bitrate.dart';
-export 'resolution.dart';
 
 enum ArgumentType {
   global,
