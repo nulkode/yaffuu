@@ -5,7 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yaffuu/logic/bloc/queue.dart';
-import 'package:yaffuu/styles/text.dart';
+import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/ui/components/appbar.dart';
 import 'package:go_router/go_router.dart';
 
@@ -48,11 +48,11 @@ class HomePage extends StatelessWidget {
                   SizedBox(height: 16),
                   QueueStatus(),
                   SizedBox(height: 8),
-                  Text('Input', style: titleStyle),
+                  Text('Input', style: AppTypography.titleStyle),
                   SizedBox(height: 8),
                   FilePickerCard(),
                   SizedBox(height: 16),
-                  Text('Operation', style: titleStyle),
+                  Text('Operation', style: AppTypography.titleStyle),
                   SizedBox(height: 8),
                   OperationsList(),
                 ],

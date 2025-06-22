@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:yaffuu/logic/bloc/queue.dart';
-import 'package:yaffuu/main.dart';
+import 'package:yaffuu/app/router/app_router.dart';
 
 class DropOverlay extends StatefulWidget {
   const DropOverlay({super.key});
@@ -18,7 +18,7 @@ class _DropOverlayState extends State<DropOverlay> {
   Widget build(BuildContext context) {
     return IgnorePointer(
       child: ValueListenableBuilder<RouteInformation>(
-        valueListenable: router.routeInformationProvider,
+        valueListenable: AppRouter.router.routeInformationProvider,
         builder: (context, route, child) {
           return BlocBuilder<QueueBloc, QueueState>(
             builder: (context, state) {

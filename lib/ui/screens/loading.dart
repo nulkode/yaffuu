@@ -1,35 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:yaffuu/logic/bloc/queue.dart';
-import 'package:yaffuu/logic/classes/exception.dart';
-import 'package:yaffuu/logic/ffmpeg.dart';
-import 'package:yaffuu/logic/logger.dart';
-import 'package:yaffuu/logic/managers/cuda.dart';
-import 'package:yaffuu/logic/managers/ffmpeg.dart';
-import 'package:yaffuu/logic/managers/managers.dart';
-import 'package:yaffuu/logic/managers/output_file.dart';
-import 'package:yaffuu/logic/user_preferences.dart';
-import 'package:yaffuu/main.dart';
+import 'package:yaffuu/logic/services/app_initialization_service.dart';
 import 'package:yaffuu/ui/components/logos.dart';
-import 'package:yaffuu/ui/screens/error.dart';
-
-class AppInfo {
-  final String logPathInfo;
-  final FFmpegInfo ffmpegInfo;
-  final Directory dataDir;
-  final OutputFileManager outputFileManager;
-
-  AppInfo({
-    required this.logPathInfo,
-    required this.ffmpegInfo,
-    required this.dataDir,
-    required this.outputFileManager,
-  });
-}
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
@@ -39,101 +13,31 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  bool _initialized = false;
-  int _error = -1;
-  bool _toTutorial = false;
-  String? extra;
-  late BaseFFmpegManager _manager;
-
   @override
   void initState() {
     super.initState();
-    _init(() {
-      context.read<QueueBloc>().add(SetManagerEvent(_manager));
-
-      if (_initialized) {
-        context.go('/home');
-      } else if (_error == 4) {
-        context.go('/error/ffmpeg-missing');
-      } else if (_error != -1) {
-        context.go(
-            Uri(path: '/error-$_error', queryParameters: {'extra': extra})
-                .toString());
-      } else if (_toTutorial) {
-        context.go('/tutorial');
-      }
-    });
+    _initializeApp();
   }
 
-  Future<void> _init(VoidCallback onComplete) async {
-    try {
-      final prefs = await UserPreferences.getInstance();
-      // ignore: unused_local_variable
-      final hasSeenTutorial = prefs.hasSeenTutorial;
+  Future<void> _initializeApp() async {
+    final result = await AppInitializationService.initialize();
+    
+    if (result.manager != null) {
+      context.read<QueueBloc>().add(SetManagerEvent(result.manager!));
+    }
 
-      final ffmpegInfo = await FFService.getFFmpegInfo();
-      final logFilePath = fileLogOutput.logFilePath;
-      final Directory dataDir = Directory(
-          '${(await getApplicationDocumentsDirectory()).absolute.path}/data');
-
-      final outputFileManager = OutputFileManager(
-        dataDir: dataDir,
-        maxSizeBytes: 2 * 1024 * 1024 * 1024, // 2GB limit
-        maxFiles: 150, // Maximum 150 files
-        cleanupStrategy: CleanupStrategy.oldestFirst,
+    if (result.isInitialized) {
+      context.go('/home');
+    } else if (result.shouldShowTutorial) {
+      context.go('/tutorial');
+    } else if (result.errorCode == 4) {
+      context.go('/error/ffmpeg-missing');
+    } else if (result.errorCode != null) {
+      final uri = Uri(
+        path: '/error-${result.errorCode}',
+        queryParameters: result.errorExtra != null ? {'extra': result.errorExtra} : null,
       );
-      await outputFileManager.initialize();
-
-      final appInfo = AppInfo(
-        logPathInfo: logFilePath,
-        ffmpegInfo: ffmpegInfo,
-        dataDir: dataDir,
-        outputFileManager: outputFileManager,
-      );
-
-      getIt.registerSingleton<AppInfo>(appInfo);
-
-      if (prefs.preferredHardwareAcceleration == 'none') {
-        _manager = FFmpegManager(ffmpegInfo);
-      } else if (prefs.preferredHardwareAcceleration == 'cuda') {
-        _manager = CUDAManager(ffmpegInfo);
-      }
-
-      if (!(await _manager.isCompatible())) {
-        throw FFmpegNotCompatibleException();
-      }
-
-      // ignore: dead_code
-      if (/* !hasSeenTutorial */ false) {
-        // TODO: build tutorial
-        setState(() {
-          _toTutorial = true;
-        });
-      } else {
-        setState(() {
-          _initialized = true;
-        });
-      }
-    } on FFmpegNotCompatibleException {
-      setState(() {
-        _error = AppErrorType.ffmpegNotCompatible.id;
-      });
-    } on FFmpegNotFoundException {
-      setState(() {
-        _error = 4;
-      });
-    } on FFmpegNotAccessibleException {
-      setState(() {
-        _error = AppErrorType.ffmpegNotAccessible.id;
-      });
-    } on Exception catch (e) {
-      logger.e('An unknown error occurred: $e');
-      setState(() {
-        _error = AppErrorType.other.id;
-        extra = e.toString();
-      });
-    } finally {
-      onComplete();
+      context.go(uri.toString());
     }
   }
 

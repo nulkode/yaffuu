@@ -4,9 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:yaffuu/logic/managers/output_file.dart';
+import 'package:yaffuu/logic/models/app_info.dart';
 import 'package:yaffuu/main.dart';
-import 'package:yaffuu/ui/screens/loading.dart';
-import 'package:yaffuu/styles/text.dart';
+import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/ui/components/context_menu.dart';
 import 'package:yaffuu/ui/components/appbar.dart';
 import 'package:go_router/go_router.dart';
@@ -339,7 +339,7 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Storage Usage', style: titleStyle),
+                        const Text('Storage Usage', style: AppTypography.titleStyle),
                         const SizedBox(height: 16),
                         LinearProgressIndicator(
                           value: _stats!.usagePercentage / 100,
@@ -382,7 +382,7 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Expanded(
-                          child: Text('Files', style: titleStyle),
+                          child: Text('Files', style: AppTypography.titleStyle),
                         ),
                         if (_files.isNotEmpty)
                           IconButton(

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yaffuu/logic/logger.dart';
-import 'package:yaffuu/styles/text.dart';
+import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/ui/components/appbar.dart';
 
 // TODO: fix when ffmpeg is successfully installed by winget but it's detected as an error
@@ -24,12 +24,12 @@ class FFmpegMissingScreen extends StatelessWidget {
               children: [
                 const Text(
                   'I have already installed FFmpeg',
-                  style: titleStyle,
+                  style: AppTypography.titleStyle,
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Please ensure that FFmpeg is added to your system PATH. Restart the application after verifying.',
-                  style: contentStyle,
+                  style: AppTypography.contentStyle,
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -45,12 +45,12 @@ class FFmpegMissingScreen extends StatelessWidget {
                 const SizedBox(height: 24),
                 const Text(
                   "I don't have FFmpeg installed",
-                  style: titleStyle,
+                  style: AppTypography.titleStyle,
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'FFmpeg is the engine that powers yaffuu. Without it, the application is just a shell. Let me assist you in downloading and installing FFmpeg. (Don\'t worry, it should be fast and painless!)',
-                  style: contentStyle,
+                  style: AppTypography.contentStyle,
                 ),
                 const SizedBox(height: 16),
                 if (Platform.isWindows)
@@ -58,7 +58,7 @@ class FFmpegMissingScreen extends StatelessWidget {
                 else
                   const Text(
                     'Oops! It seems I\'m on an environment that I\'m not familiar with. Please install FFmpeg manually.',
-                    style: contentStyle,
+                    style: AppTypography.contentStyle,
                   ),
                 const SizedBox(height: 24),
               ],
@@ -151,7 +151,7 @@ class _WindowsFfmpegInstallerState extends State<WindowsFfmpegInstaller> {
       children: [
         const Text(
           'As I have detected that you have winget, a package manager for Windows, I can help you install FFmpeg at the click of a button.',
-          style: contentStyle,
+          style: AppTypography.contentStyle,
         ),
         const SizedBox(height: 16),
         ElevatedButton(
@@ -163,7 +163,7 @@ class _WindowsFfmpegInstallerState extends State<WindowsFfmpegInstaller> {
           const SizedBox(height: 16),
           const Text(
             'Oops! An error occurred during installation.',
-            style: contentStyle,
+            style: AppTypography.contentStyle,
           ),
           const SizedBox(height: 8),
           ElevatedButton(

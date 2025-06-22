@@ -4,15 +4,15 @@ import 'package:yaffuu/logic/bloc/queue.dart';
 import 'package:yaffuu/logic/ffmpeg.dart';
 import 'package:yaffuu/logic/managers/cuda.dart';
 import 'package:yaffuu/logic/managers/ffmpeg.dart';
+import 'package:yaffuu/logic/models/app_info.dart';
 import 'package:yaffuu/main.dart';
-import 'package:yaffuu/styles/text.dart';
+import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/ui/components/appbar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yaffuu/ui/components/help.dart';
 import 'package:yaffuu/logic/bloc/theme.dart';
 import 'package:yaffuu/logic/bloc/hardware_acceleration.dart';
 import 'package:yaffuu/ui/components/logos.dart';
-import 'package:yaffuu/ui/screens/loading.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -56,7 +56,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 16),
-                      const Text('App Theme', style: titleStyle),
+                      const Text('App Theme', style: AppTypography.titleStyle),
                       const SizedBox(height: 8),
                       Column(
                         children: [
@@ -94,7 +94,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: 32),
                       const Row(
                         children: [
-                          Text('Hardware Acceleration', style: titleStyle),
+                          Text('Hardware Acceleration', style: AppTypography.titleStyle),
                           SizedBox(width: 8),
                           HelpButton(
                             title: 'Hardware Acceleration',
@@ -165,7 +165,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         },
                       ),
                       const SizedBox(height: 32),
-                      const Text('FFmpeg Information', style: titleStyle),
+                      const Text('FFmpeg Information', style: AppTypography.titleStyle),
                       const SizedBox(height: 8),
                       Text('Version: ${_ffmpegInfo.version}'),
                       const SizedBox(height: 8),
@@ -176,9 +176,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       ConfigurationSection(ffmpegInfo: _ffmpegInfo),
                       const SizedBox(height: 16),
                       LibrariesSection(ffmpegInfo: _ffmpegInfo),
-                      const SizedBox(height: 16),
-                      const Text('Hardware Acceleration Methods',
-                          style: subtitleStyle),
+                      const SizedBox(height: 16),                      const Text('Hardware Acceleration Methods',
+                          style: AppTypography.subtitleStyle),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 4.0,
@@ -274,7 +273,7 @@ class LibrariesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Libraries', style: subtitleStyle),
+        const Text('Libraries', style: AppTypography.subtitleStyle),
         const SizedBox(height: 8),
         Table(
           border: TableBorder.all(color: Colors.grey),
@@ -284,15 +283,15 @@ class LibrariesSection extends StatelessWidget {
               children: [
                 Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Text('Library', style: subsubtitleStyle),
+                  child: Text('Library', style: AppTypography.subsubtitleStyle),
                 ),
                 Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Text('Compiled Version', style: subsubtitleStyle),
+                  child: Text('Compiled Version', style: AppTypography.subsubtitleStyle),
                 ),
                 Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Text('Runtime Version', style: subsubtitleStyle),
+                  child: Text('Runtime Version', style: AppTypography.subsubtitleStyle),
                 ),
               ],
             ),
@@ -303,7 +302,7 @@ class LibrariesSection extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(libName, style: codeStyle),
+                    child: Text(libName, style: AppTypography.codeStyle),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -376,7 +375,7 @@ class _ConfigurationSectionState extends State<ConfigurationSection>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Configuration', style: subtitleStyle),
+        const Text('Configuration', style: AppTypography.subtitleStyle),
         const SizedBox(height: 8),
         OutlinedButton.icon(
           onPressed: _toggleExpand,

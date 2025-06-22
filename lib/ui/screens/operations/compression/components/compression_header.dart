@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../../logic/classes/compression_option.dart';
-import '../../../../../../styles/text.dart';
+import 'package:yaffuu/app/theme/typography.dart';
 
 class CompressionHeader extends StatelessWidget {
   final CompressionApproach selectedApproach;
@@ -16,7 +16,7 @@ class CompressionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        const headerText = Text('Compression', style: titleStyle);
+        const headerText = Text('Compression', style: AppTypography.titleStyle);
         final segmentedButton = _buildSegmentedButton();
         
         const minWidthForInline = 500.0;
