@@ -235,7 +235,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
                             ''',
-                          style: const TextStyle(fontSize: 12.0),
+                          style: TextStyle(fontSize: 12.0),
                         ),
                         const SizedBox(height: 8),
                         const Text('FFmpeg is a trademark of Fabrice Bellard. yaffuu is not affiliated with FFmpeg.'),

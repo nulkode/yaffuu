@@ -62,6 +62,7 @@ class ContextMenuButton extends StatelessWidget {
         return PopupMenuItem<void>(
           height: 32,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+          onTap: action.onTap,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -80,7 +81,6 @@ class ContextMenuButton extends StatelessWidget {
               ),
             ],
           ),
-          onTap: action.onTap,
         );
       }).toList(),
     );

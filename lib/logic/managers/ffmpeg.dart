@@ -19,9 +19,11 @@ class FFmpegManager extends BaseFFmpegManager {
 
   FFmpegManager(this._ffmpegInfo);
   /// Gets the last output file from the most recent operation
+  @override
   XFile? get lastOutput => _lastOutput;
 
   /// Clears the last output file reference
+  @override
   void clearLastOutput() {
     _lastOutput = null;
   }
