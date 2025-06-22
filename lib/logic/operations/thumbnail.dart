@@ -23,11 +23,15 @@ class VideoToImageOperation implements Operation {
         Argument(
           type: ArgumentType.output,
           value:
-              '-ss ${position!.inSeconds}', // TODO: check how decimals are handled
+              '-ss ${position!.inSeconds}',
         ),
       Argument(
         type: ArgumentType.output,
         value: '-vframes 1',
+      ),
+      Argument(
+        type: ArgumentType.output,
+        value: '-vf scale=\'min(320,iw)\':-2',
       ),
       Argument(
         type: ArgumentType.outputFormat,
@@ -35,7 +39,7 @@ class VideoToImageOperation implements Operation {
       ),
       Argument(
         type: ArgumentType.outputExtension,
-        value: '.png', // TODO: allow to change output format
+        value: '.jpg',
       ),
     ];
 

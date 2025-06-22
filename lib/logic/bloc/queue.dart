@@ -4,7 +4,7 @@ import 'package:yaffuu/logic/classes/exception.dart';
 import 'package:yaffuu/logic/logger.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
-import 'package:yaffuu/logic/operations/video_to_image.dart';
+import 'package:yaffuu/logic/operations/thumbnail.dart';
 
 abstract class QueueEvent {}
 
