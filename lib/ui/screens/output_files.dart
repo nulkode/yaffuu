@@ -33,15 +33,14 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
   }
 
   Future<void> _loadFiles() async {
-    // Only show loading on initial load, not on refresh
     if (_files.isEmpty) {
       setState(() => _loading = true);
     }
-    
+
     try {
       final files = await _outputManager.getOutputFiles();
       final stats = await _outputManager.getStorageStats();
-      
+
       setState(() {
         _files = files;
         _stats = stats;
@@ -69,7 +68,6 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
 
   Future<void> _saveFile(OutputFileInfo fileInfo) async {
     try {
-      // Let user choose where to save the file
       String? outputPath = await FilePicker.platform.saveFile(
         dialogTitle: 'Save ${fileInfo.name}',
         fileName: fileInfo.name,
@@ -78,12 +76,11 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
       );
 
       if (outputPath != null) {
-        // Copy the file to the chosen location
         final sourceFile = File(fileInfo.file.path);
         final targetFile = File(outputPath);
-        
+
         await sourceFile.copy(targetFile.path);
-        
+
         if (mounted) {
           showDialog(
             context: context,
@@ -121,9 +118,9 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
 
   Future<void> _shareFile(OutputFileInfo fileInfo) async {
     try {
-      // For now, just copy the file path since share_plus might not be available
+      // TODO: Implement share plus
       await Clipboard.setData(ClipboardData(text: fileInfo.file.path));
-      
+
       if (mounted) {
         showDialog(
           context: context,
@@ -160,9 +157,8 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
 
   Future<void> _copyFile(OutputFileInfo fileInfo) async {
     try {
-      // Copy to clipboard (file path)
       await Clipboard.setData(ClipboardData(text: fileInfo.file.path));
-      
+
       if (mounted) {
         showDialog(
           context: context,
@@ -220,7 +216,7 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
       try {
         await _outputManager.deleteOutputFile(fileInfo.file);
         await _loadFiles(); // Refresh the list
-        
+
         if (mounted) {
           showDialog(
             context: context,
@@ -261,7 +257,8 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Clear All Files'),
-        content: const Text('Are you sure you want to delete all output files? This action cannot be undone.'),
+        content: const Text(
+            'Are you sure you want to delete all output files? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -280,7 +277,7 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
       try {
         await _outputManager.clearAllFiles();
         await _loadFiles(); // Refresh the list
-        
+
         if (mounted) {
           showDialog(
             context: context,
@@ -338,18 +335,12 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: 16),
-                  
-                  // Storage Usage Header
                   if (_stats != null) ...[
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Title only
                         const Text('Storage Usage', style: titleStyle),
-                        
                         const SizedBox(height: 16),
-                        
-                        // Progress bar
                         LinearProgressIndicator(
                           value: _stats!.usagePercentage / 100,
                           backgroundColor: Colors.grey[300],
@@ -361,26 +352,22 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
                                     : Colors.green,
                           ),
                         ),
-                        
                         const SizedBox(height: 8),
-                        
-                        // Stats row below progress bar
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Left side - Size and files info
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('${_stats!.formattedCurrentSize} / ${_stats!.formattedMaxSize}'),
+                                  Text(
+                                      '${_stats!.formattedCurrentSize} / ${_stats!.formattedMaxSize}'),
                                   const SizedBox(height: 4),
-                                  Text('${_stats!.currentFiles} / ${_stats!.maxFiles} files'),
+                                  Text(
+                                      '${_stats!.currentFiles} / ${_stats!.maxFiles} files'),
                                 ],
                               ),
                             ),
-                            
-                            // Right side - Percentage
                             Text(
                               '${_stats!.usagePercentage.toStringAsFixed(1)}%',
                             ),
@@ -388,13 +375,9 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
                         ),
                       ],
                     ),
-                    
                     const SizedBox(height: 40),
                   ],
-                  
-                  // Files List Header and Content
                   if (!_loading) ...[
-                    // Files Header
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -425,8 +408,6 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
                       ],
                     ),
                   ],
-                  
-                  // Files List
                   if (_loading)
                     const Padding(
                       padding: EdgeInsets.all(32),
@@ -454,20 +435,20 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
                   else
                     ImplicitlyAnimatedList<OutputFileInfo>(
                       items: _files,
-                      areItemsTheSame: (oldItem, newItem) => oldItem.file.path == newItem.file.path,
+                      areItemsTheSame: (oldItem, newItem) =>
+                          oldItem.file.path == newItem.file.path,
                       insertDuration: const Duration(milliseconds: 300),
                       removeDuration: const Duration(milliseconds: 250),
                       itemBuilder: (context, animation, fileInfo, index) {
-                        // Create smooth in-out animations
                         final sizeAnimation = CurvedAnimation(
                           parent: animation,
                           curve: Curves.easeInOut,
                         );
-                        
-                        // Fade starts earlier and uses a different curve
+
                         final fadeAnimation = CurvedAnimation(
                           parent: animation,
-                          curve: const Interval(0.0, 0.75, curve: Curves.easeOut),
+                          curve:
+                              const Interval(0.0, 0.75, curve: Curves.easeOut),
                         );
 
                         return SizeTransition(
@@ -493,7 +474,6 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                     ),
-                  
                   const SizedBox(height: 16),
                 ],
               ),
@@ -527,7 +507,8 @@ class _FileListItem extends StatelessWidget {
       return Icons.video_file;
     } else if (['.mp3', '.wav', '.aac', '.flac', '.ogg'].contains(ext)) {
       return Icons.audio_file;
-    } else if (['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'].contains(ext)) {
+    } else if (['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']
+        .contains(ext)) {
       return Icons.image;
     }
     return Icons.insert_drive_file;
@@ -536,7 +517,7 @@ class _FileListItem extends StatelessWidget {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final diff = now.difference(date);
-    
+
     if (diff.inDays > 7) {
       return '${date.day}/${date.month}/${date.year}';
     } else if (diff.inDays > 0) {
@@ -548,7 +529,9 @@ class _FileListItem extends StatelessWidget {
     } else {
       return 'Just now';
     }
-  }  @override
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ContextMenuButton(
       actions: [

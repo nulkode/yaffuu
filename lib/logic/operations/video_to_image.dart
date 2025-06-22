@@ -15,9 +15,9 @@ class VideoToImageOperation implements Operation {
   bool isCompatible(CompatibilityContext context) {
     return true;
   }
+
   @override
   List<Argument> toArguments([BaseFFmpegManager? manager]) {
-    // Base arguments that work for all managers
     List<Argument> baseArgs = [
       if (position != null)
         Argument(
@@ -39,11 +39,9 @@ class VideoToImageOperation implements Operation {
       ),
     ];
 
-    // Add manager-specific arguments if manager is provided
     if (manager != null) {
       switch (manager.acceleration.id) {
         case 'cuda':
-          // Add CUDA-specific arguments for hardware acceleration
           baseArgs.addAll([
             Argument(
               type: ArgumentType.global,
@@ -57,7 +55,6 @@ class VideoToImageOperation implements Operation {
           break;
         case 'none':
         default:
-          // No additional arguments needed for software decoding
           break;
       }
     }

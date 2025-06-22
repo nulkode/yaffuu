@@ -191,7 +191,6 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
     final file = (state as QueueReadyState).file;
     final currentThumbnail = (state as QueueReadyState).thumbnail;
 
-    // Use provided thumbnail or keep current one
     final thumbnail = event.thumbnail ?? currentThumbnail;
 
     emit(QueueReadyState(manager, event.operation, file, thumbnail));
@@ -232,7 +231,6 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
     manager.setFile(file);
 
     try {
-      // Generate thumbnail for the file
       final thumbnail =
           await _generateThumbnail(manager, emit) ?? currentThumbnail;
 
@@ -246,18 +244,15 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
         final exception =
             error is Exception ? error : Exception(error.toString());
 
-        // Keep the current thumbnail even if operation failed
         emit(QueueErrorState(manager, null, exception, file, currentThumbnail));
       }
     }
   }
 
-  /// Generates a thumbnail for the current file using video-to-image operation
   Future<XFile?> _generateThumbnail(
     BaseFFmpegManager manager,
     Emitter<QueueState> emit,
   ) async {
-    // Clear any previous output before starting new operation
     manager.clearLastOutput();
 
     try {

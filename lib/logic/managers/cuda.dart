@@ -11,7 +11,7 @@ class CUDAManager extends BaseFFmpegManager {
         displayName: 'NVIDIA CUDA',
         implemented: false,
       );
-      
+
   // ignore: unused_field
   final FFmpegInfo _ffmpegInfo;
   // ignore: unused_field
@@ -47,12 +47,11 @@ class CUDAManager extends BaseFFmpegManager {
   @override
   Future<bool> isOperationCompatible(Operation operation) async {
     if (!await isCompatible()) return false;
-    
-    // CUDA is mainly for video operations
-    return operation.type == OperationType.video || 
-           operation.type == OperationType.moving ||
-           operation.type == OperationType.visual ||
-           operation.type == OperationType.all;
+
+    return operation.type == OperationType.video ||
+        operation.type == OperationType.moving ||
+        operation.type == OperationType.visual ||
+        operation.type == OperationType.all;
   }
 
   @override

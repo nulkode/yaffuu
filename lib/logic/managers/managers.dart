@@ -30,10 +30,8 @@ abstract class BaseFFmpegManager {
 
   void setFile(XFile file);
   Stream<Progress> execute(Operation operation);
-  
-  /// Gets the last output file from the most recent operation
+
   XFile? get lastOutput;
-  
-  /// Clears the last output file reference
+
   void clearLastOutput() {}
 }

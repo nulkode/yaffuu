@@ -16,7 +16,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(      appBar: YaffuuAppBar(
+    return Scaffold(
+      appBar: YaffuuAppBar(
         leftChildren: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -130,11 +131,14 @@ class FilePickerCard extends StatelessWidget {
     super.key,
   });
 
-  @override  Widget build(BuildContext context) {    return BlocBuilder<QueueBloc, QueueState>(builder: (context, state) {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<QueueBloc, QueueState>(builder: (context, state) {
       final disabled = state is! QueueReadyState;
       final loading = state is QueueLoadingState;
       final showFiles = state is QueueReadyState && state.file is XFile;
-      final thumbnail = state is QueueReadyState ? state.thumbnail : null;      return Column(
+      final thumbnail = state is QueueReadyState ? state.thumbnail : null;
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Card.outlined(
@@ -183,7 +187,8 @@ class FilePickerCard extends StatelessWidget {
                                 )
                               : Container(
                                   key: ValueKey('file-${state.hashCode}'),
-                                  child: _buildFileDisplay(context, state, thumbnail),
+                                  child: _buildFileDisplay(
+                                      context, state, thumbnail),
                                 ),
                         )
                       : CircularProgressIndicator(
@@ -209,10 +214,13 @@ class FilePickerCard extends StatelessWidget {
                           children: [
                             OutlinedButton(
                               onPressed: () {
-                                context.read<QueueBloc>().add(RemoveFileEvent());
+                                context
+                                    .read<QueueBloc>()
+                                    .add(RemoveFileEvent());
                               },
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: Theme.of(context).colorScheme.primary,
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.primary,
                                 side: BorderSide(
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
@@ -229,18 +237,20 @@ class FilePickerCard extends StatelessWidget {
         ],
       );
     });
-  }  Widget _buildFileDisplay(BuildContext context, QueueState state, XFile? thumbnail) {
+  }
+
+  Widget _buildFileDisplay(
+      BuildContext context, QueueState state, XFile? thumbnail) {
     if (state is! QueueReadyState || state.file == null) {
       return const Text('No file selected');
     }
 
     final file = state.file!;
-    
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
-          // Thumbnail or placeholder
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: SizedBox(
@@ -253,18 +263,19 @@ class FilePickerCard extends StatelessWidget {
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           color: Colors.grey.shade300,
-                          child: const Icon(Icons.broken_image, color: Colors.grey),
+                          child: const Icon(Icons.broken_image,
+                              color: Colors.grey),
                         );
                       },
                     )
                   : Container(
                       color: Colors.grey.shade200,
-                      child: const Icon(Icons.video_file, size: 30, color: Colors.grey),
+                      child: const Icon(Icons.video_file,
+                          size: 30, color: Colors.grey),
                     ),
             ),
           ),
           const SizedBox(width: 12),
-          // File information
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,9 +295,8 @@ class FilePickerCard extends StatelessWidget {
                   future: file.length(),
                   builder: (context, snapshot) {
                     final size = snapshot.data;
-                    final sizeText = size != null 
-                        ? _formatFileSize(size)
-                        : 'Unknown size';
+                    final sizeText =
+                        size != null ? _formatFileSize(size) : 'Unknown size';
                     return Text(
                       sizeText,
                       style: TextStyle(
@@ -307,7 +317,8 @@ class FilePickerCard extends StatelessWidget {
   String _formatFileSize(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    if (bytes < 1024 * 1024 * 1024)
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 }

@@ -18,11 +18,10 @@ class FFmpegManager extends BaseFFmpegManager {
   XFile? _lastOutput;
 
   FFmpegManager(this._ffmpegInfo);
-  /// Gets the last output file from the most recent operation
+
   @override
   XFile? get lastOutput => _lastOutput;
 
-  /// Clears the last output file reference
   @override
   void clearLastOutput() {
     _lastOutput = null;
@@ -35,7 +34,6 @@ class FFmpegManager extends BaseFFmpegManager {
 
   @override
   Future<bool> isCompatible() {
-    // TODO: check versions, libraries, configurations, etc.
     return Future.value(true);
   }
 
@@ -43,6 +41,7 @@ class FFmpegManager extends BaseFFmpegManager {
   Future<bool> isOperationCompatible(Operation operation) {
     return Future.value(true);
   }
+
   @override
   Stream<Progress> execute(Operation operation) async* {
     logger.d('Executing operation: ${operation.runtimeType}');
@@ -62,11 +61,11 @@ class FFmpegManager extends BaseFFmpegManager {
     final inputFileArg = Argument(
       type: ArgumentType.inputFile,
       value: _file!.path,
-    );    if (!arguments.contains(inputFileArg)) {
+    );
+    if (!arguments.contains(inputFileArg)) {
       arguments.add(inputFileArg);
     }
-    
-    // Create temporary output path
+
     final tempOutputPath =
         '${appInfo.dataDir.path}/temp_${DateTime.now().millisecondsSinceEpoch}_${_file!.name}${outputExtensionArgs.isNotEmpty ? outputExtensionArgs.first.value : ''}';
 
@@ -75,14 +74,13 @@ class FFmpegManager extends BaseFFmpegManager {
     await for (final rawProgress in stream) {
       yield Progress.fromRaw(rawProgress);
     }
-    
-    // Move the completed file to the managed output directory
+
     final tempFile = File(tempOutputPath);
     if (await tempFile.exists()) {
-      final managedFile = await appInfo.outputFileManager.saveOutputFile(tempFile);
+      final managedFile =
+          await appInfo.outputFileManager.saveOutputFile(tempFile);
       _lastOutput = XFile(managedFile.path);
-      
-      // Clean up the temporary file
+
       await tempFile.delete();
     }
   }

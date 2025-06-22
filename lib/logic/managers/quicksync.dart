@@ -11,7 +11,7 @@ class QuickSyncManager extends BaseFFmpegManager {
         displayName: 'Intel Quick Sync',
         implemented: false,
       );
-      
+
   // ignore: unused_field
   final FFmpegInfo _ffmpegInfo;
   // ignore: unused_field
@@ -46,12 +46,11 @@ class QuickSyncManager extends BaseFFmpegManager {
   @override
   Future<bool> isOperationCompatible(Operation operation) async {
     if (!await isCompatible()) return false;
-    
-    // Quick Sync is mainly for video operations
-    return operation.type == OperationType.video || 
-           operation.type == OperationType.moving ||
-           operation.type == OperationType.visual ||
-           operation.type == OperationType.all;
+
+    return operation.type == OperationType.video ||
+        operation.type == OperationType.moving ||
+        operation.type == OperationType.visual ||
+        operation.type == OperationType.all;
   }
 
   @override

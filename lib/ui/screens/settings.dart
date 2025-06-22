@@ -99,7 +99,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           HelpButton(
                             title: 'Hardware Acceleration',
                             content:
-                              'Hardware acceleration usually makes processing faster by utilizing specialized hardware components, such as dedicated graphics cards (GPUs), to enhance video processing performance. Note that only certain codecs support hardware acceleration.',
+                                'Hardware acceleration usually makes processing faster by utilizing specialized hardware components, such as dedicated graphics cards (GPUs), to enhance video processing performance. Note that only certain codecs support hardware acceleration.',
                           ),
                         ],
                       ),
@@ -208,21 +208,20 @@ class _SettingsPageState extends State<SettingsPage> {
                       Row(
                         children: [
                           ElevatedButton.icon(
-                            onPressed: () {
-                              // Add your donation link or functionality here
-                            },
+                            onPressed: () {},
                             icon: const Icon(Icons.favorite, color: Colors.red),
                             label: const Text('Donate'),
                           ),
                           const SizedBox(width: 8),
-                          const Text('Half of the donations will be donated to ffmpeg.'),
+                          const Text(
+                              'Half of the donations will be donated to ffmpeg.'),
                         ],
                       ),
                       const SizedBox(height: 16),
                       const Text('yet another ffmpeg wrapper, version 0.1.0.'),
                       const SizedBox(height: 8),
-                        const Text(
-                          '''
+                      const Text(
+                        '''
 Copyright © 2025 nulkode
 
 This program is free software: you can redistribute it and/or modify
@@ -235,21 +234,20 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
                             ''',
-                          style: TextStyle(fontSize: 12.0),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text('FFmpeg is a trademark of Fabrice Bellard. yaffuu is not affiliated with FFmpeg.'),
-                        const SizedBox(height: 16),
-                        OutlinedButton(
-                          onPressed: () {
-                            showLicensePage(
-                              context: context,
-                            );
-                          },
-                          child: const Text('Show Licenses'),
-                        ),
-
-                      
+                        style: TextStyle(fontSize: 12.0),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                          'FFmpeg is a trademark of Fabrice Bellard. yaffuu is not affiliated with FFmpeg.'),
+                      const SizedBox(height: 16),
+                      OutlinedButton(
+                        onPressed: () {
+                          showLicensePage(
+                            context: context,
+                          );
+                        },
+                        child: const Text('Show Licenses'),
+                      ),
                       const SizedBox(height: 32),
                     ],
                   ),

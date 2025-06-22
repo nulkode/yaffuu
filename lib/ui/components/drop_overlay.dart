@@ -22,7 +22,8 @@ class _DropOverlayState extends State<DropOverlay> {
         builder: (context, route, child) {
           return BlocBuilder<QueueBloc, QueueState>(
             builder: (context, state) {
-              final canDrop = state is QueueReadyState && route.uri.path == '/home';
+              final canDrop =
+                  state is QueueReadyState && route.uri.path == '/home';
 
               return DropTarget(
                 onDragEntered: (detail) {

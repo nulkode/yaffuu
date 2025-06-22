@@ -56,7 +56,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
       } else if (_error == 4) {
         context.go('/error/ffmpeg-missing');
       } else if (_error != -1) {
-        context.go(Uri(path: '/error-$_error', queryParameters: {'extra': extra}).toString());
+        context.go(
+            Uri(path: '/error-$_error', queryParameters: {'extra': extra})
+                .toString());
       } else if (_toTutorial) {
         context.go('/tutorial');
       }
@@ -70,10 +72,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
       final hasSeenTutorial = prefs.hasSeenTutorial;
 
       final ffmpegInfo = await FFService.getFFmpegInfo();
-      final logFilePath = fileLogOutput.logFilePath;      final Directory dataDir = Directory(
+      final logFilePath = fileLogOutput.logFilePath;
+      final Directory dataDir = Directory(
           '${(await getApplicationDocumentsDirectory()).absolute.path}/data');
 
-      // Initialize output file manager with configurable limits
       final outputFileManager = OutputFileManager(
         dataDir: dataDir,
         maxSizeBytes: 2 * 1024 * 1024 * 1024, // 2GB limit
@@ -102,7 +104,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
       }
 
       // ignore: dead_code
-      if (/* !hasSeenTutorial */ false) { // TODO: build tutorial
+      if (/* !hasSeenTutorial */ false) {
+        // TODO: build tutorial
         setState(() {
           _toTutorial = true;
         });

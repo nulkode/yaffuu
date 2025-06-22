@@ -42,8 +42,9 @@ class ContextMenuButton extends StatelessWidget {
   void _showContextMenu(BuildContext context, Offset position) {
     logger.d('Showing context menu at position: $position');
 
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-    
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+
     showMenu(
       context: context,
       position: RelativeRect.fromRect(

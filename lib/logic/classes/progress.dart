@@ -38,7 +38,6 @@ class RawProgress {
   }
 }
 
-
 class Progress extends RawProgress {
   Progress._({
     required super.frame,

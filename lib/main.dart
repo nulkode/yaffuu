@@ -60,7 +60,8 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/error/ffmpeg-missing',
       builder: (context, state) => const FFmpegMissingScreen(),
-    ),    GoRoute(
+    ),
+    GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsPage(),
     ),

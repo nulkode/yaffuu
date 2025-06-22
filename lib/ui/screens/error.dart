@@ -38,7 +38,7 @@ class ErrorPage extends StatelessWidget {
         break;
       case AppErrorType.other:
         errorMessage = 'An unknown error occurred.';
-        break;  
+        break;
     }
 
     return Scaffold(

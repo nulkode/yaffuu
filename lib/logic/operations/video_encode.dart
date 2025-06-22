@@ -49,7 +49,7 @@ enum EncodingPreset {
 class VideoEncodeOperation implements Operation {
   @override
   final OperationType type = OperationType.video;
-  
+
   final VideoCodec codec;
   final int? bitrate; // in kbps
   final EncodingPreset? preset; // encoding preset
@@ -83,11 +83,9 @@ class VideoEncodeOperation implements Operation {
           break;
       }
     } else {
-      // Fallback to software encoding if no manager provided
       args.addAll(_getSoftwareArguments());
     }
 
-    // Add common arguments
     if (bitrate != null) {
       args.add(Argument(
         type: ArgumentType.output,
