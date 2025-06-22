@@ -38,7 +38,7 @@ class HomePage extends StatelessWidget {
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
-          child: const SingleChildScrollView(
+          child: SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -53,6 +53,8 @@ class HomePage extends StatelessWidget {
                   FilePickerCard(),
                   SizedBox(height: 16),
                   Text('Operation', style: titleStyle),
+                  SizedBox(height: 8),
+                  OperationsList(),
                 ],
               ),
             ),
@@ -320,5 +322,99 @@ class FilePickerCard extends StatelessWidget {
     if (bytes < 1024 * 1024 * 1024)
       return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  }
+}
+
+class OperationsList extends StatelessWidget {
+  const OperationsList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<QueueBloc, QueueState>(
+      builder: (context, state) {
+        final hasFile = state is QueueReadyState && state.file != null;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildOperationCard(
+              context: context,
+              title: 'Video Compression',
+              subtitle: 'Reduce file size while maintaining quality',
+              icon: Icons.compress,              enabled: hasFile,
+              onTap: hasFile
+                  ? () => context.push('/operations/compression')
+                  : null,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildOperationCard({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required bool enabled,
+    VoidCallback? onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Card.outlined(
+        clipBehavior: Clip.hardEdge,
+        child: InkWell(
+          onTap: enabled ? onTap : null,
+          child: Opacity(
+            opacity: enabled ? 1.0 : 0.5,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Icon(
+                    icon,
+                    size: 32,
+                    color: enabled
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.grey,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: enabled
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.grey,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

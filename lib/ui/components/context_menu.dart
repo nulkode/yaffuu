@@ -18,25 +18,46 @@ class ContextMenuAction {
 class ContextMenuButton extends StatelessWidget {
   final List<ContextMenuAction> actions;
   final Widget child;
+  final bool activateOnMainTap;
+  final bool positionAtWidget;
 
   const ContextMenuButton({
     super.key,
     required this.actions,
     required this.child,
+    this.activateOnMainTap = false,
+    this.positionAtWidget = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onSecondaryTapDown: (details) {
-        _showContextMenu(context, details.globalPosition);
+      onTapDown: activateOnMainTap ? (details) {
+        final position = positionAtWidget 
+            ? _getWidgetPosition(context)
+            : details.globalPosition;
+        _showContextMenu(context, position);
+      } : null,
+      onSecondaryTapDown: activateOnMainTap ? null : (details) {
+        final position = positionAtWidget 
+            ? _getWidgetPosition(context)
+            : details.globalPosition;
+        _showContextMenu(context, position);
       },
-      onLongPressStart: (details) {
-        _showContextMenu(context, details.globalPosition);
+      onLongPressStart: activateOnMainTap ? null : (details) {
+        final position = positionAtWidget 
+            ? _getWidgetPosition(context)
+            : details.globalPosition;
+        _showContextMenu(context, position);
       },
       child: child,
     );
+  }
+
+  Offset _getWidgetPosition(BuildContext context) {
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    return renderBox.localToGlobal(Offset.zero);
   }
 
   void _showContextMenu(BuildContext context, Offset position) {

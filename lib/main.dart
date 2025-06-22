@@ -11,6 +11,7 @@ import 'package:yaffuu/ui/screens/loading.dart';
 import 'package:yaffuu/ui/screens/home.dart';
 import 'package:yaffuu/ui/screens/output_files.dart';
 import 'package:yaffuu/ui/screens/settings.dart';
+import 'package:yaffuu/ui/screens/operations/compression.dart';
 import 'package:yaffuu/logic/bloc/theme.dart';
 import 'package:yaffuu/ui/components/drop_overlay.dart';
 
@@ -64,10 +65,13 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsPage(),
-    ),
-    GoRoute(
+    ),    GoRoute(
       path: '/output-files',
       builder: (context, state) => const OutputFilesScreen(),
+    ),
+    GoRoute(
+      path: '/operations/compression',
+      builder: (context, state) => const CompressionView(),
     ),
   ],
 );
