@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../logic/classes/compression_option.dart';
-import '../components/custom_size_input.dart';
+import '../../../../../logic/classes/compression_option.dart';
+import 'custom_size_input.dart';
 
 class ThresholdOptionCard extends StatelessWidget {
   final CompressionOption option;

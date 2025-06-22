@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../logic/classes/compression_option.dart';
-import '../../components/compression_header.dart';
+import 'compression/components/compression_header.dart';
 import 'compression/threshold_view.dart';
 import 'compression/advanced_view.dart';
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animated_list_plus/animated_list_plus.dart';
 import '../../../../logic/classes/compression_option.dart';
 import '../../../../logic/classes/compression_data.dart';
-import '../../../components/threshold_option_card.dart';
+import 'components/threshold_option_card.dart';
 
 class ThresholdView extends StatefulWidget {
   final Function(CompressionOption?, String?) onSelectionChanged;

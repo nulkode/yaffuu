@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../logic/classes/compression_option.dart';
-import '../../../styles/text.dart';
+import '../../../../../../logic/classes/compression_option.dart';
+import '../../../../../../styles/text.dart';
 
 class CompressionHeader extends StatelessWidget {
   final CompressionApproach selectedApproach;
