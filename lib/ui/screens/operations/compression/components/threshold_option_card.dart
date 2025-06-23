@@ -39,12 +39,11 @@ class ThresholdOptionCard extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                // Determine layout based on card width
                 const minWidthForInline = 500.0;
-                final shouldUseInlineLayout = option.isCustom && 
-                    isSelected && 
+                final shouldUseInlineLayout = option.isCustom &&
+                    isSelected &&
                     constraints.maxWidth >= minWidthForInline;
-                
+
                 return Column(
                   children: [
                     Row(
@@ -53,7 +52,7 @@ class ThresholdOptionCard extends StatelessWidget {
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: option.color.withOpacity(0.1),
+                            color: option.color.withAlpha(25),
                             borderRadius: BorderRadius.circular(24),
                           ),
                           child: Icon(
@@ -94,7 +93,9 @@ class ThresholdOptionCard extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           )
-                        else if (isSelected && shouldUseInlineLayout && _canShowCustomInput())
+                        else if (isSelected &&
+                            shouldUseInlineLayout &&
+                            _canShowCustomInput())
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(left: 16),
@@ -103,10 +104,9 @@ class ThresholdOptionCard extends StatelessWidget {
                           ),
                       ],
                     ),
-                    // Custom size input for the Custom option when selected (vertical fallback)
-                    if (option.isCustom && 
-                        isSelected && 
-                        !shouldUseInlineLayout && 
+                    if (option.isCustom &&
+                        isSelected &&
+                        !shouldUseInlineLayout &&
                         _canShowCustomInput())
                       Padding(
                         padding: const EdgeInsets.only(top: 16),
@@ -123,10 +123,10 @@ class ThresholdOptionCard extends StatelessWidget {
   }
 
   bool _canShowCustomInput() {
-    return customSizeController != null && 
-           selectedUnit != null && 
-           units != null && 
-           onUnitChanged != null;
+    return customSizeController != null &&
+        selectedUnit != null &&
+        units != null &&
+        onUnitChanged != null;
   }
 
   Widget _buildCustomInput() {

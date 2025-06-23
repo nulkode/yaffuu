@@ -22,8 +22,7 @@ class VideoToImageOperation implements Operation {
       if (position != null)
         Argument(
           type: ArgumentType.output,
-          value:
-              '-ss ${position!.inSeconds}',
+          value: '-ss ${position!.inSeconds}',
         ),
       Argument(
         type: ArgumentType.output,

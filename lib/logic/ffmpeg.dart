@@ -178,7 +178,7 @@ abstract class FFService {
         final isRunning = !await process.exitCode
             .timeout(
               const Duration(milliseconds: 1),
-              onTimeout: () => -1, // Still running if timeout occurs
+              onTimeout: () => -1,
             )
             .then((code) => true)
             .catchError((_) => false);

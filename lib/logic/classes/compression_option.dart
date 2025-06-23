@@ -23,7 +23,7 @@ class CompressionOption {
       'maxSize': maxSize,
       'icon': icon.codePoint,
       'description': description,
-      'color': color.value,
+      'color': color.toARGB32(),
       'isCustom': isCustom,
     };
   }
@@ -32,9 +32,10 @@ class CompressionOption {
     return CompressionOption(
       platform: map['platform'] ?? '',
       maxSize: map['maxSize'] ?? '',
-      icon: IconData(map['icon'] ?? Icons.help.codePoint, fontFamily: 'MaterialIcons'),
+      icon: IconData(map['icon'] ?? Icons.help.codePoint,
+          fontFamily: 'MaterialIcons'),
       description: map['description'] ?? '',
-      color: Color(map['color'] ?? Colors.grey.value),
+      color: Color(map['color'] ?? Colors.grey.toARGB32()),
       isCustom: map['isCustom'] ?? false,
     );
   }

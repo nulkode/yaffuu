@@ -37,49 +37,52 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _initializePreferences() async {
     _userPreferences = await UserPreferences.getInstance();
     setState(() {
-      _selectedHardwareAcceleration = _userPreferences.preferredHardwareAcceleration;
+      _selectedHardwareAcceleration =
+          _userPreferences.preferredHardwareAcceleration;
     });
-  }  void _updateHardwareAcceleration(String method) async {
+  }
+
+  void _updateHardwareAcceleration(String method) async {
     setState(() {
       _selectedHardwareAcceleration = method;
     });
     _userPreferences.preferredHardwareAcceleration = method;
 
-    // Update the queue manager using the provider
     try {
-      final manager = await getIt<FFmpegManagerProvider>().createManager(method);
-      
+      final manager =
+          await getIt<FFmpegManagerProvider>().createManager(method);
+
       if (mounted) {
         context.read<QueueBloc>().add(SetManagerEvent(manager));
       }
     } catch (e) {
-      // Handle compatibility errors gracefully
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Hardware acceleration "$method" is not compatible: $e'),
+            content:
+                Text('Hardware acceleration "$method" is not compatible: $e'),
             backgroundColor: Colors.red,
           ),
         );
-        
-        // Revert to 'none' if the selected method fails
+
         setState(() {
           _selectedHardwareAcceleration = 'none';
         });
         _userPreferences.preferredHardwareAcceleration = 'none';
-        
-        // Try to create a fallback manager
+
         try {
-          final fallbackManager = await getIt<FFmpegManagerProvider>().createManager('none');
+          final fallbackManager =
+              await getIt<FFmpegManagerProvider>().createManager('none');
           if (mounted) {
             context.read<QueueBloc>().add(SetManagerEvent(fallbackManager));
           }
         } catch (fallbackError) {
-          // If even 'none' fails, there's a bigger problem
+          // TODO: revise
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Critical error: Unable to create fallback manager: $fallbackError'),
+                content: Text(
+                    'Critical error: Unable to create fallback manager: $fallbackError'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -152,7 +155,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: 32),
                       const Row(
                         children: [
-                          Text('Hardware Acceleration', style: AppTypography.titleStyle),
+                          Text('Hardware Acceleration',
+                              style: AppTypography.titleStyle),
                           SizedBox(width: 8),
                           HelpButton(
                             title: 'Hardware Acceleration',
@@ -160,23 +164,27 @@ class _SettingsPageState extends State<SettingsPage> {
                                 'Hardware acceleration usually makes processing faster by utilizing specialized hardware components, such as dedicated graphics cards (GPUs), to enhance video processing performance. Note that only certain codecs support hardware acceleration.',
                           ),
                         ],
-                      ),                      const SizedBox(height: 8),
+                      ),
+                      const SizedBox(height: 8),
                       Column(
-                        children: FFmpegManagerProvider.getAvailableAccelerations()
-                            .map((acceleration) {
+                        children:
+                            FFmpegManagerProvider.getAvailableAccelerations()
+                                .map((acceleration) {
                           return Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 4.0),
                             child: Column(
                               children: [
-                                Row(                                  children: [
+                                Row(
+                                  children: [
                                     Radio<String>(
                                       value: acceleration.id,
                                       groupValue: _selectedHardwareAcceleration,
                                       onChanged: acceleration.implemented
                                           ? (value) {
                                               if (value != null) {
-                                                _updateHardwareAcceleration(value);
+                                                _updateHardwareAcceleration(
+                                                    value);
                                               }
                                             }
                                           : null,
@@ -210,7 +218,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         }).toList(),
                       ),
                       const SizedBox(height: 32),
-                      const Text('FFmpeg Information', style: AppTypography.titleStyle),
+                      const Text('FFmpeg Information',
+                          style: AppTypography.titleStyle),
                       const SizedBox(height: 8),
                       Text('Version: ${_ffmpegInfo.version}'),
                       const SizedBox(height: 8),
@@ -221,7 +230,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       ConfigurationSection(ffmpegInfo: _ffmpegInfo),
                       const SizedBox(height: 16),
                       LibrariesSection(ffmpegInfo: _ffmpegInfo),
-                      const SizedBox(height: 16),                      const Text('Hardware Acceleration Methods',
+                      const SizedBox(height: 16),
+                      const Text('Hardware Acceleration Methods',
                           style: AppTypography.subtitleStyle),
                       const SizedBox(height: 8),
                       Wrap(
@@ -332,11 +342,13 @@ class LibrariesSection extends StatelessWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Text('Compiled Version', style: AppTypography.subsubtitleStyle),
+                  child: Text('Compiled Version',
+                      style: AppTypography.subsubtitleStyle),
                 ),
                 Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Text('Runtime Version', style: AppTypography.subsubtitleStyle),
+                  child: Text('Runtime Version',
+                      style: AppTypography.subsubtitleStyle),
                 ),
               ],
             ),

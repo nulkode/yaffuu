@@ -10,13 +10,12 @@ class FFmpegManagerProvider {
 
   FFmpegManagerProvider(this._ffmpegInfo);
 
-  /// Create a manager for the specified acceleration method
   Future<BaseFFmpegManager> createManager(String acceleration) async {
     final BaseFFmpegManager manager = switch (acceleration) {
       'none' => FFmpegManager(_ffmpegInfo),
       'cuda' => CUDAManager(_ffmpegInfo),
       'quicksync' => QuickSyncManager(_ffmpegInfo),
-      _ => FFmpegManager(_ffmpegInfo), // Default fallback
+      _ => FFmpegManager(_ffmpegInfo),
     };
 
     if (!(await manager.isCompatible())) {
@@ -26,12 +25,14 @@ class FFmpegManagerProvider {
     return manager;
   }
 
-  /// Get all available acceleration methods
   static List<AccelerationInformation> getAvailableAccelerations() {
     return [
-      AccelerationInformation(id: 'none', displayName: 'None', implemented: true),
-      AccelerationInformation(id: 'cuda', displayName: 'NVIDIA CUDA', implemented: false),
-      AccelerationInformation(id: 'quicksync', displayName: 'Intel Quick Sync', implemented: false),
+      AccelerationInformation(
+          id: 'none', displayName: 'None', implemented: true),
+      AccelerationInformation(
+          id: 'cuda', displayName: 'NVIDIA CUDA', implemented: false),
+      AccelerationInformation(
+          id: 'quicksync', displayName: 'Intel Quick Sync', implemented: false),
     ];
   }
 }

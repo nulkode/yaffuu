@@ -18,9 +18,9 @@ class CompressionHeader extends StatelessWidget {
       builder: (context, constraints) {
         const headerText = Text('Compression', style: AppTypography.titleStyle);
         final segmentedButton = _buildSegmentedButton();
-        
+
         const minWidthForInline = 500.0;
-        
+
         if (constraints.maxWidth >= minWidthForInline) {
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

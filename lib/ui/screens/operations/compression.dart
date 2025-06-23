@@ -40,16 +40,15 @@ class _CompressionViewState extends State<CompressionView> {
                   onApproachChanged: _onApproachChanged,
                 ),
                 const SizedBox(height: 32),
-                // Dynamic content based on selected approach
                 Expanded(
                   child: _buildCompressionContent(),
                 ),
                 const SizedBox(height: 16),
-                // Common Start Compression button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _canStartCompression() ? _startCompression : null,
+                    onPressed:
+                        _canStartCompression() ? _startCompression : null,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
@@ -79,7 +78,6 @@ class _CompressionViewState extends State<CompressionView> {
   void _onApproachChanged(CompressionApproach approach) {
     setState(() {
       selectedApproach = approach;
-      // Reset selection when switching approaches
       selectedOption = null;
       customSize = null;
     });
@@ -97,17 +95,18 @@ class _CompressionViewState extends State<CompressionView> {
       case CompressionApproach.byThreshold:
         return selectedOption != null;
       case CompressionApproach.advanced:
-        return true; // Advanced view is always valid for now
+        return true;
     }
   }
 
   void _startCompression() {
-    // TODO: Implement compression logic
     if (selectedOption != null) {
-      final size = selectedOption!.isCustom ? customSize : selectedOption!.maxSize;
+      final size =
+          selectedOption!.isCustom ? customSize : selectedOption!.maxSize;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Starting compression for ${selectedOption!.platform}: $size'),
+          content: Text(
+              'Starting compression for ${selectedOption!.platform}: $size'),
         ),
       );
     }

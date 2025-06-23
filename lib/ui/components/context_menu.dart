@@ -33,24 +33,30 @@ class ContextMenuButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onTapDown: activateOnMainTap ? (details) {
-        final position = positionAtWidget 
-            ? _getWidgetPosition(context)
-            : details.globalPosition;
-        _showContextMenu(context, position);
-      } : null,
-      onSecondaryTapDown: activateOnMainTap ? null : (details) {
-        final position = positionAtWidget 
-            ? _getWidgetPosition(context)
-            : details.globalPosition;
-        _showContextMenu(context, position);
-      },
-      onLongPressStart: activateOnMainTap ? null : (details) {
-        final position = positionAtWidget 
-            ? _getWidgetPosition(context)
-            : details.globalPosition;
-        _showContextMenu(context, position);
-      },
+      onTapDown: activateOnMainTap
+          ? (details) {
+              final position = positionAtWidget
+                  ? _getWidgetPosition(context)
+                  : details.globalPosition;
+              _showContextMenu(context, position);
+            }
+          : null,
+      onSecondaryTapDown: activateOnMainTap
+          ? null
+          : (details) {
+              final position = positionAtWidget
+                  ? _getWidgetPosition(context)
+                  : details.globalPosition;
+              _showContextMenu(context, position);
+            },
+      onLongPressStart: activateOnMainTap
+          ? null
+          : (details) {
+              final position = positionAtWidget
+                  ? _getWidgetPosition(context)
+                  : details.globalPosition;
+              _showContextMenu(context, position);
+            },
       child: child,
     );
   }

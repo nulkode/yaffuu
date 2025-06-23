@@ -18,11 +18,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
     super.initState();
     _initializeApp();
   }
+
   Future<void> _initializeApp() async {
     final result = await AppInitializationService.initialize();
-    
+
     if (!mounted) return;
-    
+
     if (result.manager != null) {
       context.read<QueueBloc>().add(SetManagerEvent(result.manager!));
     }
@@ -36,7 +37,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
     } else if (result.errorCode != null) {
       final uri = Uri(
         path: '/error-${result.errorCode}',
-        queryParameters: result.errorExtra != null ? {'extra': result.errorExtra} : null,
+        queryParameters:
+            result.errorExtra != null ? {'extra': result.errorExtra} : null,
       );
       context.go(uri.toString());
     }

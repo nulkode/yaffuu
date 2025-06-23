@@ -29,9 +29,8 @@ class _ThresholdViewState extends State<ThresholdView> {
 
   @override
   Widget build(BuildContext context) {
-    // Get the list of options to display based on selection state
-    final displayOptions = selectedOptionIndex == null 
-        ? CompressionData.defaultOptions 
+    final displayOptions = selectedOptionIndex == null
+        ? CompressionData.defaultOptions
         : [CompressionData.defaultOptions[selectedOptionIndex!]];
 
     return Column(
@@ -40,7 +39,7 @@ class _ThresholdViewState extends State<ThresholdView> {
         const SizedBox(height: 8),
         ImplicitlyAnimatedList<CompressionOption>(
           items: displayOptions,
-          areItemsTheSame: (oldItem, newItem) => 
+          areItemsTheSame: (oldItem, newItem) =>
               oldItem.platform == newItem.platform,
           insertDuration: const Duration(milliseconds: 400),
           removeDuration: const Duration(milliseconds: 300),
@@ -56,7 +55,8 @@ class _ThresholdViewState extends State<ThresholdView> {
               curve: const Interval(0.0, 0.8, curve: Curves.easeOut),
             );
 
-            final originalIndex = CompressionData.defaultOptions.indexOf(option);
+            final originalIndex =
+                CompressionData.defaultOptions.indexOf(option);
             final isSelected = selectedOptionIndex == originalIndex;
 
             return SizeTransition(
@@ -73,7 +73,8 @@ class _ThresholdViewState extends State<ThresholdView> {
                     index: originalIndex,
                     isSelected: isSelected,
                     onTap: () => _selectOption(originalIndex, option),
-                    customSizeController: option.isCustom ? _customSizeController : null,
+                    customSizeController:
+                        option.isCustom ? _customSizeController : null,
                     selectedUnit: option.isCustom ? _selectedUnit : null,
                     units: option.isCustom ? CompressionData.sizeUnits : null,
                     onUnitChanged: option.isCustom ? _onUnitChanged : null,
@@ -85,7 +86,6 @@ class _ThresholdViewState extends State<ThresholdView> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
         ),
-        // Close button outside the list when an option is selected
         AnimatedOpacity(
           duration: const Duration(milliseconds: 300),
           opacity: selectedOptionIndex != null ? 1.0 : 0.0,
@@ -114,15 +114,14 @@ class _ThresholdViewState extends State<ThresholdView> {
     setState(() {
       if (selectedOptionIndex == null) {
         selectedOptionIndex = index;
-        // Set default value for custom option
         if (option.isCustom) {
           _customSizeController.text = '25';
         }
       }
     });
-    
-    // Notify parent about selection
-    final customSize = option.isCustom ? '${_customSizeController.text} $_selectedUnit' : null;
+
+    final customSize =
+        option.isCustom ? '${_customSizeController.text} $_selectedUnit' : null;
     widget.onSelectionChanged(option, customSize);
   }
 
@@ -137,13 +136,12 @@ class _ThresholdViewState extends State<ThresholdView> {
     setState(() {
       _selectedUnit = unit;
     });
-    
-    // Update parent if custom option is selected
-    if (selectedOptionIndex != null && 
+
+    if (selectedOptionIndex != null &&
         CompressionData.defaultOptions[selectedOptionIndex!].isCustom) {
       final customSize = '${_customSizeController.text} $_selectedUnit';
       widget.onSelectionChanged(
-        CompressionData.defaultOptions[selectedOptionIndex!], 
+        CompressionData.defaultOptions[selectedOptionIndex!],
         customSize,
       );
     }

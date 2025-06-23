@@ -319,8 +319,9 @@ class FilePickerCard extends StatelessWidget {
   String _formatFileSize(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024)
+    if (bytes < 1024 * 1024 * 1024) {
       return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 }
@@ -341,7 +342,8 @@ class OperationsList extends StatelessWidget {
               context: context,
               title: 'Video Compression',
               subtitle: 'Reduce file size while maintaining quality',
-              icon: Icons.compress,              enabled: hasFile,
+              icon: Icons.compress,
+              enabled: hasFile,
               onTap: hasFile
                   ? () => context.push('/operations/compression')
                   : null,

@@ -177,7 +177,7 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
     }
 
     // TODO: start operation
-    
+
     emit(QueueBusyState(manager, operation, 0, file, thumbnail));
   }
 
@@ -263,7 +263,7 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
       final stream = manager.execute(operation);
 
       await for (final progress in stream) {
-        if (emit.isDone) break; // Check if emitter is still active
+        if (emit.isDone) break;
         logger.d(
             'Thumbnail generation progress: frame=${progress.frame}, fps=${progress.fps}, size=${progress.size}');
       }
@@ -272,7 +272,7 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
       return manager.lastOutput;
     } catch (error) {
       logger.e('Error during thumbnail generation: $error');
-      return null; // Return null if thumbnail generation fails
+      return null;
     }
   }
 

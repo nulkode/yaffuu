@@ -215,7 +215,7 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
     if (confirm == true) {
       try {
         await _outputManager.deleteOutputFile(fileInfo.file);
-        await _loadFiles(); // Refresh the list
+        await _loadFiles();
 
         if (mounted) {
           showDialog(
@@ -276,7 +276,7 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
     if (confirm == true) {
       try {
         await _outputManager.clearAllFiles();
-        await _loadFiles(); // Refresh the list
+        await _loadFiles();
 
         if (mounted) {
           showDialog(
@@ -339,7 +339,8 @@ class _OutputFilesScreenState extends State<OutputFilesScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Storage Usage', style: AppTypography.titleStyle),
+                        const Text('Storage Usage',
+                            style: AppTypography.titleStyle),
                         const SizedBox(height: 16),
                         LinearProgressIndicator(
                           value: _stats!.usagePercentage / 100,

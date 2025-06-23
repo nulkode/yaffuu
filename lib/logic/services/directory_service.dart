@@ -13,9 +13,9 @@ class DirectoryService {
       maxFiles: 150, // Maximum 150 files
       cleanupStrategy: CleanupStrategy.oldestFirst,
     );
-    
+
     await outputFileManager.initialize();
-    
+
     return (dataDir, outputFileManager);
   }
 }

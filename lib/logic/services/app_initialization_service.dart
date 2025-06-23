@@ -25,26 +25,24 @@ class AppInitializationResult {
     this.manager,
   });
 
-  AppInitializationResult.success(BaseFFmpegManager manager) :
-    isInitialized = true,
-    errorCode = null,
-    errorExtra = null,
-    shouldShowTutorial = false,
-    manager = manager;
+  AppInitializationResult.success(BaseFFmpegManager this.manager)
+      : isInitialized = true,
+        errorCode = null,
+        errorExtra = null,
+        shouldShowTutorial = false;
 
-  AppInitializationResult.tutorial() :
-    isInitialized = false,
-    errorCode = null,
-    errorExtra = null,
-    shouldShowTutorial = true,
-    manager = null;
+  AppInitializationResult.tutorial()
+      : isInitialized = false,
+        errorCode = null,
+        errorExtra = null,
+        shouldShowTutorial = true,
+        manager = null;
 
-  AppInitializationResult.error(int errorCode, [String? extra]) :
-    isInitialized = false,
-    errorCode = errorCode,
-    errorExtra = extra,
-    shouldShowTutorial = false,
-    manager = null;
+  AppInitializationResult.error(int this.errorCode, [String? extra])
+      : isInitialized = false,
+        errorExtra = extra,
+        shouldShowTutorial = false,
+        manager = null;
 }
 
 class AppInitializationService {
@@ -56,8 +54,9 @@ class AppInitializationService {
 
       final ffmpegInfo = await FFService.getFFmpegInfo();
       final logFilePath = fileLogOutput.logFilePath;
-      
-      final (dataDir, outputFileManager) = await DirectoryService.setupDirectories();
+
+      final (dataDir, outputFileManager) =
+          await DirectoryService.setupDirectories();
 
       final appInfo = AppInfo(
         logPathInfo: logFilePath,
@@ -68,9 +67,8 @@ class AppInitializationService {
 
       DependencyInjectionService.registerAppInfo(appInfo);
 
-      final manager = await getIt<FFmpegManagerProvider>().createManager(
-        prefs.preferredHardwareAcceleration
-      );
+      final manager = await getIt<FFmpegManagerProvider>()
+          .createManager(prefs.preferredHardwareAcceleration);
 
       // ignore: dead_code
       if (/* !hasSeenTutorial */ false) {
