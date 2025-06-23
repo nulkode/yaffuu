@@ -39,12 +39,13 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {
       _selectedHardwareAcceleration = _userPreferences.preferredHardwareAcceleration;
     });
-  }
-  void _updateHardwareAcceleration(String method) async {
+  }  void _updateHardwareAcceleration(String method) async {
     setState(() {
       _selectedHardwareAcceleration = method;
     });
-    _userPreferences.preferredHardwareAcceleration = method;    // Update the queue manager using the provider
+    _userPreferences.preferredHardwareAcceleration = method;
+
+    // Update the queue manager using the provider
     try {
       final manager = await getIt<FFmpegManagerProvider>().createManager(method);
       
@@ -68,8 +69,22 @@ class _SettingsPageState extends State<SettingsPage> {
         _userPreferences.preferredHardwareAcceleration = 'none';
         
         // Try to create a fallback manager
-        final fallbackManager = await getIt<FFmpegManagerProvider>().createManager('none');
-        context.read<QueueBloc>().add(SetManagerEvent(fallbackManager));
+        try {
+          final fallbackManager = await getIt<FFmpegManagerProvider>().createManager('none');
+          if (mounted) {
+            context.read<QueueBloc>().add(SetManagerEvent(fallbackManager));
+          }
+        } catch (fallbackError) {
+          // If even 'none' fails, there's a bigger problem
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Critical error: Unable to create fallback manager: $fallbackError'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
       }
     }
   }
