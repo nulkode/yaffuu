@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yaffuu/logic/bloc/queue.dart';
-import 'package:yaffuu/logic/services/ffmpeg_manager_service.dart';
+import 'package:yaffuu/logic/providers/ffmpeg_manager_provider.dart';
 import 'package:yaffuu/logic/models/app_info.dart';
 import 'package:yaffuu/logic/models/ffmpeg_info.dart';
 import 'package:yaffuu/logic/user_preferences.dart';
@@ -44,14 +44,9 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {
       _selectedHardwareAcceleration = method;
     });
-    _userPreferences.preferredHardwareAcceleration = method;
-
-    // Update the queue manager using the service
+    _userPreferences.preferredHardwareAcceleration = method;    // Update the queue manager using the provider
     try {
-      final manager = await FFmpegManagerService.createManager(
-        getIt<AppInfo>().ffmpegInfo,
-        method,
-      );
+      final manager = await getIt<FFmpegManagerProvider>().createManager(method);
       
       if (mounted) {
         context.read<QueueBloc>().add(SetManagerEvent(manager));
@@ -73,10 +68,7 @@ class _SettingsPageState extends State<SettingsPage> {
         _userPreferences.preferredHardwareAcceleration = 'none';
         
         // Try to create a fallback manager
-        final fallbackManager = await FFmpegManagerService.createManager(
-          getIt<AppInfo>().ffmpegInfo,
-          'none',
-        );
+        final fallbackManager = await getIt<FFmpegManagerProvider>().createManager('none');
         context.read<QueueBloc>().add(SetManagerEvent(fallbackManager));
       }
     }
@@ -155,7 +147,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ],
                       ),                      const SizedBox(height: 8),
                       Column(
-                        children: FFmpegManagerService.getAvailableAccelerations()
+                        children: FFmpegManagerProvider.getAvailableAccelerations()
                             .map((acceleration) {
                           return Padding(
                             padding:

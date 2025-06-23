@@ -5,16 +5,18 @@ import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/classes/exception.dart';
 import 'package:yaffuu/logic/models/ffmpeg_info.dart';
 
-class FFmpegManagerService {
-  static Future<BaseFFmpegManager> createManager(
-    FFmpegInfo ffmpegInfo, 
-    String acceleration
-  ) async {
+class FFmpegManagerProvider {
+  final FFmpegInfo _ffmpegInfo;
+
+  FFmpegManagerProvider(this._ffmpegInfo);
+
+  /// Create a manager for the specified acceleration method
+  Future<BaseFFmpegManager> createManager(String acceleration) async {
     final BaseFFmpegManager manager = switch (acceleration) {
-      'none' => FFmpegManager(ffmpegInfo),
-      'cuda' => CUDAManager(ffmpegInfo),
-      'quicksync' => QuickSyncManager(ffmpegInfo),
-      _ => FFmpegManager(ffmpegInfo), // Default fallback
+      'none' => FFmpegManager(_ffmpegInfo),
+      'cuda' => CUDAManager(_ffmpegInfo),
+      'quicksync' => QuickSyncManager(_ffmpegInfo),
+      _ => FFmpegManager(_ffmpegInfo), // Default fallback
     };
 
     if (!(await manager.isCompatible())) {

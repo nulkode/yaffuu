@@ -5,9 +5,10 @@ import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/classes/exception.dart';
 import 'package:yaffuu/logic/models/app_info.dart';
 import 'package:yaffuu/logic/services/directory_service.dart';
-import 'package:yaffuu/logic/services/ffmpeg_manager_service.dart';
+import 'package:yaffuu/logic/providers/ffmpeg_manager_provider.dart';
 import 'package:yaffuu/logic/services/dependency_injection_service.dart';
 import 'package:yaffuu/ui/screens/error.dart';
+import 'package:yaffuu/main.dart';
 
 class AppInitializationResult {
   final bool isInitialized;
@@ -67,8 +68,7 @@ class AppInitializationService {
 
       DependencyInjectionService.registerAppInfo(appInfo);
 
-      final manager = await FFmpegManagerService.createManager(
-        ffmpegInfo, 
+      final manager = await getIt<FFmpegManagerProvider>().createManager(
         prefs.preferredHardwareAcceleration
       );
 
