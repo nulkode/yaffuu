@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:yaffuu/logic/ffmpeg.dart';
 import 'package:yaffuu/logic/managers/output_file.dart';
+import 'package:yaffuu/logic/models/ffmpeg_info.dart';
 
 class AppInfo {
   final String logPathInfo;

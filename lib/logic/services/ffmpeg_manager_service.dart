@@ -1,8 +1,8 @@
-import 'package:yaffuu/logic/ffmpeg.dart';
 import 'package:yaffuu/logic/managers/cuda.dart';
 import 'package:yaffuu/logic/managers/ffmpeg.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/classes/exception.dart';
+import 'package:yaffuu/logic/models/ffmpeg_info.dart';
 
 class FFmpegManagerService {
   static Future<BaseFFmpegManager> createManager(

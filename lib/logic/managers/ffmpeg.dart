@@ -2,10 +2,11 @@
 
 import 'dart:io';
 import 'package:cross_file/cross_file.dart';
-import 'package:yaffuu/logic/classes/progress.dart';
+import 'package:yaffuu/logic/models/progress.dart';
 import 'package:yaffuu/logic/logger.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
 import 'package:yaffuu/logic/models/app_info.dart';
+import 'package:yaffuu/logic/models/ffmpeg_info.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
 import 'package:yaffuu/logic/ffmpeg.dart';
 import 'package:yaffuu/main.dart';

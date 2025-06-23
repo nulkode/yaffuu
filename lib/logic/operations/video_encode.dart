@@ -1,4 +1,4 @@
-import 'package:yaffuu/logic/classes/compatibility.dart';
+import 'package:yaffuu/logic/models/compatibility.dart';
 import 'package:yaffuu/logic/operations/operations.dart';
 import 'package:yaffuu/logic/managers/managers.dart';
 

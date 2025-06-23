@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yaffuu/logic/bloc/queue.dart';
-import 'package:yaffuu/logic/ffmpeg.dart';
 import 'package:yaffuu/logic/managers/cuda.dart';
 import 'package:yaffuu/logic/managers/ffmpeg.dart';
 import 'package:yaffuu/logic/models/app_info.dart';
+import 'package:yaffuu/logic/models/ffmpeg_info.dart';
 import 'package:yaffuu/main.dart';
 import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/ui/components/appbar.dart';
