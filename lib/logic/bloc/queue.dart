@@ -176,7 +176,9 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
           manager, null, Exception('No operation'), file, thumbnail));
     }
 
-    // TODO: start operation    emit(QueueBusyState(manager, operation, 0, file, thumbnail));
+    // TODO: start operation
+    
+    emit(QueueBusyState(manager, operation, 0, file, thumbnail));
   }
 
   void _onReady(
