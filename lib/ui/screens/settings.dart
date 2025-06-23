@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yaffuu/logic/bloc/queue.dart';
-import 'package:yaffuu/logic/managers/cuda.dart';
-import 'package:yaffuu/logic/managers/ffmpeg.dart';
+import 'package:yaffuu/logic/services/ffmpeg_manager_service.dart';
 import 'package:yaffuu/logic/models/app_info.dart';
 import 'package:yaffuu/logic/models/ffmpeg_info.dart';
+import 'package:yaffuu/logic/user_preferences.dart';
 import 'package:yaffuu/main.dart';
 import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/ui/components/appbar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yaffuu/ui/components/help.dart';
 import 'package:yaffuu/logic/bloc/theme.dart';
-import 'package:yaffuu/logic/bloc/hardware_acceleration.dart';
 import 'package:yaffuu/ui/components/logos.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -22,6 +21,9 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  late UserPreferences _userPreferences;
+  String _selectedHardwareAcceleration = 'none';
+
   FFmpegInfo get _ffmpegInfo {
     return getIt<AppInfo>().ffmpegInfo;
   }
@@ -29,6 +31,55 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
+    _initializePreferences();
+  }
+
+  Future<void> _initializePreferences() async {
+    _userPreferences = await UserPreferences.getInstance();
+    setState(() {
+      _selectedHardwareAcceleration = _userPreferences.preferredHardwareAcceleration;
+    });
+  }
+  void _updateHardwareAcceleration(String method) async {
+    setState(() {
+      _selectedHardwareAcceleration = method;
+    });
+    _userPreferences.preferredHardwareAcceleration = method;
+
+    // Update the queue manager using the service
+    try {
+      final manager = await FFmpegManagerService.createManager(
+        getIt<AppInfo>().ffmpegInfo,
+        method,
+      );
+      
+      if (mounted) {
+        context.read<QueueBloc>().add(SetManagerEvent(manager));
+      }
+    } catch (e) {
+      // Handle compatibility errors gracefully
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Hardware acceleration "$method" is not compatible: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        
+        // Revert to 'none' if the selected method fails
+        setState(() {
+          _selectedHardwareAcceleration = 'none';
+        });
+        _userPreferences.preferredHardwareAcceleration = 'none';
+        
+        // Try to create a fallback manager
+        final fallbackManager = await FFmpegManagerService.createManager(
+          getIt<AppInfo>().ffmpegInfo,
+          'none',
+        );
+        context.read<QueueBloc>().add(SetManagerEvent(fallbackManager));
+      }
+    }
   }
 
   @override
@@ -102,67 +153,54 @@ class _SettingsPageState extends State<SettingsPage> {
                                 'Hardware acceleration usually makes processing faster by utilizing specialized hardware components, such as dedicated graphics cards (GPUs), to enhance video processing performance. Note that only certain codecs support hardware acceleration.',
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 8),
-                      BlocBuilder<HardwareAccelerationBloc,
-                          HardwareAccelerationState>(
-                        builder: (context, selectedMethod) {
-                          final hardwareAccelerations = {
-                            'none': 'None',
-                          }; // TODO: make this dynamic
-
-                          return Column(
-                            children:
-                                hardwareAccelerations.entries.map((entry) {
-                              final id = entry.key;
-                              final friendlyName = entry.value;
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4.0),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Radio<String>(
-                                          value: id,
-                                          groupValue: selectedMethod.method,
-                                          onChanged: (value) {
-                                            context
-                                                .read<
-                                                    HardwareAccelerationBloc>()
-                                                .add(HardwareAccelerationEvent(
-                                                    value!));
-
-                                            if (value == 'none') {
-                                              context.read<QueueBloc>().add(
-                                                    SetManagerEvent(
-                                                      FFmpegManager(
-                                                          getIt<AppInfo>()
-                                                              .ffmpegInfo),
-                                                    ),
-                                                  );
-                                            } else if (value == 'cuda') {
-                                              context.read<QueueBloc>().add(
-                                                    SetManagerEvent(
-                                                      CUDAManager(
-                                                          getIt<AppInfo>()
-                                                              .ffmpegInfo),
-                                                    ),
-                                                  );
+                      ),                      const SizedBox(height: 8),
+                      Column(
+                        children: FFmpegManagerService.getAvailableAccelerations()
+                            .map((acceleration) {
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 4.0),
+                            child: Column(
+                              children: [
+                                Row(                                  children: [
+                                    Radio<String>(
+                                      value: acceleration.id,
+                                      groupValue: _selectedHardwareAcceleration,
+                                      onChanged: acceleration.implemented
+                                          ? (value) {
+                                              if (value != null) {
+                                                _updateHardwareAcceleration(value);
+                                              }
                                             }
-                                          },
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(friendlyName),
-                                      ],
+                                          : null,
                                     ),
-                                    const SizedBox(height: 16),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      acceleration.displayName,
+                                      style: TextStyle(
+                                        color: acceleration.implemented
+                                            ? null
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                    if (!acceleration.implemented) ...[
+                                      const SizedBox(width: 8),
+                                      const Text(
+                                        '(Not implemented)',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontStyle: FontStyle.italic,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
                                   ],
                                 ),
-                              );
-                            }).toList(),
+                                const SizedBox(height: 16),
+                              ],
+                            ),
                           );
-                        },
+                        }).toList(),
                       ),
                       const SizedBox(height: 32),
                       const Text('FFmpeg Information', style: AppTypography.titleStyle),
