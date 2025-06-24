@@ -1,0 +1,40 @@
+import 'package:yaffuu/domain/models/compatibility.dart';
+import 'package:yaffuu/ffmpeg/engines/base_engine.dart';
+
+enum ArgumentType {
+  global,
+  input,
+  inputFile,
+  output,
+  outputFormat,
+  outputExtension,
+  videoFilter,
+  audioFilter,
+}
+
+class Argument {
+  final ArgumentType type;
+  final String value;
+
+  Argument({
+    required this.type,
+    required this.value,
+  });
+}
+
+enum OperationType {
+  video,
+  audio,
+  image,
+  visual, // video and image
+  moving, // video and audio
+  all
+}
+
+abstract class Operation {
+  final OperationType type = OperationType.all;
+
+  bool isCompatible(CompatibilityContext context);
+
+  List<Argument> toArguments([FFmpegEngine? engine]);
+}

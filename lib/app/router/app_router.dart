@@ -1,11 +1,11 @@
 import 'package:go_router/go_router.dart';
-import 'package:yaffuu/ui/screens/error.dart';
-import 'package:yaffuu/ui/screens/ffmpeg_missing.dart';
-import 'package:yaffuu/ui/screens/loading.dart';
-import 'package:yaffuu/ui/screens/home.dart';
-import 'package:yaffuu/ui/screens/output_files.dart';
-import 'package:yaffuu/ui/screens/settings.dart';
-import 'package:yaffuu/ui/screens/operations/compression.dart';
+import 'package:yaffuu/presentation/screens/common/error_screen.dart';
+import 'package:yaffuu/presentation/screens/common/ffmpeg_missing_screen.dart';
+import 'package:yaffuu/presentation/screens/common/loading_screen.dart';
+import 'package:yaffuu/presentation/screens/home/home_screen.dart';
+import 'package:yaffuu/presentation/screens/common/output_files_screen.dart';
+import 'package:yaffuu/presentation/screens/common/settings_screen.dart';
+import 'package:yaffuu/presentation/screens/workflows/compression/compression_screen.dart';
 import 'route_paths.dart';
 
 class AppRouter {

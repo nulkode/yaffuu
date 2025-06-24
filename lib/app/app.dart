@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yaffuu/logic/bloc/theme.dart';
-import 'package:yaffuu/ui/components/drop_overlay.dart';
+import 'package:yaffuu/presentation/bloc/theme.dart';
+import 'package:yaffuu/presentation/shared/widgets/drop_overlay.dart';
 import 'package:yaffuu/app/router/app_router.dart';
 import 'package:yaffuu/app/constants/app_constants.dart';
 
