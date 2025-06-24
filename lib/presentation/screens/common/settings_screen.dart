@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yaffuu/presentation/bloc/queue.dart';
 import 'package:yaffuu/domain/models/ffmpeg_info.dart';
-import 'package:yaffuu/logic/user_preferences.dart';
+import 'package:yaffuu/domain/preferences/preferences_manager.dart';
+import 'package:yaffuu/domain/preferences/general/settings_preferences.dart';
 import 'package:yaffuu/main.dart';
 import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/presentation/shared/widgets/appbar.dart';
@@ -19,11 +19,13 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  late UserPreferences _userPreferences;
-  String _selectedHardwareAcceleration = 'none';
+  late PreferencesManager _preferencesManager;
+  HwAccel _selectedHardwareAcceleration = HwAccel.none;
 
-  FFmpegInfo get _ffmpegInfo {
-    return getIt<EngineProvider>();
+  // TODO: Replace with proper FFmpegInfo when queue service is ready
+  FFmpegInfo? get _ffmpegInfo {
+    // return getIt<FFmpegInfo>();
+    return null;
   }
 
   @override
@@ -33,23 +35,23 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _initializePreferences() async {
-    _userPreferences = await UserPreferences.getInstance();
+    _preferencesManager = getIt<PreferencesManager>();
+    final hwAccel = await _preferencesManager.settings.getHwAccel();
     setState(() {
-      _selectedHardwareAcceleration =
-          _userPreferences.preferredHardwareAcceleration;
+      _selectedHardwareAcceleration = hwAccel;
     });
   }
 
-  void _updateHardwareAcceleration(String method) async {
+  void _updateHardwareAcceleration(HwAccel method) async {
     setState(() {
       _selectedHardwareAcceleration = method;
     });
-    _userPreferences.preferredHardwareAcceleration = method;
+    await _preferencesManager.settings.setHwAccel(method);
 
+    // TODO: Update engine when queue service is ready
+    /*
     try {
-      final engine =
-          await getIt<EngineProvider>().createEngine(method);
-
+      final engine = await queueService.createEngine(method);
       if (mounted) {
         context.read<QueueBloc>().add(SetEngineEvent(engine));
       }
@@ -57,36 +59,45 @@ class _SettingsPageState extends State<SettingsPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:
-                Text('Hardware acceleration "$method" is not compatible: $e'),
+            content: Text('Hardware acceleration "${method.value}" is not compatible: $e'),
             backgroundColor: Colors.red,
           ),
         );
 
         setState(() {
-          _selectedHardwareAcceleration = 'none';
+          _selectedHardwareAcceleration = HwAccel.none;
         });
-        _userPreferences.preferredHardwareAcceleration = 'none';
+        await _preferencesManager.settings.setHwAccel(HwAccel.none);
 
         try {
-          final fallbackEngine =
-              await getIt<EngineProvider>().createEngine('none');
+          final fallbackEngine = await queueService.createEngine(HwAccel.none);
           if (mounted) {
             context.read<QueueBloc>().add(SetEngineEvent(fallbackEngine));
           }
         } catch (fallbackError) {
-          // TODO: revise
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(
-                    'Critical error: Unable to create fallback engine: $fallbackError'),
+                content: Text('Critical error: Unable to create fallback engine: $fallbackError'),
                 backgroundColor: Colors.red,
               ),
             );
           }
         }
       }
+    }
+    */
+  }
+
+  /// Get display name for hardware acceleration option
+  String _getHwAccelDisplayName(HwAccel hwAccel) {
+    switch (hwAccel) {
+      case HwAccel.none:
+        return 'None (Software only)';
+      case HwAccel.cuda:
+        return 'NVIDIA CUDA';
+      case HwAccel.qsv:
+        return 'Intel QuickSync Video';
     }
   }
 
@@ -165,9 +176,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       const SizedBox(height: 8),
                       Column(
-                        children:
-                            EngineProvider.getAvailableAccelerations()
-                                .map((acceleration) {
+                        children: HwAccel.values.map((acceleration) {
                           return Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 4.0),
@@ -175,38 +184,17 @@ class _SettingsPageState extends State<SettingsPage> {
                               children: [
                                 Row(
                                   children: [
-                                    Radio<String>(
-                                      value: acceleration.id,
+                                    Radio<HwAccel>(
+                                      value: acceleration,
                                       groupValue: _selectedHardwareAcceleration,
-                                      onChanged: acceleration.implemented
-                                          ? (value) {
-                                              if (value != null) {
-                                                _updateHardwareAcceleration(
-                                                    value);
-                                              }
-                                            }
-                                          : null,
+                                      onChanged: (value) {
+                                        if (value != null) {
+                                          _updateHardwareAcceleration(value);
+                                        }
+                                      },
                                     ),
                                     const SizedBox(width: 8),
-                                    Text(
-                                      acceleration.displayName,
-                                      style: TextStyle(
-                                        color: acceleration.implemented
-                                            ? null
-                                            : Colors.grey,
-                                      ),
-                                    ),
-                                    if (!acceleration.implemented) ...[
-                                      const SizedBox(width: 8),
-                                      const Text(
-                                        '(Not implemented)',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontStyle: FontStyle.italic,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
+                                    Text(_getHwAccelDisplayName(acceleration)),
                                   ],
                                 ),
                                 const SizedBox(height: 16),
@@ -219,32 +207,37 @@ class _SettingsPageState extends State<SettingsPage> {
                       const Text('FFmpeg Information',
                           style: AppTypography.titleStyle),
                       const SizedBox(height: 8),
-                      Text('Version: ${_ffmpegInfo.version}'),
-                      const SizedBox(height: 8),
-                      Text(_ffmpegInfo.copyright.replaceAll('(c)', '©')),
-                      const SizedBox(height: 8),
-                      Text('Built With: ${_ffmpegInfo.builtWith}'),
-                      const SizedBox(height: 16),
-                      ConfigurationSection(ffmpegInfo: _ffmpegInfo),
-                      const SizedBox(height: 16),
-                      LibrariesSection(ffmpegInfo: _ffmpegInfo),
-                      const SizedBox(height: 16),
-                      const Text('Hardware Acceleration Methods',
-                          style: AppTypography.subtitleStyle),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 4.0,
-                        runSpacing: 4.0,
-                        children: _ffmpegInfo.hardwareAccelerationMethods!
-                            .map((config) {
-                          return Chip(
-                            label: Text(
-                              config,
-                            ),
-                            padding: const EdgeInsets.all(0),
-                          );
-                        }).toList(),
-                      ),
+                      if (_ffmpegInfo != null) ...[
+                        Text('Version: ${_ffmpegInfo!.version}'),
+                        const SizedBox(height: 8),
+                        Text(_ffmpegInfo!.copyright.replaceAll('(c)', '©')),
+                        const SizedBox(height: 8),
+                        Text('Built With: ${_ffmpegInfo!.builtWith}'),
+                        const SizedBox(height: 16),
+                        ConfigurationSection(ffmpegInfo: _ffmpegInfo),
+                        const SizedBox(height: 16),
+                        LibrariesSection(ffmpegInfo: _ffmpegInfo),
+                        const SizedBox(height: 16),
+                        const Text('Hardware Acceleration Methods',
+                            style: AppTypography.subtitleStyle),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 4.0,
+                          runSpacing: 4.0,
+                          children: _ffmpegInfo!.hardwareAccelerationMethods!
+                              .map((config) {
+                            return Chip(
+                              label: Text(
+                                config,
+                              ),
+                              padding: const EdgeInsets.all(0),
+                            );
+                          }).toList(),
+                        ),
+                      ] else ...[
+                        const Text('FFmpeg information not available'),
+                        const Text('(Will be available when queue service is implemented)'),
+                      ],
                       const SizedBox(height: 32),
                       const Stack(
                         children: [
