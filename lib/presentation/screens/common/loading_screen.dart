@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yaffuu/domain/init_service.dart';
+import 'package:yaffuu/domain/common/startup_service.dart';
 import 'package:yaffuu/presentation/shared/widgets/logos.dart';
 
 class LoadingScreen extends StatefulWidget {
@@ -18,7 +18,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   Future<void> _initializeApp() async {
-    final result = await AppInitializationService.initialize();
+    final result = await StartupService.getInitialState();
 
     if (!mounted) return;
 
