@@ -1,4 +1,4 @@
-import 'package:yaffuu/domain/constants/exception.dart';
+import 'package:yaffuu/domain/common/constants/exception.dart';
 
 enum Codec {
   h264('h264'),
@@ -13,15 +13,12 @@ enum Codec {
         return codec;
       }
     }
-    throw JsonParsingException();
+    throw JsonParsingException("Unknown codec: $name");
   }
 }
 
 enum Format {
-  mp4('mp4'),
-  mkv('mkv'),
-  mov('mov'),
-  m4a('m4a');
+  mp4('mp4');
 
   final String name;
   const Format(this.name);
@@ -32,7 +29,7 @@ enum Format {
         return format;
       }
     }
-    throw JsonParsingException();
+    throw JsonParsingException("Unknown format: $name");
   }
 }
 
@@ -47,16 +44,18 @@ class VideoStream extends MediaStream {
   final int width;
   final int height;
   final double duration;
+  final int bitrate;
 
-  VideoStream._(
-      super.index, super.codec, this.width, this.height, this.duration);
+  VideoStream._(super.index, super.codec, this.width, this.height,
+      this.duration, this.bitrate);
 
   static VideoStream fromJson(Map<String, dynamic> json) {
     if (json['index'] == null ||
         json['codec_name'] == null ||
         json['width'] == null ||
         json['height'] == null ||
-        json['duration'] == null) {
+        json['duration'] == null ||
+        json['bitrate'] == null) {
       throw JsonParsingException('Invalid video stream JSON data.');
     }
     return VideoStream._(
@@ -65,6 +64,7 @@ class VideoStream extends MediaStream {
       json['width'],
       json['height'],
       double.parse(json['duration']),
+      json['bitrate'],
     );
   }
 }

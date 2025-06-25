@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:path/path.dart' as path;
-import 'package:yaffuu/domain/logger.dart';
+import 'package:yaffuu/domain/common/logger.dart';
 
 enum CleanupStrategy {
   oldestFirst,

@@ -1,5 +1,5 @@
-import 'package:yaffuu/domain/models/media.dart';
-import 'package:yaffuu/domain/models/ffmpeg_info.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/models/media.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/models/ffmpeg_info.dart';
 
 class CompatibilityContext {
   final FFmpegInfo ffmpegInfo;

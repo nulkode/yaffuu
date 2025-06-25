@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yaffuu/domain/logger.dart';
+import 'package:yaffuu/domain/common/logger.dart';
 
 class ContextMenuAction {
   final String label;

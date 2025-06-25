@@ -6,7 +6,7 @@ import 'package:yaffuu/domain/preferences/preferences_migration.dart';
 /// Central manager for all app preferences
 class PreferencesManager {
   SharedPreferences? _preferences;
-  
+
   // Preference instances
   SettingsPreferences? _settings;
   UxMemoriesPreferences? _uxMemories;
@@ -14,10 +14,10 @@ class PreferencesManager {
   /// Initialize the preferences manager
   Future<void> init() async {
     _preferences = await SharedPreferences.getInstance();
-    
+
     // Run migrations before initializing preferences
     await PreferencesMigration.runMigrations();
-    
+
     // Initialize all preference managers
     _settings = SettingsPreferences(_preferences!);
     _uxMemories = UxMemoriesPreferences(_preferences!);
@@ -26,7 +26,8 @@ class PreferencesManager {
   /// Get settings preferences
   SettingsPreferences get settings {
     if (_settings == null) {
-      throw StateError('PreferencesManager not initialized. Call init() first.');
+      throw StateError(
+          'PreferencesManager not initialized. Call init() first.');
     }
     return _settings!;
   }
@@ -34,7 +35,8 @@ class PreferencesManager {
   /// Get UX memories preferences
   UxMemoriesPreferences get uxMemories {
     if (_uxMemories == null) {
-      throw StateError('PreferencesManager not initialized. Call init() first.');
+      throw StateError(
+          'PreferencesManager not initialized. Call init() first.');
     }
     return _uxMemories!;
   }
@@ -45,7 +47,8 @@ class PreferencesManager {
   /// Clear all preferences (for testing/debugging)
   Future<void> clearAll() async {
     if (_preferences == null) {
-      throw StateError('PreferencesManager not initialized. Call init() first.');
+      throw StateError(
+          'PreferencesManager not initialized. Call init() first.');
     }
     await _preferences!.clear();
   }

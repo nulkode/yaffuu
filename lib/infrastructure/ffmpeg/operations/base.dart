@@ -1,10 +1,9 @@
-import 'package:yaffuu/domain/models/compatibility.dart';
-import 'package:yaffuu/ffmpeg/engines/base_engine.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/models/compatibility.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/engines/base_engine.dart';
 
 enum ArgumentType {
   global,
   input,
-  inputFile,
   output,
   outputFormat,
   outputExtension,

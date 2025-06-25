@@ -1,23 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yaffuu/domain/common/constants/hwaccel.dart';
 import '../base_preferences.dart';
-
-/// Hardware acceleration options for video processing
-enum HwAccel {
-  none('none'),
-  cuda('cuda'),
-  qsv('qsv'); // QuickSync Video (Intel)
-
-  const HwAccel(this.value);
-  final String value;
-
-  static HwAccel fromString(String value) {
-    return HwAccel.values.firstWhere(
-      (hwAccel) => hwAccel.value == value,
-      orElse: () => HwAccel.none,
-    );
-  }
-}
 
 /// Settings preferences manager
 class SettingsPreferences extends BasePreferences {

@@ -9,10 +9,10 @@ class PreferencesKey<T> {
 
   /// The string key used to store/retrieve the preference
   final String key;
-  
+
   /// The default value to return if the preference doesn't exist
   final T defaultValue;
-  
+
   /// The type of the preference value
   Type get type => T;
 }
@@ -82,8 +82,9 @@ abstract class BasePreferences {
 
   /// Clear all preferences with this baseKey prefix
   Future<bool> clearAll() async {
-    final keys = _prefs.getKeys().where((key) => key.startsWith('$baseKey.')).toList();
-    
+    final keys =
+        _prefs.getKeys().where((key) => key.startsWith('$baseKey.')).toList();
+
     bool success = true;
     for (final key in keys) {
       success &= await _prefs.remove(key);

@@ -10,9 +10,9 @@ final getIt = GetIt.instance;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   await AppInitializationService.initialize();
-  
+
   runApp(
     MultiBlocProvider(
       providers: [

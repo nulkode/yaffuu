@@ -3,47 +3,36 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
-import 'package:yaffuu/domain/models/ffmpeg_info.dart';
-import 'package:yaffuu/domain/models/progress.dart';
-import 'package:yaffuu/ffmpeg/operations/operations.dart';
-import 'package:yaffuu/domain/constants/exception.dart';
-import 'package:yaffuu/domain/logger.dart';
-
-class EngineInformation {
-  final String id;
-  final String displayName;
-  final bool implemented;
-
-  EngineInformation({
-    required this.id,
-    required this.displayName,
-    required this.implemented,
-  });
-}
+import 'package:yaffuu/domain/common/constants/hwaccel.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/models/ffmpeg_info.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/models/media.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/models/progress.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/operations/base.dart';
+import 'package:yaffuu/domain/common/constants/exception.dart';
+import 'package:yaffuu/domain/common/logger.dart';
 
 abstract class FFmpegEngine {
   static const _quietVerbose = ['-v', 'error', '-hide_banner'];
-  final EngineInformation acceleration = EngineInformation(
-    id: 'none',
-    displayName: 'None',
-    implemented: true,
-  );
+  XFile? _file;
+  MediaFile? _mediaFile;
+  Process? _runningProcess;
+  StreamController<Progress>? _progressController;
+
+  final HwAccel hwAccel = HwAccel.none;
 
   FFmpegEngine();
 
-  Stream<double> get progress;
+  XFile? get file => _file;
+
+  MediaFile? get mediaFile => _mediaFile;
 
   Future<bool> isCompatible();
 
   Future<bool> isOperationCompatible(Operation operation);
 
-  void setFile(XFile file);
+  Future<void> setInputFile(XFile file);
 
   Stream<Progress> execute(Operation operation);
-
-  XFile? get lastOutput;
-
-  void clearLastOutput();
 
   Future<FFmpegInfo> getFFmpegInfo() async {
     try {
@@ -69,7 +58,34 @@ abstract class FFmpegEngine {
     }
   }
 
-  Stream<RawProgress> run(List<Argument> arguments, String outputFile) async* {
+  Future<MediaFile> getMediaFileInfo() async {
+    if (_file == null) {
+      throw Exception('Input file is not set.');
+    }
+
+    final result = await Process.run(
+      'ffprobe',
+      [
+        ..._quietVerbose,
+        '-show_format',
+        '-show_streams',
+        '-of',
+        'json',
+        _file!.path,
+      ],
+    );
+
+    if (result.exitCode != 0) {
+      throw FFmpegException('Failed to get media file info: ${result.stderr}');
+    }
+
+    final json = jsonDecode(result.stdout);
+    _mediaFile = MediaFile.fromJson(json);
+
+    return _mediaFile!;
+  }
+
+  Stream<Progress> run(List<Argument> arguments) async* {
     final globalArgs = arguments
         .where((arg) => arg.type == ArgumentType.global)
         .map((arg) => arg.value)
@@ -79,10 +95,6 @@ abstract class FFmpegEngine {
         .where((arg) => arg.type == ArgumentType.input)
         .map((arg) => arg.value)
         .expand((value) => value.split(' '))
-        .toList();
-    final inputFileArgs = arguments
-        .where((arg) => arg.type == ArgumentType.inputFile)
-        .map((arg) => arg.value)
         .toList();
     final outputArgs = arguments
         .where((arg) => arg.type == ArgumentType.output)
@@ -102,11 +114,8 @@ abstract class FFmpegEngine {
         .map((arg) => arg.value)
         .toList();
 
-    if (inputFileArgs.isEmpty) {
-      throw ArgumentError('No input file provided.');
-    } else if (inputFileArgs.length > 1) {
-      throw ArgumentError(
-          'Multiple input files provided. Only one input file is allowed.');
+    if (_file == null) {
+      throw Exception('Input file is not set.');
     }
 
     if (outputFormatArgs.length > 1) {
@@ -124,7 +133,7 @@ abstract class FFmpegEngine {
       ...globalArgs,
       ...inputArgs,
       '-i',
-      inputFileArgs.first,
+      _file!.path,
       if (videoFilterArgs.isNotEmpty) '-vf',
       if (videoFilterArgs.isNotEmpty) videoFilterArgs.join(','),
       if (audioFilterArgs.isNotEmpty) '-af',
@@ -132,16 +141,16 @@ abstract class FFmpegEngine {
       ...outputArgs,
       if (outputFormatArgs.isNotEmpty) '-format',
       outputFormatArgs.first,
-      outputFile,
+      // outputFile, TODO: handle output file
     ];
 
-    final process = await Process.start('ffmpeg', processArguments);
-    final controller = StreamController<RawProgress>();
+    _runningProcess = await Process.start('ffmpeg', processArguments);
+    _progressController = StreamController<Progress>();
 
     logger.d('Executing FFmpeg with arguments: $processArguments');
-    logger.d('Process started with PID: ${process.pid}');
+    logger.d('Process started with PID: ${_runningProcess!.pid}');
 
-    process.stdout
+    _runningProcess!.stdout
         .transform(const SystemEncoding().decoder)
         .transform(const LineSplitter())
         .listen(
@@ -152,10 +161,8 @@ abstract class FFmpegEngine {
             if (event.contains('frame=') ||
                 event.contains('fps=') ||
                 event.contains('size=')) {
-              final progress = RawProgress.parse([event]);
-              logger.d(
-                  'Parsed progress: frame=${progress.frame}, fps=${progress.fps}, size=${progress.size}');
-              controller.add(progress);
+              final progress = Progress.parse([event]);
+              _progressController!.add(progress);
             }
           }
         } catch (e) {
@@ -164,14 +171,14 @@ abstract class FFmpegEngine {
       },
       onError: (error) {
         logger.e('FFmpeg stdout error: $error');
-        controller.addError(error);
+        _progressController!.addError(error);
       },
       onDone: () {
         logger.d('FFmpeg stdout stream completed');
       },
     );
 
-    process.stderr
+    _runningProcess!.stderr
         .transform(const SystemEncoding().decoder)
         .transform(const LineSplitter())
         .listen(
@@ -186,21 +193,23 @@ abstract class FFmpegEngine {
       },
     );
 
-    process.exitCode.then((exitCode) {
+    _runningProcess!.exitCode.then((exitCode) {
       logger.d('FFmpeg process completed with exit code: $exitCode');
       if (exitCode != 0) {
-        controller.addError(
+        _progressController!.addError(
             FFmpegException('FFmpeg process failed with exit code: $exitCode'));
       }
-      controller.close();
+      _progressController!.close();
+      _cleanup();
     }).catchError((error) {
       logger.e('FFmpeg process error: $error');
-      controller.addError(error);
-      controller.close();
+      _progressController!.addError(error);
+      _progressController!.close();
+      _cleanup();
     });
 
     try {
-      await for (final progress in controller.stream) {
+      await for (final progress in _progressController!.stream) {
         yield progress;
       }
     } catch (e) {
@@ -208,25 +217,56 @@ abstract class FFmpegEngine {
       rethrow;
     } finally {
       try {
-        final isRunning = !await process.exitCode
-            .timeout(
-              const Duration(milliseconds: 1),
-              onTimeout: () => -1,
-            )
-            .then((code) => true)
-            .catchError((_) => false);
+        final isRunning = _runningProcess != null &&
+            !await _runningProcess!.exitCode
+                .timeout(
+                  const Duration(milliseconds: 1),
+                  onTimeout: () => -1,
+                )
+                .then((code) => true)
+                .catchError((_) => false);
 
-        if (isRunning && !process.kill()) {
+        if (isRunning && !_runningProcess!.kill()) {
           logger.w('Failed to kill FFmpeg process');
         }
       } catch (e) {
         logger.d('Could not determine process state, attempting to kill: $e');
         try {
-          process.kill();
+          _runningProcess?.kill();
         } catch (killError) {
           logger.w('Failed to kill FFmpeg process: $killError');
         }
+      } finally {
+        _cleanup();
       }
+    }
+  }
+
+  void _cleanup() {
+    _runningProcess = null;
+    _progressController = null;
+  }
+
+  /// Stops the currently running FFmpeg process if any.
+  /// Returns true if a process was stopped, false if no process was running.
+  bool stop() {
+    if (_runningProcess == null) {
+      return false;
+    }
+
+    try {
+      final killed = _runningProcess!.kill();
+      if (killed) {
+        logger.d('FFmpeg process stopped');
+        _progressController
+            ?.addError(FFmpegException('Process stopped by user'));
+        _progressController?.close();
+        _cleanup();
+      }
+      return killed;
+    } catch (e) {
+      logger.e('Failed to stop FFmpeg process: $e');
+      return false;
     }
   }
 }

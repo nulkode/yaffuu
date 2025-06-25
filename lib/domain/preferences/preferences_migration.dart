@@ -21,7 +21,9 @@ class PreferencesMigration {
     SharedPreferences prefs,
     int fromVersion,
   ) async {
-    for (int version = fromVersion + 1; version <= _currentMigrationVersion; version++) {
+    for (int version = fromVersion + 1;
+        version <= _currentMigrationVersion;
+        version++) {
       await _migrateToVersion(prefs, version);
     }
   }
@@ -40,7 +42,8 @@ class PreferencesMigration {
       //   await _migrateToVersion2(prefs);
       //   break;
       default:
-        throw UnsupportedError('Migration to version $targetVersion is not supported');
+        throw UnsupportedError(
+            'Migration to version $targetVersion is not supported');
     }
   }
 

@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
-import 'package:yaffuu/domain/output_files_service.dart';
-import 'package:yaffuu/domain/logger.dart';
+import 'package:yaffuu/infrastructure/output_files_manager.dart';
+import 'package:yaffuu/domain/common/logger.dart';
 import 'package:yaffuu/domain/preferences/preferences_manager.dart';
-import 'package:yaffuu/domain/constants/exception.dart';
+import 'package:yaffuu/domain/common/constants/exception.dart';
 import 'package:yaffuu/presentation/screens/common/error_screen.dart';
 import 'package:yaffuu/main.dart';
 
@@ -45,22 +45,20 @@ class AppInitializationResult {
 
 /// Service responsible for initializing the entire application
 class AppInitializationService {
-  
   /// Main initialization method that orchestrates the entire app startup
   static Future<AppInitializationResult> initialize() async {
     try {
       await _initializeDependencies();
-      
+
       final shouldShowTutorial = await _checkTutorialStatus();
-      
+
       if (shouldShowTutorial) {
         return AppInitializationResult.tutorial();
       }
-      
+
       await _finalizeInitialization();
-      
+
       return AppInitializationResult.success();
-      
     } on FFmpegNotCompatibleException {
       return AppInitializationResult.error(AppErrorType.ffmpegNotCompatible.id);
     } on FFmpegNotFoundException {
@@ -77,17 +75,18 @@ class AppInitializationService {
   static Future<void> _initializeDependencies() async {
     final preferencesManager = PreferencesManager();
     await preferencesManager.init();
-    
+
     final (dataDir, outputFileManager) = await _setupDirectories();
-    
+
     await _registerDependencies(preferencesManager, outputFileManager);
   }
 
   /// Check if the user has seen the tutorial and needs to see it
   static Future<bool> _checkTutorialStatus() async {
     final preferencesManager = getIt<PreferencesManager>();
-    final hasSeenTutorial = await preferencesManager.uxMemories.getHasSeenTutorial();
-    
+    final hasSeenTutorial =
+        await preferencesManager.uxMemories.getHasSeenTutorial();
+
     return !hasSeenTutorial;
   }
 
@@ -95,7 +94,7 @@ class AppInitializationService {
   static Future<void> _finalizeInitialization() async {
     // TODO: Initialize FFmpeg engine when queue service is ready
     // TODO: Setup any other services that depend on preferences
-    
+
     logger.i('App initialization completed successfully');
   }
 
@@ -105,14 +104,14 @@ class AppInitializationService {
     OutputFileManager outputFileManager,
   ) async {
     getIt.registerSingleton<PreferencesManager>(preferencesManager);
-    
+
     getIt.registerSingleton<OutputFileManager>(outputFileManager);
-    
+
     // TODO: Register other services as they are created
     // - QueueService
     // - FFmpegEngine (when ready)
     // - Any other core services
-    
+
     logger.i('Dependencies registered successfully');
   }
 
@@ -129,7 +128,7 @@ class AppInitializationService {
     );
 
     await outputFileManager.initialize();
-    
+
     logger.i('Directories setup completed: ${dataDir.path}');
     return (dataDir, outputFileManager);
   }

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yaffuu/presentation/bloc/queue.dart';
 import 'package:yaffuu/domain/init_service.dart';
 import 'package:yaffuu/presentation/shared/widgets/logos.dart';
 
@@ -23,10 +21,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
     final result = await AppInitializationService.initialize();
 
     if (!mounted) return;
-
-    if (result.engine != null) {
-      context.read<QueueBloc>().add(SetEngineEvent(result.engine!));
-    }
 
     if (result.isInitialized) {
       context.go('/home');

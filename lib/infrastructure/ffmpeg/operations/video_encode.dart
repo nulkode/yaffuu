@@ -1,6 +1,6 @@
-import 'package:yaffuu/domain/models/compatibility.dart';
-import 'package:yaffuu/ffmpeg/operations/operations.dart';
-import 'package:yaffuu/ffmpeg/engines/base_engine.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/models/compatibility.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/engines/base_engine.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/operations/base.dart';
 
 enum VideoCodec {
   h264,
@@ -69,108 +69,13 @@ class VideoEncodeOperation implements Operation {
   List<Argument> toArguments([FFmpegEngine? engine]) {
     List<Argument> args = [];
 
-    if (engine != null) {
-      switch (engine.acceleration.id) {
-        case 'cuda':
-          args.addAll(_getCudaArguments());
-          break;
-        case 'quicksync':
-          args.addAll(_getQuickSyncArguments());
-          break;
-        case 'none':
-        default:
-          args.addAll(_getSoftwareArguments());
-          break;
-      }
-    } else {
-      args.addAll(_getSoftwareArguments());
-    }
+    args.addAll(_getSoftwareArguments());
 
     if (bitrate != null) {
       args.add(Argument(
         type: ArgumentType.output,
         value: '-b:v ${bitrate}k',
       ));
-    }
-
-    return args;
-  }
-
-  List<Argument> _getCudaArguments() {
-    List<Argument> args = [
-      Argument(
-        type: ArgumentType.global,
-        value: '-hwaccel cuda',
-      ),
-      Argument(
-        type: ArgumentType.global,
-        value: '-hwaccel_output_format cuda',
-      ),
-    ];
-
-    switch (codec) {
-      case VideoCodec.h264:
-        args.add(Argument(
-          type: ArgumentType.output,
-          value: '-c:v h264_nvenc',
-        ));
-        if (preset != null) {
-          args.add(Argument(
-            type: ArgumentType.output,
-            value: '-preset ${preset!.value}',
-          ));
-        }
-        break;
-      case VideoCodec.h265:
-        args.add(Argument(
-          type: ArgumentType.output,
-          value: '-c:v hevc_nvenc',
-        ));
-        if (preset != null) {
-          args.add(Argument(
-            type: ArgumentType.output,
-            value: '-preset ${preset!.value}',
-          ));
-        }
-        break;
-      case VideoCodec.av1:
-        args.add(Argument(
-          type: ArgumentType.output,
-          value: '-c:v av1_nvenc',
-        ));
-        break;
-    }
-
-    return args;
-  }
-
-  List<Argument> _getQuickSyncArguments() {
-    List<Argument> args = [
-      Argument(
-        type: ArgumentType.global,
-        value: '-hwaccel qsv',
-      ),
-    ];
-
-    switch (codec) {
-      case VideoCodec.h264:
-        args.add(Argument(
-          type: ArgumentType.output,
-          value: '-c:v h264_qsv',
-        ));
-        break;
-      case VideoCodec.h265:
-        args.add(Argument(
-          type: ArgumentType.output,
-          value: '-c:v hevc_qsv',
-        ));
-        break;
-      case VideoCodec.av1:
-        args.add(Argument(
-          type: ArgumentType.output,
-          value: '-c:v av1_qsv',
-        ));
-        break;
     }
 
     return args;

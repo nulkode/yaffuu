@@ -1,6 +1,7 @@
-import 'package:yaffuu/domain/models/compatibility.dart';
-import 'package:yaffuu/ffmpeg/operations/operations.dart';
-import 'package:yaffuu/ffmpeg/engines/base_engine.dart';
+import 'package:yaffuu/domain/common/constants/hwaccel.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/models/compatibility.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/engines/base_engine.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/operations/base.dart';
 
 class VideoToImageOperation implements Operation {
   @override
@@ -43,21 +44,8 @@ class VideoToImageOperation implements Operation {
     ];
 
     if (engine != null) {
-      switch (engine.acceleration.id) {
-        case 'cuda':
-          baseArgs.addAll([
-            Argument(
-              type: ArgumentType.global,
-              value: '-hwaccel cuda',
-            ),
-            Argument(
-              type: ArgumentType.global,
-              value: '-hwaccel_output_format cuda',
-            ),
-          ]);
-          break;
-        case 'none':
-        default:
+      switch (engine.hwAccel) {
+        case HwAccel.none:
           break;
       }
     }

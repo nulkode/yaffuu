@@ -10,10 +10,10 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeMode> {
 
   ThemeBloc() : super(ThemeMode.system) {
     _preferencesManager = getIt<PreferencesManager>();
-    
+
     on<ThemeEvent>((event, emit) async {
       late ThemeMode newTheme;
-      
+
       switch (event) {
         case ThemeEvent.light:
           newTheme = ThemeMode.light;
@@ -25,11 +25,11 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeMode> {
           newTheme = ThemeMode.system;
           break;
       }
-      
+
       await _preferencesManager.settings.setThemeMode(newTheme);
       emit(newTheme);
     });
-    
+
     _loadInitialTheme();
   }
 

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as path;
-import 'package:yaffuu/domain/output_files_service.dart';
+import 'package:yaffuu/infrastructure/output_files_manager.dart';
 import 'package:yaffuu/main.dart';
 import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/presentation/shared/widgets/context_menu.dart';

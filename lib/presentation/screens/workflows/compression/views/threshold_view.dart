@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animated_list_plus/animated_list_plus.dart';
-import 'package:yaffuu/presentation/screens/workflows/compression/constants/compression_option.dart' as CompressionData;
+import 'package:yaffuu/presentation/screens/workflows/compression/constants/compression_option.dart'
+    as CompressionData;
 import '../constants/compression_option.dart';
 import '../widgets/threshold_option_card.dart';
 

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yaffuu/domain/logger.dart';
+import 'package:yaffuu/domain/common/logger.dart';
 import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/presentation/shared/widgets/appbar.dart';
 

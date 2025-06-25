@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yaffuu/domain/models/ffmpeg_info.dart';
+import 'package:yaffuu/domain/common/constants/hwaccel.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/models/ffmpeg_info.dart';
 import 'package:yaffuu/domain/preferences/preferences_manager.dart';
-import 'package:yaffuu/domain/preferences/general/settings_preferences.dart';
 import 'package:yaffuu/main.dart';
 import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/presentation/shared/widgets/appbar.dart';
@@ -87,18 +87,6 @@ class _SettingsPageState extends State<SettingsPage> {
       }
     }
     */
-  }
-
-  /// Get display name for hardware acceleration option
-  String _getHwAccelDisplayName(HwAccel hwAccel) {
-    switch (hwAccel) {
-      case HwAccel.none:
-        return 'None (Software only)';
-      case HwAccel.cuda:
-        return 'NVIDIA CUDA';
-      case HwAccel.qsv:
-        return 'Intel QuickSync Video';
-    }
   }
 
   @override
@@ -194,7 +182,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                       },
                                     ),
                                     const SizedBox(width: 8),
-                                    Text(_getHwAccelDisplayName(acceleration)),
+                                    Text(acceleration.displayName),
                                   ],
                                 ),
                                 const SizedBox(height: 16),
@@ -236,7 +224,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                       ] else ...[
                         const Text('FFmpeg information not available'),
-                        const Text('(Will be available when queue service is implemented)'),
+                        const Text(
+                            '(Will be available when queue service is implemented)'),
                       ],
                       const SizedBox(height: 32),
                       const Stack(
