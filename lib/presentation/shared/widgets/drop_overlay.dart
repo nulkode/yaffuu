@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:desktop_drop/desktop_drop.dart';
-import 'package:yaffuu/presentation/bloc/queue_bloc.dart';
+import 'package:yaffuu/presentation/bloc/workbench_bloc.dart';
 import 'package:yaffuu/app/router/app_router.dart';
 
 class DropOverlay extends StatefulWidget {
@@ -20,10 +20,10 @@ class _DropOverlayState extends State<DropOverlay> {
       child: ValueListenableBuilder<RouteInformation>(
         valueListenable: AppRouter.router.routeInformationProvider,
         builder: (context, route, child) {
-          return BlocBuilder<QueueBloc, QueueState>(
+          return BlocBuilder<WorkbenchBloc, WorkbenchState>(
             builder: (context, state) {
               final canDrop =
-                  state is QueueReadyState && route.uri.path == '/home';
+                  state is! WorkbenchAnalysisFailed && route.uri.path == '/home';
 
               return DropTarget(
                 onDragEntered: (detail) {
@@ -57,8 +57,8 @@ class _DropOverlayState extends State<DropOverlay> {
                     }
 
                     context
-                        .read<QueueBloc>()
-                        .add(AddFileEvent(detail.files.first));
+                        .read<WorkbenchBloc>()
+                        .add(FileAdded(detail.files.first));
                   }
                 },
                 child: Opacity(

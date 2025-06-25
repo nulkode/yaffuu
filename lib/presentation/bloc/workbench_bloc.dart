@@ -7,6 +7,7 @@ import 'package:yaffuu/domain/preferences/preferences_manager.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/models/ffmpeg_info.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/models/media.dart';
 import 'package:yaffuu/domain/common/logger.dart';
+import 'package:yaffuu/main.dart';
 
 // Events
 
@@ -37,19 +38,23 @@ final class WorkbenchAnalysisInProgress extends WorkbenchState {}
 
 /// State when file analysis is complete and all data is available.
 final class WorkbenchReady extends WorkbenchState {
+  /// The original input file.
+  final XFile inputFile;
+
   /// Metadata of the loaded media file.
   final MediaFile mediaFile;
-  
+
   /// Generated thumbnail image (can be null if generation failed).
   final XFile? thumbnail;
-  
+
   /// FFmpeg build information including available codecs and formats.
   final FFmpegInfo ffmpegInfo;
-  
+
   /// Currently selected hardware acceleration setting.
   final HwAccel currentHwAccel;
 
   WorkbenchReady({
+    required this.inputFile,
     required this.mediaFile,
     required this.thumbnail,
     required this.ffmpegInfo,
@@ -70,29 +75,27 @@ final class WorkbenchAnalysisFailed extends WorkbenchState {
 /// BLoC for managing the workbench state and file analysis.
 class WorkbenchBloc extends Bloc<WorkbenchEvent, WorkbenchState> {
   /// Service for analyzing media files and generating thumbnails.
-  final MediaFileAnalyzer _mediaFileAnalyzer;
-  
+  late final MediaFileAnalyzer _mediaFileAnalyzer;
+
   /// Service for retrieving FFmpeg build information.
-  final FFmpegInfoService _ffmpegInfoService;
-  
+  late final FFmpegInfoService _ffmpegInfoService;
+
   /// Manager for accessing user preferences.
-  final PreferencesManager _preferencesManager;
+  late final PreferencesManager _preferencesManager;
 
   /// Creates a new workbench BLoC with the required dependencies.
-  WorkbenchBloc({
-    required MediaFileAnalyzer mediaFileAnalyzer,
-    required FFmpegInfoService ffmpegInfoService,
-    required PreferencesManager preferencesManager,
-  })  : _mediaFileAnalyzer = mediaFileAnalyzer,
-        _ffmpegInfoService = ffmpegInfoService,
-        _preferencesManager = preferencesManager,
-        super(WorkbenchInitial()) {
+  WorkbenchBloc() : super(WorkbenchInitial()) {
+    _mediaFileAnalyzer = getIt<MediaFileAnalyzer>();
+    _ffmpegInfoService = getIt<FFmpegInfoService>();
+    _preferencesManager = getIt<PreferencesManager>();
+
     on<FileAdded>(_onFileAdded);
     on<FileCleared>(_onFileCleared);
   }
 
   /// Handles the file added event by analyzing the file and gathering all required data.
-  Future<void> _onFileAdded(FileAdded event, Emitter<WorkbenchState> emit) async {
+  Future<void> _onFileAdded(
+      FileAdded event, Emitter<WorkbenchState> emit) async {
     emit(WorkbenchAnalysisInProgress());
 
     try {
@@ -111,6 +114,7 @@ class WorkbenchBloc extends Bloc<WorkbenchEvent, WorkbenchState> {
       logger.i('File analysis completed successfully');
 
       emit(WorkbenchReady(
+        inputFile: event.file,
         mediaFile: mediaFile,
         thumbnail: thumbnail,
         ffmpegInfo: ffmpegInfo,

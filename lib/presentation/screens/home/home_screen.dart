@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yaffuu/presentation/bloc/queue_bloc.dart';
+import 'package:yaffuu/presentation/bloc/workbench_bloc.dart';
 import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/presentation/shared/widgets/appbar.dart';
 import 'package:go_router/go_router.dart';
@@ -79,25 +80,21 @@ class QueueStatus extends StatelessWidget {
             onTap: () {},
             child: BlocBuilder<QueueBloc, QueueState>(
               builder: (context, state) {
-                final color = state is QueueReadyState
+                final color = state is QueueLoaded
                     ? Colors.green
-                    : state is QueueBusyState
-                        ? Colors.orange
-                        : state is QueueErrorState
-                            ? Colors.red
-                            : state is QueueLoadingState
-                                ? Colors.blue
-                                : Colors.grey;
+                    : state is QueueError
+                        ? Colors.red
+                        : state is QueueInitial
+                            ? Colors.grey
+                            : Colors.grey;
 
-                final text = state is QueueReadyState
+                final text = state is QueueLoaded
                     ? 'Ready'
-                    : state is QueueBusyState
-                        ? 'Busy'
-                        : state is QueueErrorState
-                            ? 'Error'
-                            : state is QueueLoadingState
-                                ? 'Loading'
-                                : 'Unknown';
+                    : state is QueueError
+                        ? 'Error'
+                        : state is QueueInitial
+                            ? 'Initial'
+                            : 'Unknown';
 
                 return Row(
                   mainAxisSize: MainAxisSize.min,
@@ -135,11 +132,11 @@ class FilePickerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<QueueBloc, QueueState>(builder: (context, state) {
-      final disabled = state is! QueueReadyState;
-      final loading = state is QueueLoadingState;
-      final showFiles = state is QueueReadyState && state.file is XFile;
-      final thumbnail = state is QueueReadyState ? state.thumbnail : null;
+    return BlocBuilder<WorkbenchBloc, WorkbenchState>(builder: (context, state) {
+      final disabled = state is WorkbenchAnalysisFailed;
+      final loading = state is WorkbenchAnalysisInProgress;
+      final showFiles = state is WorkbenchReady;
+      final thumbnail = state is WorkbenchReady ? state.thumbnail : null;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -159,8 +156,8 @@ class FilePickerCard extends StatelessWidget {
 
                       if (result != null && context.mounted) {
                         context
-                            .read<QueueBloc>()
-                            .add(AddFileEvent(result.xFiles.first));
+                            .read<WorkbenchBloc>()
+                            .add(FileAdded(result.xFiles.first));
                       }
                     }
                   : null,
@@ -217,8 +214,8 @@ class FilePickerCard extends StatelessWidget {
                             OutlinedButton(
                               onPressed: () {
                                 context
-                                    .read<QueueBloc>()
-                                    .add(RemoveFileEvent());
+                                    .read<WorkbenchBloc>()
+                                    .add(FileCleared());
                               },
                               style: OutlinedButton.styleFrom(
                                 foregroundColor:
@@ -242,12 +239,12 @@ class FilePickerCard extends StatelessWidget {
   }
 
   Widget _buildFileDisplay(
-      BuildContext context, QueueState state, XFile? thumbnail) {
-    if (state is! QueueReadyState || state.file == null) {
+      BuildContext context, WorkbenchState state, XFile? thumbnail) {
+    if (state is! WorkbenchReady) {
       return const Text('No file selected');
     }
 
-    final file = state.file!;
+    final inputFile = state.inputFile;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -284,7 +281,7 @@ class FilePickerCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  file.name,
+                  inputFile.name,
                   style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
@@ -294,7 +291,7 @@ class FilePickerCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 FutureBuilder<int>(
-                  future: file.length(),
+                  future: inputFile.length(),
                   builder: (context, snapshot) {
                     final size = snapshot.data;
                     final sizeText =
@@ -331,9 +328,9 @@ class OperationsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<QueueBloc, QueueState>(
+    return BlocBuilder<WorkbenchBloc, WorkbenchState>(
       builder: (context, state) {
-        final hasFile = state is QueueReadyState && state.file != null;
+        final hasFile = state is WorkbenchReady;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

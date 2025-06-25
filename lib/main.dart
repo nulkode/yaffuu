@@ -5,6 +5,7 @@ import 'package:yaffuu/presentation/bloc/queue_bloc.dart';
 import 'package:yaffuu/domain/init_service.dart';
 import 'package:yaffuu/presentation/bloc/theme_bloc.dart';
 import 'package:yaffuu/app/app.dart';
+import 'package:yaffuu/presentation/bloc/workbench_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -20,6 +21,7 @@ void main() async {
           create: (context) => ThemeBloc(),
         ),
         BlocProvider(create: (context) => QueueBloc()),
+        BlocProvider(create:  (context) => WorkbenchBloc()),
       ],
       child: const MainApp(),
     ),

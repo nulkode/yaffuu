@@ -3,6 +3,7 @@ import 'package:yaffuu/domain/queue/queue_service.dart';
 import 'package:yaffuu/domain/queue/queue_status.dart';
 import 'package:yaffuu/domain/workflows/base/workflow.dart';
 import 'package:yaffuu/domain/common/logger.dart';
+import 'package:yaffuu/main.dart';
 
 // Events
 
@@ -81,10 +82,12 @@ final class QueueError extends QueueState {
 /// BLoC responsible for managing the processing queue.
 class QueueBloc extends Bloc<QueueEvent, QueueState> {
   /// Service for managing queue operations.
-  final QueueService _queueService;
+  late final QueueService _queueService;
 
   /// Creates a new queue BLoC with the required queue service.
-  QueueBloc(this._queueService) : super(const QueueInitial()) {
+  QueueBloc() : super(const QueueInitial()) {
+    _queueService = getIt<QueueService>();
+
     on<QueueInitialized>(_onQueueInitialized);
     on<WorkflowSubmitted>(_onWorkflowSubmitted);
     on<QueueItemRemoved>(_onQueueItemRemoved);
