@@ -4,7 +4,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yaffuu/presentation/bloc/queue.dart';
+import 'package:yaffuu/presentation/bloc/queue_bloc.dart';
 import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/presentation/shared/widgets/appbar.dart';
 import 'package:go_router/go_router.dart';

@@ -8,7 +8,7 @@ import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/presentation/shared/widgets/appbar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yaffuu/presentation/shared/widgets/help.dart';
-import 'package:yaffuu/presentation/bloc/theme.dart';
+import 'package:yaffuu/presentation/bloc/theme_bloc.dart';
 import 'package:yaffuu/presentation/shared/widgets/logos.dart';
 
 class SettingsPage extends StatefulWidget {

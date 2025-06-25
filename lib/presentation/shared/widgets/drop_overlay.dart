@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:desktop_drop/desktop_drop.dart';
-import 'package:yaffuu/presentation/bloc/queue.dart';
+import 'package:yaffuu/presentation/bloc/queue_bloc.dart';
 import 'package:yaffuu/app/router/app_router.dart';
 
 class DropOverlay extends StatefulWidget {
