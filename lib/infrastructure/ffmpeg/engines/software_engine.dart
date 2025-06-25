@@ -23,7 +23,6 @@ class SoftwareEngine extends FFmpegEngine {
   @override
   Future<void> setInputFile(XFile file) async {
     _file = file;
-    _mediaFile = await getMediaFileInfo();
     // TODO: check if the file is compatible with this engine
   }
 

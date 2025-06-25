@@ -7,6 +7,8 @@ import 'package:yaffuu/domain/preferences/preferences_manager.dart';
 import 'package:yaffuu/domain/common/constants/exception.dart';
 import 'package:yaffuu/presentation/screens/common/error_screen.dart';
 import 'package:yaffuu/main.dart';
+import 'package:yaffuu/domain/ffmpeg/ffmpeg_info_service.dart';
+import 'package:yaffuu/domain/media/media_file_analyzer.dart';
 
 /// Result object containing the outcome of app initialization
 class AppInitializationResult {
@@ -78,7 +80,14 @@ class AppInitializationService {
 
     final (dataDir, outputFileManager) = await _setupDirectories();
 
-    await _registerDependencies(preferencesManager, outputFileManager);
+    // Create FFmpeg service instances
+    final ffmpegInfoService = FFmpegInfoService();
+    final mediaFileAnalyzer = MediaFileAnalyzer();
+
+    // Initialize FFmpeg services
+    await _initializeFFmpegServices(ffmpegInfoService);
+
+    await _registerDependencies(preferencesManager, outputFileManager, ffmpegInfoService, mediaFileAnalyzer);
   }
 
   /// Check if the user has seen the tutorial and needs to see it
@@ -102,10 +111,16 @@ class AppInitializationService {
   static Future<void> _registerDependencies(
     PreferencesManager preferencesManager,
     OutputFileManager outputFileManager,
+    FFmpegInfoService ffmpegInfoService,
+    MediaFileAnalyzer mediaFileAnalyzer,
   ) async {
     getIt.registerSingleton<PreferencesManager>(preferencesManager);
 
     getIt.registerSingleton<OutputFileManager>(outputFileManager);
+
+    // Register FFmpeg services as singletons
+    getIt.registerSingleton<FFmpegInfoService>(ffmpegInfoService);
+    getIt.registerSingleton<MediaFileAnalyzer>(mediaFileAnalyzer);
 
     // TODO: Register other services as they are created
     // - QueueService
@@ -131,5 +146,13 @@ class AppInitializationService {
 
     logger.i('Directories setup completed: ${dataDir.path}');
     return (dataDir, outputFileManager);
+  }
+
+  /// Initialize FFmpeg-related services and pre-cache information
+  static Future<void> _initializeFFmpegServices(FFmpegInfoService ffmpegInfoService) async {
+    // Pre-cache FFmpeg information at startup
+    await ffmpegInfoService.getFFmpegInfo();
+    
+    logger.i('FFmpeg services initialized successfully');
   }
 }

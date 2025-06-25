@@ -4,88 +4,32 @@ import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:yaffuu/domain/common/constants/hwaccel.dart';
-import 'package:yaffuu/infrastructure/ffmpeg/models/ffmpeg_info.dart';
-import 'package:yaffuu/infrastructure/ffmpeg/models/media.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/models/progress.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/operations/base.dart';
 import 'package:yaffuu/domain/common/constants/exception.dart';
 import 'package:yaffuu/domain/common/logger.dart';
 
+/// Abstract base class for FFmpeg engines with static utility methods.
 abstract class FFmpegEngine {
   static const _quietVerbose = ['-v', 'error', '-hide_banner'];
-  XFile? _file;
-  MediaFile? _mediaFile;
-  Process? _runningProcess;
-  StreamController<Progress>? _progressController;
+  static Process? _runningProcess;
+  static StreamController<Progress>? _progressController;
 
   final HwAccel hwAccel = HwAccel.none;
 
   FFmpegEngine();
 
-  XFile? get file => _file;
-
-  MediaFile? get mediaFile => _mediaFile;
-
+  /// Checks if this engine is compatible with the current system.
   Future<bool> isCompatible();
 
+  /// Checks if this engine supports the given operation.
   Future<bool> isOperationCompatible(Operation operation);
 
-  Future<void> setInputFile(XFile file);
+  /// Executes an operation with the specified input file and output path.
+  Stream<Progress> execute(Operation operation, XFile inputFile, String outputFilePath);
 
-  Stream<Progress> execute(Operation operation);
-
-  Future<FFmpegInfo> getFFmpegInfo() async {
-    try {
-      final versionResult = await Process.run('ffmpeg', ['-version']);
-      final hwAccelResult =
-          await Process.run('ffmpeg', [..._quietVerbose, '-hwaccels']);
-
-      if (versionResult.exitCode == 0 && hwAccelResult.exitCode == 0) {
-        final info = FFmpegInfo.parse(
-          versionResult.stdout,
-          hardwareAccelerationMethods: hwAccelResult.stdout,
-        );
-
-        return info;
-      } else {
-        throw FFmpegException('An unknown error occurred.');
-      }
-    } on ProcessException {
-      throw FFmpegNotFoundException();
-    } on Exception catch (e) {
-      logger.e('An unknown error occurred: $e');
-      throw FFmpegException('An unknown error occurred: $e');
-    }
-  }
-
-  Future<MediaFile> getMediaFileInfo() async {
-    if (_file == null) {
-      throw Exception('Input file is not set.');
-    }
-
-    final result = await Process.run(
-      'ffprobe',
-      [
-        ..._quietVerbose,
-        '-show_format',
-        '-show_streams',
-        '-of',
-        'json',
-        _file!.path,
-      ],
-    );
-
-    if (result.exitCode != 0) {
-      throw FFmpegException('Failed to get media file info: ${result.stderr}');
-    }
-
-    final json = jsonDecode(result.stdout);
-    _mediaFile = MediaFile.fromJson(json);
-
-    return _mediaFile!;
-  }
-
-  Stream<Progress> run(List<Argument> arguments) async* {
+  /// Static utility method for executing FFmpeg processes.
+  static Stream<Progress> run(XFile inputFile, String outputFilePath, List<Argument> arguments) async* {
     final globalArgs = arguments
         .where((arg) => arg.type == ArgumentType.global)
         .map((arg) => arg.value)
@@ -114,10 +58,6 @@ abstract class FFmpegEngine {
         .map((arg) => arg.value)
         .toList();
 
-    if (_file == null) {
-      throw Exception('Input file is not set.');
-    }
-
     if (outputFormatArgs.length > 1) {
       throw ArgumentError(
           'Multiple output formats provided. Only one output format is allowed.');
@@ -133,15 +73,15 @@ abstract class FFmpegEngine {
       ...globalArgs,
       ...inputArgs,
       '-i',
-      _file!.path,
+      inputFile.path,
       if (videoFilterArgs.isNotEmpty) '-vf',
       if (videoFilterArgs.isNotEmpty) videoFilterArgs.join(','),
       if (audioFilterArgs.isNotEmpty) '-af',
       if (audioFilterArgs.isNotEmpty) audioFilterArgs.join(','),
       ...outputArgs,
       if (outputFormatArgs.isNotEmpty) '-format',
-      outputFormatArgs.first,
-      // outputFile, TODO: handle output file
+      if (outputFormatArgs.isNotEmpty) outputFormatArgs.first,
+      outputFilePath,
     ];
 
     _runningProcess = await Process.start('ffmpeg', processArguments);
@@ -242,14 +182,14 @@ abstract class FFmpegEngine {
     }
   }
 
-  void _cleanup() {
+  /// Cleans up static resources after process completion.
+  static void _cleanup() {
     _runningProcess = null;
     _progressController = null;
   }
 
   /// Stops the currently running FFmpeg process if any.
-  /// Returns true if a process was stopped, false if no process was running.
-  bool stop() {
+  static bool stop() {
     if (_runningProcess == null) {
       return false;
     }

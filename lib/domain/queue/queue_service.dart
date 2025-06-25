@@ -4,16 +4,17 @@ import 'package:uuid/uuid.dart';
 import 'package:yaffuu/domain/common/constants/hwaccel.dart';
 import 'package:yaffuu/domain/queue/queue_status.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/models/progress.dart';
-import 'package:yaffuu/infrastructure/ffmpeg/models/media.dart';
 import 'package:yaffuu/domain/workflows/base/workflow.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/engines/base_engine.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/engines/software_engine.dart';
+import 'package:yaffuu/infrastructure/output_files_manager.dart';
 import 'package:yaffuu/domain/common/logger.dart';
 
 class QueueService {
   static const _uuid = Uuid();
 
   final List<QueueItem> _items = [];
+  final OutputFileManager _outputFileManager;
   QueueItem? _currentItem;
   FFmpegEngine? _engine;
   bool _isProcessing = false;
@@ -23,6 +24,9 @@ class QueueService {
 
   final StreamController<QueueStatus> _statusController =
       StreamController<QueueStatus>.broadcast();
+
+  /// Constructor requires an output file manager
+  QueueService(this._outputFileManager);
 
   /// Stream of queue status updates
   Stream<QueueStatus> get statusStream => _statusController.stream;
@@ -81,52 +85,17 @@ class QueueService {
   /// Get current acceleration method
   HwAccel? get currentAcceleration => _currentAcceleration;
 
-  /// Add an input file to prepare it for processing
-  /// This will get media file information and generate a thumbnail
-  Future<String> addInputFile(XFile inputFile) async {
+  /// Add a workflow to the queue for processing
+  Future<void> addToQueue(Workflow workflow) async {
     if (!isInitialized) {
       throw StateError(
-          'Queue service must be initialized before adding input files. Call initialize(hwAccel) first.');
-    }
-
-    logger.d('Adding input file: ${inputFile.path}');
-
-    try {
-      // Set the input file on the engine to get media information
-      await _engine!.setInputFile(inputFile);
-
-      // Get media file information
-      final mediaFile = await _engine!.getMediaFileInfo();
-
-      // TODO: Generate thumbnail from the media file
-      // This could be done using the engine or a separate thumbnail service
-      logger.d(
-          'Media file info obtained: ${mediaFile.formats.isNotEmpty ? mediaFile.formats.first.name : "unknown"} format, ${mediaFile.streams.length} streams, ${mediaFile.size} bytes');
-
-      // For now, return a success indicator
-      // In the future, you might want to store this information
-      return 'Input file ready: ${inputFile.name}';
-    } catch (e) {
-      logger.e('Failed to process input file: $e');
-      throw Exception('Failed to process input file: $e');
-    }
-  }
-
-  /// Start a workflow with the current input file
-  String startWorkflow(Workflow workflow) {
-    if (!isInitialized) {
-      throw StateError(
-          'Queue service must be initialized before starting workflows. Call initialize(hwAccel) first.');
-    }
-
-    if (_engine?.file == null) {
-      throw StateError('No input file set. Call addInputFile() first.');
+          'Queue service must be initialized before adding workflows. Call initialize(hwAccel) first.');
     }
 
     final item = QueueItem(
       id: _uuid.v4(),
       workflow: workflow,
-      inputFile: _engine!.file!,
+      inputFile: workflow.inputFile,
       createdAt: DateTime.now(),
     );
 
@@ -138,8 +107,7 @@ class QueueService {
       _processQueue();
     }
 
-    logger.d('Workflow started: ${item.id}');
-    return item.id;
+    logger.d('Workflow added to queue: ${item.id}');
   }
 
   /// Remove an item from the queue
@@ -259,11 +227,11 @@ class QueueService {
         throw StateError('Engine not initialized');
       }
 
-      // Set input file
-      await _engine!.setInputFile(item.inputFile);
+      // Get the output file path for this workflow
+      final outputFilePath = await _outputFileManager.getNewOutputFilePath(item.workflow.inputFile.name);
 
-      // Execute workflow
-      _currentSubscription = item.workflow.execute(_engine!).listen(
+      // Execute workflow with the new signature
+      _currentSubscription = item.workflow.execute(_engine!, outputFilePath).listen(
         (workflowProgress) {
           // Update progress - we'll need to implement a way to extract Progress from WorkflowProgress
           // For now, let's assume the workflow provides progress updates
@@ -314,9 +282,9 @@ class QueueService {
 
   /// Cancel the currently running item
   void _cancelCurrentItem() {
-    if (_currentItem != null && _engine != null) {
-      // Stop the engine if it has a stop method
-      _engine!.stop();
+    if (_currentItem != null) {
+      // Stop the engine using the static method
+      FFmpegEngine.stop();
 
       _updateItemStatus(
         _currentItem!,
@@ -370,22 +338,5 @@ class QueueService {
   void dispose() {
     _currentSubscription?.cancel();
     _statusController.close();
-  }
-
-  /// Check if an input file is currently set
-  bool get hasInputFile => _engine?.file != null;
-
-  /// Get the current input file if set
-  XFile? get currentInputFile => _engine?.file;
-
-  /// Get the current media file information if available
-  MediaFile? get currentMediaFile => _engine?.mediaFile;
-
-  /// Clear the current input file
-  void clearInputFile() {
-    // Note: This doesn't actually clear the file from the engine
-    // as there's no clear method in the base engine interface
-    // This would need to be implemented in the engine interface
-    logger.d('Input file reference cleared');
   }
 }

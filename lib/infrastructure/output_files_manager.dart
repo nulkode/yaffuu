@@ -184,6 +184,14 @@ class OutputFileManager {
     }
   }
 
+  /// Generate a new output file path for a given original file name
+  Future<String> getNewOutputFilePath(String originalFileName) async {
+    await initialize();
+
+    final fileName = _generateFileName(File(originalFileName));
+    return path.join(outputDirectory.path, fileName);
+  }
+
   String _generateFileName(File sourceFile) {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final originalName = path.basenameWithoutExtension(sourceFile.path);
