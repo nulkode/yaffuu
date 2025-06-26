@@ -55,7 +55,7 @@ class VideoStream extends MediaStream {
         json['width'] == null ||
         json['height'] == null ||
         json['duration'] == null ||
-        json['bitrate'] == null) {
+        json['bit_rate'] == null) {
       throw JsonParsingException('Invalid video stream JSON data.');
     }
     return VideoStream._(
@@ -64,7 +64,7 @@ class VideoStream extends MediaStream {
       json['width'],
       json['height'],
       double.parse(json['duration']),
-      json['bitrate'],
+      int.parse(json['bit_rate']),
     );
   }
 }
