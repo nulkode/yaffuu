@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:yaffuu/domain/common/constants/hwaccel.dart';
+import 'package:yaffuu/domain/common/constants/exception.dart';
 import 'package:yaffuu/domain/ffmpeg/ffmpeg_info_service.dart';
 import 'package:yaffuu/domain/media/media_file_analyzer.dart';
 import 'package:yaffuu/domain/preferences/preferences_manager.dart';
@@ -64,10 +65,13 @@ final class WorkbenchReady extends WorkbenchState {
 
 /// State when file analysis fails.
 final class WorkbenchAnalysisFailed extends WorkbenchState {
-  /// Error message describing what went wrong during analysis.
+  /// User-friendly error message describing what went wrong during analysis.
   final String error;
+  
+  /// Technical details for debugging purposes (optional).
+  final String? technicalDetails;
 
-  WorkbenchAnalysisFailed(this.error);
+  WorkbenchAnalysisFailed(this.error, {this.technicalDetails});
 }
 
 // BLoC
@@ -101,14 +105,11 @@ class WorkbenchBloc extends Bloc<WorkbenchEvent, WorkbenchState> {
     try {
       logger.i('Starting analysis of file: ${event.file.path}');
 
-      // Analyze the media file to get metadata and thumbnail
       final analysisResult = await _mediaFileAnalyzer.analyze(event.file);
       final (mediaFile, thumbnail) = analysisResult;
 
-      // Get FFmpeg build information
       final ffmpegInfo = await _ffmpegInfoService.getFFmpegInfo();
 
-      // Get current hardware acceleration preference
       final currentHwAccel = await _preferencesManager.settings.getHwAccel();
 
       logger.i('File analysis completed successfully');
@@ -122,7 +123,18 @@ class WorkbenchBloc extends Bloc<WorkbenchEvent, WorkbenchState> {
       ));
     } catch (error) {
       logger.e('File analysis failed: $error');
-      emit(WorkbenchAnalysisFailed(error.toString()));
+      
+      String userFriendlyMessage;
+      String? technicalDetails;
+      
+      if (error is MultimediaNotFoundOrNotRecognizedException) {
+        userFriendlyMessage = 'The selected file is not a valid media file or cannot be read. Please select a supported video file.';
+      } else {
+        userFriendlyMessage = 'An unexpected error occurred while analyzing the file. Please try again.';
+        technicalDetails = error.toString();
+      }
+      
+      emit(WorkbenchAnalysisFailed(userFriendlyMessage, technicalDetails: technicalDetails));
     }
   }
 

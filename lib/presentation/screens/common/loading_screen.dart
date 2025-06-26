@@ -25,7 +25,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
     if (result.isInitialized) {
       context.go('/home');
     } else if (result.shouldShowTutorial) {
-      context.go('/tutorial');
+      // context.go('/tutorial'); TODO: Implement tutorial screen
+      context.go('/home');
     } else if (result.errorCode == 4) {
       context.go('/error/ffmpeg-missing');
     } else if (result.errorCode != null) {

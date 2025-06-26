@@ -8,6 +8,7 @@ import 'package:yaffuu/presentation/bloc/queue_bloc.dart';
 import 'package:yaffuu/presentation/bloc/workbench_bloc.dart';
 import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/presentation/shared/widgets/appbar.dart';
+import 'package:yaffuu/presentation/shared/widgets/error_dialog.dart';
 import 'package:go_router/go_router.dart';
 
 // TODO: implement pasting files
@@ -17,46 +18,63 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: YaffuuAppBar(
-        leftChildren: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              context.push('/settings');
+    return BlocListener<WorkbenchBloc, WorkbenchState>(
+      listener: (context, state) {
+        if (state is WorkbenchAnalysisFailed) {
+          showDetailedErrorDialog(
+            context: context,
+            title: 'File Analysis Error',
+            message: state.error,
+            technicalDetails: state.technicalDetails,
+            onOk: () {
+              Navigator.of(context).pop();
+              // Clear the failed state and allow user to try again
+              context.read<WorkbenchBloc>().add(FileCleared());
             },
-            tooltip: 'Settings',
-          ),
-          IconButton(
-            icon: const Icon(Icons.folder_open),
-            onPressed: () {
-              context.push('/output-files');
-            },
-            tooltip: 'Output Files',
-          ),
-        ],
-      ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 16),
-                  QueueStatus(),
-                  SizedBox(height: 8),
-                  Text('Input', style: AppTypography.titleStyle),
-                  SizedBox(height: 8),
-                  FilePickerCard(),
-                  SizedBox(height: 16),
-                  Text('Operation', style: AppTypography.titleStyle),
-                  SizedBox(height: 8),
-                  OperationsList(),
-                ],
+          );
+        }
+      },
+      child: Scaffold(
+        appBar: YaffuuAppBar(
+          leftChildren: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                context.push('/settings');
+              },
+              tooltip: 'Settings',
+            ),
+            IconButton(
+              icon: const Icon(Icons.folder_open),
+              onPressed: () {
+                context.push('/output-files');
+              },
+              tooltip: 'Output Files',
+            ),
+          ],
+        ),
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 16),
+                    QueueStatus(),
+                    SizedBox(height: 8),
+                    Text('Input', style: AppTypography.titleStyle),
+                    SizedBox(height: 8),
+                    FilePickerCard(),
+                    SizedBox(height: 16),
+                    Text('Operation', style: AppTypography.titleStyle),
+                    SizedBox(height: 8),
+                    OperationsList(),
+                  ],
+                ),
               ),
             ),
           ),
