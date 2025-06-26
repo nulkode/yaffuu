@@ -42,12 +42,10 @@ class QueueService {
   /// Initialize the queue with a specific hardware acceleration
   /// Can be called multiple times to change engines
   Future<void> initialize(HwAccel hwAccel) async {
-    // If already initialized with the same acceleration, skip
     if (_isInitialized && _currentAcceleration == hwAccel && _engine != null) {
       return;
     }
 
-    // Stop current processing if changing engines
     if (_isProcessing && _currentAcceleration != hwAccel) {
       await _stopCurrentProcessing();
     }
@@ -55,24 +53,16 @@ class QueueService {
     logger.d('Initializing queue with acceleration: ${hwAccel.displayName}');
 
     try {
-      // Create new engine
       final newEngine = await _createEngine(hwAccel);
 
-      // Clean up old engine if exists
       _engine = null;
 
-      // Set new engine
       _engine = newEngine;
       _currentAcceleration = hwAccel;
       _isInitialized = true;
 
       logger.d('Queue initialized successfully with ${hwAccel.displayName}');
       _notifyStatusChanged();
-
-      // Resume processing if there are pending items
-      if (_items.any((item) => item.isPending)) {
-        _processQueue();
-      }
     } catch (e) {
       logger.e('Failed to initialize queue with ${hwAccel.displayName}: $e');
       rethrow;
@@ -102,7 +92,6 @@ class QueueService {
     _items.add(item);
     _notifyStatusChanged();
 
-    // Auto-start processing if not already running
     if (!_isProcessing) {
       _processQueue();
     }
@@ -117,12 +106,10 @@ class QueueService {
 
     final item = _items[index];
 
-    // If it's the current item, cancel it
     if (_currentItem?.id == itemId) {
       _cancelCurrentItem();
     }
 
-    // Remove from queue if not running
     if (item.status == QueueItemStatus.pending) {
       _items.removeAt(index);
       _notifyStatusChanged();
@@ -170,7 +157,6 @@ class QueueService {
         break;
     }
 
-    // Check compatibility
     final isCompatible = await engine.isCompatible();
     if (!isCompatible) {
       throw Exception('Engine ${hwAccel.displayName} is not compatible');
@@ -183,7 +169,6 @@ class QueueService {
   Future<void> _stopCurrentProcessing() async {
     if (_isProcessing) {
       _cancelCurrentItem();
-      // Wait a bit for graceful shutdown
       await Future.delayed(const Duration(milliseconds: 100));
     }
   }
@@ -218,25 +203,18 @@ class QueueService {
     _currentItem = item;
 
     try {
-      // Update item status to running
       _updateItemStatus(item, QueueItemStatus.running,
           startedAt: DateTime.now());
 
-      // Use the initialized engine
       if (_engine == null) {
         throw StateError('Engine not initialized');
       }
 
-      // Get the output file path for this workflow
       final outputFilePath = await _outputFileManager.getNewOutputFilePath(item.workflow.inputFile.name);
 
-      // Execute workflow with the new signature
       _currentSubscription = item.workflow.execute(_engine!, outputFilePath).listen(
         (workflowProgress) {
-          // Update progress - we'll need to implement a way to extract Progress from WorkflowProgress
-          // For now, let's assume the workflow provides progress updates
           if (workflowProgress.isComplete) {
-            // Workflow completed, no need to update progress
           } else {
             // TODO: Extract progress information from WorkflowProgress
             // _updateItemProgress(item, progress);
@@ -264,7 +242,6 @@ class QueueService {
         },
       );
 
-      // Wait for completion
       await _currentSubscription?.asFuture();
     } catch (e) {
       logger.e('Item processing error: $e');
@@ -283,7 +260,6 @@ class QueueService {
   /// Cancel the currently running item
   void _cancelCurrentItem() {
     if (_currentItem != null) {
-      // Stop the engine using the static method
       FFmpegEngine.stop();
 
       _updateItemStatus(

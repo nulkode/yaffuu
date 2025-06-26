@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:yaffuu/domain/preferences/preferences_manager.dart';
 import 'package:yaffuu/domain/queue/queue_service.dart';
 import 'package:yaffuu/domain/queue/queue_status.dart';
 import 'package:yaffuu/domain/workflows/base/workflow.dart';
@@ -96,31 +97,40 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
     on<QueuePaused>(_onQueuePaused);
     on<QueueResumed>(_onQueueResumed);
     on<_QueueStatusUpdated>(_onQueueStatusUpdated);
+
+    add(QueueInitialized());
   }
 
   /// Handles queue initialization by setting up status stream listening.
-  void _onQueueInitialized(QueueInitialized event, Emitter<QueueState> emit) {
-    logger.i('Initializing queue');
-    
-    // Listen to queue status updates
-    _queueService.statusStream.listen(
-      (status) => add(_QueueStatusUpdated(status)),
-      onError: (error) {
-        logger.e('Queue status stream error: $error');
-        emit(QueueError(state.status, error.toString()));
-      },
-    );
+  void _onQueueInitialized(QueueInitialized event, Emitter<QueueState> emit) async {
+    try {
+      logger.i('Initializing queue');
+      
+      await _queueService
+          .initialize(await getIt<PreferencesManager>().settings.getHwAccel());
 
-    // Emit initial status
-    emit(QueueLoaded(_queueService.currentStatus));
+      logger.i('Queue service initialized');
+
+      _queueService.statusStream.listen(
+        (status) => add(_QueueStatusUpdated(status)),
+        onError: (error) {
+          logger.e('Queue status stream error: $error');
+        },
+      );
+
+      emit(QueueLoaded(_queueService.currentStatus));
+    } catch (e) {
+      logger.e('Failed to initialize queue: $e');
+      emit(QueueError(state.status, 'Failed to initialize queue: $e'));
+    }
   }
 
   /// Handles workflow submission by delegating to the queue service.
-  void _onWorkflowSubmitted(WorkflowSubmitted event, Emitter<QueueState> emit) async {
+  void _onWorkflowSubmitted(
+      WorkflowSubmitted event, Emitter<QueueState> emit) async {
     try {
       logger.i('Submitting workflow to queue: ${event.workflow.runtimeType}');
-      
-      // Add the workflow to the queue (it now contains its input file)
+
       await _queueService.addToQueue(event.workflow);
     } catch (e) {
       logger.e('Failed to submit workflow to queue: $e');
@@ -143,7 +153,8 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
   }
 
   /// Handles clearing completed items by delegating to the queue service.
-  void _onQueueCompletedCleared(QueueCompletedCleared event, Emitter<QueueState> emit) {
+  void _onQueueCompletedCleared(
+      QueueCompletedCleared event, Emitter<QueueState> emit) {
     try {
       logger.i('Clearing completed items from queue');
       _queueService.clearCompleted();
@@ -187,7 +198,8 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
   }
 
   /// Handles internal queue status updates by emitting new loaded state.
-  void _onQueueStatusUpdated(_QueueStatusUpdated event, Emitter<QueueState> emit) {
+  void _onQueueStatusUpdated(
+      _QueueStatusUpdated event, Emitter<QueueState> emit) {
     emit(QueueLoaded(event.status));
   }
 

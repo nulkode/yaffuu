@@ -4,7 +4,6 @@ import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yaffuu/presentation/bloc/queue_bloc.dart';
 import 'package:yaffuu/presentation/bloc/workbench_bloc.dart';
 import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/presentation/shared/widgets/appbar.dart';
@@ -28,7 +27,6 @@ class HomePage extends StatelessWidget {
             technicalDetails: state.technicalDetails,
             onOk: () {
               Navigator.of(context).pop();
-              // Clear the failed state and allow user to try again
               context.read<WorkbenchBloc>().add(FileCleared());
             },
           );
@@ -64,8 +62,6 @@ class HomePage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 16),
-                    QueueStatus(),
-                    SizedBox(height: 8),
                     Text('Input', style: AppTypography.titleStyle),
                     SizedBox(height: 8),
                     FilePickerCard(),
@@ -79,65 +75,6 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class QueueStatus extends StatelessWidget {
-  const QueueStatus({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 32,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          InkWell(
-            onTap: () {},
-            child: BlocBuilder<QueueBloc, QueueState>(
-              builder: (context, state) {
-                final color = state is QueueLoaded
-                    ? Colors.green
-                    : state is QueueError
-                        ? Colors.red
-                        : state is QueueInitial
-                            ? Colors.grey
-                            : Colors.grey;
-
-                final text = state is QueueLoaded
-                    ? 'Ready'
-                    : state is QueueError
-                        ? 'Error'
-                        : state is QueueInitial
-                            ? 'Initial'
-                            : 'Unknown';
-
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(width: 8),
-                    Text(text),
-                    AspectRatio(
-                      aspectRatio: 1,
-                      child: Center(
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          )
-        ],
       ),
     );
   }
