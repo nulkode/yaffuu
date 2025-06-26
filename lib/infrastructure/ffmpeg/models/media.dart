@@ -18,7 +18,12 @@ enum Codec {
 }
 
 enum Format {
-  mp4('mp4');
+  mp4('mp4'),
+  mov('mov'),
+  m4a('m4a'),
+  tgp('3gp'),
+  tg2('3g2'),
+  mj2('mj2');
 
   final String name;
   const Format(this.name);
