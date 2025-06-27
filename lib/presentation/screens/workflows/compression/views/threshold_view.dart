@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:yaffuu/presentation/screens/workflows/compression/constants/compression_option.dart'
-    as CompressionData;
+    as compression_options;
 import '../constants/compression_option.dart';
+import '../constants/compression_priority.dart';
 import '../widgets/threshold_option_card.dart';
+import '../widgets/priority_selection_widget.dart';
 
 class ThresholdView extends StatefulWidget {
-  final Function(CompressionOption?, String?) onSelectionChanged;
+  final Function(CompressionOption?, String?, List<CompressionPriority>?)
+      onSelectionChanged;
 
   const ThresholdView({
     super.key,
@@ -17,22 +20,35 @@ class ThresholdView extends StatefulWidget {
   State<ThresholdView> createState() => _ThresholdViewState();
 }
 
-class _ThresholdViewState extends State<ThresholdView> {
+class _ThresholdViewState extends State<ThresholdView>
+    with TickerProviderStateMixin {
   int? selectedOptionIndex;
   final TextEditingController _customSizeController = TextEditingController();
   String _selectedUnit = 'MB';
+  List<CompressionPriority> _priorities = List.from(defaultPriorities);
+  late AnimationController _priorityAnimationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _priorityAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+  }
 
   @override
   void dispose() {
     _customSizeController.dispose();
+    _priorityAnimationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final displayOptions = selectedOptionIndex == null
-        ? CompressionData.defaultOptions
-        : [CompressionData.defaultOptions[selectedOptionIndex!]];
+        ? compression_options.defaultOptions
+        : [compression_options.defaultOptions[selectedOptionIndex!]];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,7 +73,7 @@ class _ThresholdViewState extends State<ThresholdView> {
             );
 
             final originalIndex =
-                CompressionData.defaultOptions.indexOf(option);
+                compression_options.defaultOptions.indexOf(option);
             final isSelected = selectedOptionIndex == originalIndex;
 
             return SizeTransition(
@@ -98,12 +114,12 @@ class _ThresholdViewState extends State<ThresholdView> {
           opacity: selectedOptionIndex != null ? 1.0 : 0.0,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            height: selectedOptionIndex != null ? 48.0 : 0.0,
+            height: selectedOptionIndex != null ? 56.0 : 0.0,
             child: selectedOptionIndex != null
                 ? Align(
                     alignment: Alignment.centerRight,
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
+                      padding: const EdgeInsets.only(top: 16.0),
                       child: IconButton(
                         onPressed: _deselectOption,
                         icon: const Icon(Icons.close),
@@ -112,6 +128,32 @@ class _ThresholdViewState extends State<ThresholdView> {
                   )
                 : null,
           ),
+        ),
+        AnimatedBuilder(
+          animation: _priorityAnimationController,
+          builder: (context, child) {
+            final sizeAnimation = CurvedAnimation(
+              parent: _priorityAnimationController,
+              curve: Curves.easeInOutCubic,
+            );
+
+            final fadeAnimation = CurvedAnimation(
+              parent: _priorityAnimationController,
+              curve: const Interval(0.0, 0.8, curve: Curves.easeOut),
+            );
+
+            return SizeTransition(
+              sizeFactor: sizeAnimation,
+              axis: Axis.vertical,
+              child: FadeTransition(
+                opacity: fadeAnimation,
+                child: PrioritySelectionWidget(
+                  priorities: _priorities,
+                  onPrioritiesChanged: _onPrioritiesChanged,
+                ),
+              ),
+            );
+          },
         ),
       ],
     );
@@ -124,19 +166,21 @@ class _ThresholdViewState extends State<ThresholdView> {
         if (option.isCustom) {
           _customSizeController.text = '25';
         }
+        _priorityAnimationController.forward();
       }
     });
 
     final customSize =
         option.isCustom ? '${_customSizeController.text} $_selectedUnit' : null;
-    widget.onSelectionChanged(option, customSize);
+    widget.onSelectionChanged(option, customSize, _priorities);
   }
 
   void _deselectOption() {
     setState(() {
       selectedOptionIndex = null;
+      _priorityAnimationController.reverse();
     });
-    widget.onSelectionChanged(null, null);
+    widget.onSelectionChanged(null, null, null);
   }
 
   void _onUnitChanged(String unit) {
@@ -145,12 +189,27 @@ class _ThresholdViewState extends State<ThresholdView> {
     });
 
     if (selectedOptionIndex != null &&
-        CompressionData.defaultOptions[selectedOptionIndex!].isCustom) {
+        compression_options.defaultOptions[selectedOptionIndex!].isCustom) {
       final customSize = '${_customSizeController.text} $_selectedUnit';
       widget.onSelectionChanged(
-        CompressionData.defaultOptions[selectedOptionIndex!],
+        compression_options.defaultOptions[selectedOptionIndex!],
         customSize,
+        _priorities,
       );
+    }
+  }
+
+  void _onPrioritiesChanged(List<CompressionPriority> priorities) {
+    setState(() {
+      _priorities = priorities;
+    });
+
+    if (selectedOptionIndex != null) {
+      final option = compression_options.defaultOptions[selectedOptionIndex!];
+      final customSize = option.isCustom
+          ? '${_customSizeController.text} $_selectedUnit'
+          : null;
+      widget.onSelectionChanged(option, customSize, _priorities);
     }
   }
 }
