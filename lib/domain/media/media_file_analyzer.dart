@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
+import 'package:path/path.dart' as path;
 import 'package:yaffuu/infrastructure/ffmpeg/models/media.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/operations/base.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/engines/base_engine.dart';
@@ -49,8 +50,7 @@ class MediaFileAnalyzer {
   Future<XFile?> _generateThumbnail(XFile file) async {
     try {
       final tempDir = Directory.systemTemp;
-      final thumbnailPath =
-          '${tempDir.path}/thumbnail_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final thumbnailPath = path.join(tempDir.path, 'thumbnail_${DateTime.now().millisecondsSinceEpoch}.jpg');
 
       final arguments = [
         Argument(

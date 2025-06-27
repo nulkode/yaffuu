@@ -52,7 +52,7 @@ class DependencyInjectionService {
   /// Sets up the directories and initializes the OutputFileManager.
   static Future<OutputFileManager> _setupOutputFileManager() async {
     final appSupportDir = await getApplicationSupportDirectory();
-    final Directory dataDir = Directory('${appSupportDir.absolute.path}/data');
+    final Directory dataDir = Directory(appSupportDir.absolute.path);
 
     final outputFileManager = OutputFileManager(
       dataDir: dataDir,
