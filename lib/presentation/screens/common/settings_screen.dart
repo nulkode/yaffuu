@@ -369,14 +369,21 @@ GNU General Public License for more details.
                       const SizedBox(height: 8),
                       const Text(
                           'FFmpeg is a trademark of Fabrice Bellard. yaffuu is not affiliated with FFmpeg.'),
-                      const SizedBox(height: 16),
-                      OutlinedButton(
-                        onPressed: () {
-                          showLicensePage(
-                            context: context,
-                          );
-                        },
-                        child: const Text('Show Licenses'),
+                      const SizedBox(height: 48),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton.icon(
+                            onPressed: () {
+                              showLicensePage(
+                                context: context,
+                              );
+                            },
+                            label: const Text('Show Licenses'),
+                            icon: const Icon(Icons.arrow_forward_ios, size: 16),
+                            iconAlignment: IconAlignment.end,
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 32),
                     ],
