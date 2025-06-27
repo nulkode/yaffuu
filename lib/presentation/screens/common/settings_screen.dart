@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yaffuu/domain/common/constants/hwaccel.dart';
+import 'package:yaffuu/domain/ffmpeg/ffmpeg_info_service.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/models/ffmpeg_info.dart';
 import 'package:yaffuu/domain/preferences/preferences_manager.dart';
 import 'package:yaffuu/main.dart';
@@ -22,10 +23,9 @@ class _SettingsPageState extends State<SettingsPage> {
   late PreferencesManager _preferencesManager;
   HwAccel _selectedHardwareAcceleration = HwAccel.none;
 
-  // TODO: Replace with proper FFmpegInfo when queue service is ready
-  FFmpegInfo? get _ffmpegInfo {
-    // return getIt<FFmpegInfo>();
-    return null;
+  Future<FFmpegInfo> get _ffmpegInfo {
+    final ffmpegInfoService = getIt<FFmpegInfoService>();
+    return ffmpegInfoService.getFFmpegInfo();
   }
 
   @override
@@ -195,38 +195,71 @@ class _SettingsPageState extends State<SettingsPage> {
                       const Text('FFmpeg Information',
                           style: AppTypography.titleStyle),
                       const SizedBox(height: 8),
-                      if (_ffmpegInfo != null) ...[
-                        Text('Version: ${_ffmpegInfo!.version}'),
-                        const SizedBox(height: 8),
-                        Text(_ffmpegInfo!.copyright.replaceAll('(c)', '©')),
-                        const SizedBox(height: 8),
-                        Text('Built With: ${_ffmpegInfo!.builtWith}'),
-                        const SizedBox(height: 16),
-                        ConfigurationSection(ffmpegInfo: _ffmpegInfo),
-                        const SizedBox(height: 16),
-                        LibrariesSection(ffmpegInfo: _ffmpegInfo),
-                        const SizedBox(height: 16),
-                        const Text('Hardware Acceleration Methods',
-                            style: AppTypography.subtitleStyle),
-                        const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 4.0,
-                          runSpacing: 4.0,
-                          children: _ffmpegInfo!.hardwareAccelerationMethods!
-                              .map((config) {
-                            return Chip(
-                              label: Text(
-                                config,
-                              ),
-                              padding: const EdgeInsets.all(0),
+                      FutureBuilder<FFmpegInfo>(
+                        future: _ffmpegInfo,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Column(
+                              children: [
+                                CircularProgressIndicator(),
+                                SizedBox(height: 8),
+                              ],
                             );
-                          }).toList(),
-                        ),
-                      ] else ...[
-                        const Text('FFmpeg information not available'),
-                        const Text(
-                            '(Will be available when queue service is implemented)'),
-                      ],
+                          } else if (snapshot.hasError) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('FFmpeg information not available'),
+                                const SizedBox(height: 4),
+                                Text('Error: ${snapshot.error}',
+                                    style: const TextStyle(color: Colors.red)),
+                              ],
+                            );
+                          } else if (snapshot.hasData) {
+                            final ffmpegInfo = snapshot.data!;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Version: ${ffmpegInfo.version}'),
+                                const SizedBox(height: 8),
+                                Text(ffmpegInfo.copyright.replaceAll('(c)', '©')),
+                                const SizedBox(height: 8),
+                                Text('Built With: ${ffmpegInfo.builtWith}'),
+                                const SizedBox(height: 16),
+                                ConfigurationSection(ffmpegInfo: ffmpegInfo),
+                                const SizedBox(height: 16),
+                                LibrariesSection(ffmpegInfo: ffmpegInfo),
+                                const SizedBox(height: 16),
+                                const Text('Hardware Acceleration Methods',
+                                    style: AppTypography.subtitleStyle),
+                                const SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 4.0,
+                                  runSpacing: 4.0,
+                                  children: ffmpegInfo.hardwareAccelerationMethods!
+                                      .map((config) {
+                                    return Chip(
+                                      label: Text(
+                                        config,
+                                      ),
+                                      padding: const EdgeInsets.all(0),
+                                    );
+                                  }).toList(),
+                                ),
+                              ],
+                            );
+                          } else {
+                            return const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('FFmpeg information not available'),
+                                Text(
+                                    '(Will be available when queue service is implemented)'),
+                              ],
+                            );
+                          }
+                        },
+                      ),
                       const SizedBox(height: 32),
                       const Stack(
                         children: [
