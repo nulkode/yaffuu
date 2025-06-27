@@ -4,6 +4,7 @@ import 'package:yaffuu/domain/common/constants/hwaccel.dart';
 import 'package:yaffuu/domain/ffmpeg/ffmpeg_info_service.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/models/ffmpeg_info.dart';
 import 'package:yaffuu/domain/preferences/preferences_manager.dart';
+import 'package:yaffuu/domain/queue/queue_service.dart';
 import 'package:yaffuu/main.dart';
 import 'package:yaffuu/app/theme/typography.dart';
 import 'package:yaffuu/presentation/shared/widgets/appbar.dart';
@@ -11,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yaffuu/presentation/shared/widgets/help.dart';
 import 'package:yaffuu/presentation/bloc/theme_bloc.dart';
 import 'package:yaffuu/presentation/shared/widgets/logos.dart';
+import 'package:yaffuu/presentation/shared/widgets/error_dialog.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -48,45 +50,106 @@ class _SettingsPageState extends State<SettingsPage> {
     });
     await _preferencesManager.settings.setHwAccel(method);
 
-    // TODO: Update engine when queue service is ready
-    /*
+    // Update the queue service engine with the new hardware acceleration method
     try {
-      final engine = await queueService.createEngine(method);
+      final queueService = getIt<QueueService>();
+      await queueService.initialize(method);
+      
       if (mounted) {
-        context.read<QueueBloc>().add(SetEngineEvent(engine));
+        // Show success dialog
+        showDialog(
+          context: context,
+          builder: (context) => Dialog(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.check_circle, color: Colors.green, size: 48),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Success',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 8),
+                    Text('Hardware acceleration changed to "${method.displayName}"'),
+                    const SizedBox(height: 24),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Hardware acceleration "${method.value}" is not compatible: $e'),
-            backgroundColor: Colors.red,
-          ),
+        await showDetailedErrorDialog(
+          context: context,
+          title: 'Hardware Acceleration Error',
+          message: 'Hardware acceleration "${method.displayName}" is not compatible with your system.',
+          technicalDetails: e.toString(),
         );
 
+        // Revert to previous setting and fallback to software engine
         setState(() {
           _selectedHardwareAcceleration = HwAccel.none;
         });
         await _preferencesManager.settings.setHwAccel(HwAccel.none);
 
         try {
-          final fallbackEngine = await queueService.createEngine(HwAccel.none);
+          final queueService = getIt<QueueService>();
+          await queueService.initialize(HwAccel.none);
+          
           if (mounted) {
-            context.read<QueueBloc>().add(SetEngineEvent(fallbackEngine));
+            // Show fallback success dialog
+            showDialog(
+              context: context,
+              builder: (context) => Dialog(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.info, color: Colors.orange, size: 48),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Fallback Applied',
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text('Reverted to software acceleration'),
+                        const SizedBox(height: 24),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
           }
         } catch (fallbackError) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Critical error: Unable to create fallback engine: $fallbackError'),
-                backgroundColor: Colors.red,
-              ),
+            await showDetailedErrorDialog(
+              context: context,
+              title: 'Critical Error',
+              message: 'Unable to initialize fallback engine. The application may not function properly.',
+              technicalDetails: fallbackError.toString(),
             );
           }
         }
       }
     }
-    */
   }
 
   @override
@@ -331,10 +394,10 @@ GNU General Public License for more details.
 class LibrariesSection extends StatelessWidget {
   const LibrariesSection({
     super.key,
-    required FFmpegInfo? ffmpegInfo,
-  }) : _ffmpegInfo = ffmpegInfo;
+    required this.ffmpegInfo,
+  });
 
-  final FFmpegInfo? _ffmpegInfo;
+  final FFmpegInfo ffmpegInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -365,7 +428,7 @@ class LibrariesSection extends StatelessWidget {
                 ),
               ],
             ),
-            ..._ffmpegInfo!.libraries.entries.map((entry) {
+            ...ffmpegInfo.libraries.entries.map((entry) {
               final libName = entry.key;
               final versions = entry.value;
               return TableRow(
@@ -395,10 +458,10 @@ class LibrariesSection extends StatelessWidget {
 class ConfigurationSection extends StatefulWidget {
   const ConfigurationSection({
     super.key,
-    required FFmpegInfo? ffmpegInfo,
-  }) : _ffmpegInfo = ffmpegInfo;
+    required this.ffmpegInfo,
+  });
 
-  final FFmpegInfo? _ffmpegInfo;
+  final FFmpegInfo ffmpegInfo;
 
   @override
   State<ConfigurationSection> createState() => _ConfigurationSectionState();
@@ -458,7 +521,7 @@ class _ConfigurationSectionState extends State<ConfigurationSection>
           child: Wrap(
             spacing: 2.0,
             runSpacing: 2.0,
-            children: widget._ffmpegInfo!.configuration.map((config) {
+            children: widget.ffmpegInfo.configuration.map((config) {
               return Chip(
                 label: Text(
                   config,
