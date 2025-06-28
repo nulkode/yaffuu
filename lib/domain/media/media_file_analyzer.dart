@@ -50,7 +50,8 @@ class MediaFileAnalyzer {
   Future<XFile?> _generateThumbnail(XFile file) async {
     try {
       final tempDir = Directory.systemTemp;
-      final thumbnailPath = path.join(tempDir.path, 'thumbnail_${DateTime.now().millisecondsSinceEpoch}.jpg');
+      final thumbnailPath = path.join(tempDir.path,
+          'thumbnail_${DateTime.now().millisecondsSinceEpoch}.jpg');
 
       final arguments = [
         Argument(

@@ -25,24 +25,17 @@ class _CompressionPageState extends State<CompressionPage> {
     return AntiAlertSoundGestureOnEmptyAreas(
       child: Column(
         children: [
-          // HEADER FIJO
           CompressionHeader(
             selectedApproach: selectedApproach,
             onApproachChanged: _onApproachChanged,
           ),
-
           const SizedBox(height: 32),
-
-          // CONTENIDO CON SCROLL - Usa Expanded para tomar el espacio restante
           Expanded(
             child: SingleChildScrollView(
               child: _buildCompressionContent(),
             ),
           ),
-
           const SizedBox(height: 16),
-
-          // BOTÓN FIJO EN LA PARTE INFERIOR
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -53,7 +46,6 @@ class _CompressionPageState extends State<CompressionPage> {
               child: const Text('Start Compression'),
             ),
           ),
-
           const SizedBox(height: 16),
         ],
       ),
@@ -111,7 +103,6 @@ class _CompressionPageState extends State<CompressionPage> {
         message += '\nPriorities: $priorityNames';
       }
 
-      // Show the compression details in a snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
@@ -119,7 +110,6 @@ class _CompressionPageState extends State<CompressionPage> {
         ),
       );
 
-      // Navigate to processing page
       context.go('/processing/compression-1');
     }
   }

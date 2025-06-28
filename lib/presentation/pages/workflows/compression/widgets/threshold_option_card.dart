@@ -40,7 +40,7 @@ class ThresholdOptionCard extends StatelessWidget {
               final shouldUseInlineLayout = option.isCustom &&
                   isSelected &&
                   constraints.maxWidth >= minWidthForInline;
-    
+
               return Column(
                 children: [
                   Row(

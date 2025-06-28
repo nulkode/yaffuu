@@ -5,7 +5,6 @@ import '../base_preferences.dart';
 class UxMemoriesPreferences extends BasePreferences {
   UxMemoriesPreferences(SharedPreferences prefs) : super('ux_memories', prefs);
 
-  // Preference keys
   static const _hasSeenTutorialKey = PreferencesKey<bool>(
     key: 'has_seen_tutorial',
     defaultValue: false,

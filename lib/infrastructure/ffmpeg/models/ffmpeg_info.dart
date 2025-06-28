@@ -19,7 +19,6 @@ class FFmpegInfo {
     String ffmpegHeader, {
     String? hardwareAccelerationMethods,
   }) {
-    /* HEADER */
     final headerLines = ffmpegHeader.split('\n');
     final versionRegex = RegExp(r'^ffmpeg version (\S+) (Copyright .+)$');
     final builtWithRegex = RegExp(r'^built with (.+)$');
@@ -60,7 +59,6 @@ class FFmpegInfo {
       }
     }
 
-    /* HARDWARE ACCELERATION */
     List<String>? hardwareMethods;
     if (hardwareAccelerationMethods != null) {
       hardwareMethods ??= [];

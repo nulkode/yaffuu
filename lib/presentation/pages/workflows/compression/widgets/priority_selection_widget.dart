@@ -12,7 +12,8 @@ class PrioritySelectionWidget extends StatefulWidget {
   });
 
   @override
-  State<PrioritySelectionWidget> createState() => _PrioritySelectionWidgetState();
+  State<PrioritySelectionWidget> createState() =>
+      _PrioritySelectionWidgetState();
 }
 
 class _PrioritySelectionWidgetState extends State<PrioritySelectionWidget> {
@@ -42,10 +43,10 @@ class _PrioritySelectionWidgetState extends State<PrioritySelectionWidget> {
       builder: (context, constraints) {
         const double cardMinWidth = 260;
         final availableWidth = constraints.maxWidth;
-        final cardWidth = availableWidth < cardMinWidth * 2 
-            ? availableWidth 
+        final cardWidth = availableWidth < cardMinWidth * 2
+            ? availableWidth
             : (availableWidth - 8) / 2;
-        
+
         return Wrap(
           spacing: 4,
           runSpacing: 4,
@@ -70,8 +71,8 @@ class _PrioritySelectionWidgetState extends State<PrioritySelectionWidget> {
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isSelected 
-                  ? Theme.of(context).colorScheme.primary 
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
                   : Colors.transparent,
               width: 2,
             ),
@@ -134,7 +135,6 @@ class _PrioritySelectionWidgetState extends State<PrioritySelectionWidget> {
       }
     });
 
-    // Create a list of selected priorities in their original order
     final selectedPriorities = _priorities
         .where((priority) => _selectedPriorities.contains(priority.type))
         .toList();

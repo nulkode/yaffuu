@@ -50,13 +50,11 @@ class _SettingsPageState extends State<SettingsPage> {
     });
     await _preferencesManager.settings.setHwAccel(method);
 
-    // Update the queue service engine with the new hardware acceleration method
     try {
       final queueService = getIt<QueueService>();
       await queueService.initialize(method);
-      
+
       if (mounted) {
-        // Show success dialog
         showDialog(
           context: context,
           builder: (context) => Dialog(
@@ -67,14 +65,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.check_circle, color: Colors.green, size: 48),
+                    const Icon(Icons.check_circle,
+                        color: Colors.green, size: 48),
                     const SizedBox(height: 16),
                     const Text(
                       'Success',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 8),
-                    Text('Hardware acceleration changed to "${method.displayName}"'),
+                    Text(
+                        'Hardware acceleration changed to "${method.displayName}"'),
                     const SizedBox(height: 24),
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
@@ -92,11 +93,11 @@ class _SettingsPageState extends State<SettingsPage> {
         await showDetailedErrorDialog(
           context: context,
           title: 'Hardware Acceleration Error',
-          message: 'Hardware acceleration "${method.displayName}" is not compatible with your system.',
+          message:
+              'Hardware acceleration "${method.displayName}" is not compatible with your system.',
           technicalDetails: e.toString(),
         );
 
-        // Revert to previous setting and fallback to software engine
         setState(() {
           _selectedHardwareAcceleration = HwAccel.none;
         });
@@ -105,9 +106,8 @@ class _SettingsPageState extends State<SettingsPage> {
         try {
           final queueService = getIt<QueueService>();
           await queueService.initialize(HwAccel.none);
-          
+
           if (mounted) {
-            // Show fallback success dialog
             showDialog(
               context: context,
               builder: (context) => Dialog(
@@ -122,7 +122,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         const SizedBox(height: 16),
                         const Text(
                           'Fallback Applied',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 8),
                         const Text('Reverted to software acceleration'),
@@ -143,7 +144,8 @@ class _SettingsPageState extends State<SettingsPage> {
             await showDetailedErrorDialog(
               context: context,
               title: 'Critical Error',
-              message: 'Unable to initialize fallback engine. The application may not function properly.',
+              message:
+                  'Unable to initialize fallback engine. The application may not function properly.',
               technicalDetails: fallbackError.toString(),
             );
           }
@@ -261,7 +263,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       FutureBuilder<FFmpegInfo>(
                         future: _ffmpegInfo,
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return const Column(
                               children: [
                                 CircularProgressIndicator(),
@@ -285,7 +288,8 @@ class _SettingsPageState extends State<SettingsPage> {
                               children: [
                                 Text('Version: ${ffmpegInfo.version}'),
                                 const SizedBox(height: 8),
-                                Text(ffmpegInfo.copyright.replaceAll('(c)', '©')),
+                                Text(ffmpegInfo.copyright
+                                    .replaceAll('(c)', '©')),
                                 const SizedBox(height: 8),
                                 Text('Built With: ${ffmpegInfo.builtWith}'),
                                 const SizedBox(height: 16),
@@ -299,7 +303,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                 Wrap(
                                   spacing: 4.0,
                                   runSpacing: 4.0,
-                                  children: ffmpegInfo.hardwareAccelerationMethods!
+                                  children: ffmpegInfo
+                                      .hardwareAccelerationMethods!
                                       .map((config) {
                                     return Chip(
                                       label: Text(

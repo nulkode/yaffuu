@@ -10,7 +10,6 @@ import 'package:yaffuu/presentation/screens/output_files/output_files_screen.dar
 import 'package:yaffuu/presentation/screens/settings/settings_screen.dart';
 import 'route_paths.dart';
 
-// Custom transition page for slide animations
 class SlideTransitionPage extends CustomTransitionPage {
   SlideTransitionPage({
     required super.child,
@@ -19,32 +18,32 @@ class SlideTransitionPage extends CustomTransitionPage {
     super.arguments,
     super.restorationId,
   }) : super(
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const curve = Curves.easeInOutCubic;
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const curve = Curves.easeInOutCubic;
 
-      return SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(1.0, 0.0), // Siempre entra desde la derecha
-          end: Offset.zero,
-        ).animate(CurvedAnimation(
-          parent: animation,
-          curve: curve,
-        )),
-        child: SlideTransition(
-          position: Tween<Offset>(
-            begin: Offset.zero,
-            end: const Offset(-1.0, 0.0), // La anterior sale hacia la izquierda
-          ).animate(CurvedAnimation(
-            parent: secondaryAnimation,
-            curve: curve,
-          )),
-          child: child,
-        ),
-      );
-    },
-    transitionDuration: const Duration(milliseconds: 350),
-    reverseTransitionDuration: const Duration(milliseconds: 350),
-  );
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(1.0, 0.0),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: animation,
+                curve: curve,
+              )),
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: Offset.zero,
+                  end: const Offset(-1.0, 0.0),
+                ).animate(CurvedAnimation(
+                  parent: secondaryAnimation,
+                  curve: curve,
+                )),
+                child: child,
+              ),
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 350),
+          reverseTransitionDuration: const Duration(milliseconds: 350),
+        );
 }
 
 class AppRouter {
@@ -70,7 +69,6 @@ class AppRouter {
               ),
             ],
           ),
-          
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -81,7 +79,6 @@ class AppRouter {
               ),
             ],
           ),
-          
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -119,7 +116,6 @@ class AppRouter {
               ),
             ],
           ),
-          
           StatefulShellBranch(
             routes: [
               GoRoute(

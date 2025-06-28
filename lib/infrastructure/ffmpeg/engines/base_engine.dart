@@ -26,10 +26,12 @@ abstract class FFmpegEngine {
   Future<bool> isOperationCompatible(Operation operation);
 
   /// Executes an operation with the specified input file and output path.
-  Stream<Progress> execute(Operation operation, XFile inputFile, String outputFilePath);
+  Stream<Progress> execute(
+      Operation operation, XFile inputFile, String outputFilePath);
 
   /// Static utility method for executing FFmpeg processes.
-  static Stream<Progress> run(XFile inputFile, String outputFilePath, List<Argument> arguments) async* {
+  static Stream<Progress> run(
+      XFile inputFile, String outputFilePath, List<Argument> arguments) async* {
     final globalArgs = arguments
         .where((arg) => arg.type == ArgumentType.global)
         .map((arg) => arg.value)

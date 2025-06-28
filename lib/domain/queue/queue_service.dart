@@ -210,9 +210,11 @@ class QueueService {
         throw StateError('Engine not initialized');
       }
 
-      final outputFilePath = await _outputFileManager.getNewOutputFilePath(item.workflow.inputFile.name);
+      final outputFilePath = await _outputFileManager
+          .getNewOutputFilePath(item.workflow.inputFile.name);
 
-      _currentSubscription = item.workflow.execute(_engine!, outputFilePath).listen(
+      _currentSubscription =
+          item.workflow.execute(_engine!, outputFilePath).listen(
         (workflowProgress) {
           if (workflowProgress.isComplete) {
           } else {
@@ -230,7 +232,6 @@ class QueueService {
           );
         },
         onDone: () {
-          // Workflow completed successfully
           // TODO: Get output file from workflow result metadata or another way
           // final outputFile = item.workflow.result.outputFile;
           _updateItemStatus(

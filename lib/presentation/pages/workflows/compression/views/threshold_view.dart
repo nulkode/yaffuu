@@ -66,16 +66,16 @@ class _ThresholdViewState extends State<ThresholdView>
               parent: animation,
               curve: Curves.easeInOutCubic,
             );
-    
+
             final fadeAnimation = CurvedAnimation(
               parent: animation,
               curve: const Interval(0.0, 0.8, curve: Curves.easeOut),
             );
-    
+
             final originalIndex =
                 compression_options.defaultOptions.indexOf(option);
             final isSelected = selectedOptionIndex == originalIndex;
-    
+
             return SizeTransition(
               sizeFactor: sizeAnimation,
               axis: Axis.vertical,
@@ -136,12 +136,12 @@ class _ThresholdViewState extends State<ThresholdView>
               parent: _priorityAnimationController,
               curve: Curves.easeInOutCubic,
             );
-    
+
             final fadeAnimation = CurvedAnimation(
               parent: _priorityAnimationController,
               curve: const Interval(0.0, 0.8, curve: Curves.easeOut),
             );
-    
+
             return SizeTransition(
               sizeFactor: sizeAnimation,
               axis: Axis.vertical,

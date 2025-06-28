@@ -7,10 +7,9 @@ import '../base_preferences.dart';
 class SettingsPreferences extends BasePreferences {
   SettingsPreferences(SharedPreferences prefs) : super('settings', prefs);
 
-  // Preference keys
   static const _themeKey = PreferencesKey<int>(
     key: 'theme_mode',
-    defaultValue: 0, // ThemeMode.system.index
+    defaultValue: 0,
   );
 
   static const _hwAccelKey = PreferencesKey<String>(

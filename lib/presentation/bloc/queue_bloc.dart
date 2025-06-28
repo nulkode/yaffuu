@@ -6,8 +6,6 @@ import 'package:yaffuu/domain/workflows/base/workflow.dart';
 import 'package:yaffuu/domain/common/logger.dart';
 import 'package:yaffuu/main.dart';
 
-// Events
-
 /// Base class for all queue events.
 sealed class QueueEvent {}
 
@@ -50,8 +48,6 @@ final class _QueueStatusUpdated extends QueueEvent {
   _QueueStatusUpdated(this.status);
 }
 
-// States
-
 /// Base class for all queue states.
 sealed class QueueState {
   /// The current status of the queue.
@@ -78,8 +74,6 @@ final class QueueError extends QueueState {
   const QueueError(super.status, this.message);
 }
 
-// BLoC
-
 /// BLoC responsible for managing the processing queue.
 class QueueBloc extends Bloc<QueueEvent, QueueState> {
   /// Service for managing queue operations.
@@ -102,10 +96,11 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
   }
 
   /// Handles queue initialization by setting up status stream listening.
-  void _onQueueInitialized(QueueInitialized event, Emitter<QueueState> emit) async {
+  void _onQueueInitialized(
+      QueueInitialized event, Emitter<QueueState> emit) async {
     try {
       logger.i('Initializing queue');
-      
+
       await _queueService
           .initialize(await getIt<PreferencesManager>().settings.getHwAccel());
 

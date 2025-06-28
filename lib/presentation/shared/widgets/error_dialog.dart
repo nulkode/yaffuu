@@ -99,18 +99,23 @@ class _DetailedErrorDialogState extends State<DetailedErrorDialog>
                                   Expanded(
                                     child: Text(
                                       widget.technicalDetails!,
-                                      style: AppTypography.codeStyle.copyWith(fontSize: 12),
+                                      style: AppTypography.codeStyle
+                                          .copyWith(fontSize: 12),
                                     ),
                                   ),
                                   IconButton(
                                     icon: AnimatedSwitcher(
-                                      duration: const Duration(milliseconds: 300),
+                                      duration:
+                                          const Duration(milliseconds: 300),
                                       child: _showCheckIcon
                                           ? FadeTransition(
                                               opacity: _fadeAnimation,
-                                              child: const Icon(Icons.check, size: 16, key: ValueKey('check')),
+                                              child: const Icon(Icons.check,
+                                                  size: 16,
+                                                  key: ValueKey('check')),
                                             )
-                                          : const Icon(Icons.copy, size: 16, key: ValueKey('copy')),
+                                          : const Icon(Icons.copy,
+                                              size: 16, key: ValueKey('copy')),
                                     ),
                                     onPressed: () => _copyToClipboard(context),
                                     tooltip: 'Copy to clipboard',
@@ -150,12 +155,12 @@ class _DetailedErrorDialogState extends State<DetailedErrorDialog>
   void _copyToClipboard(BuildContext context) async {
     if (widget.technicalDetails != null) {
       await Clipboard.setData(ClipboardData(text: widget.technicalDetails!));
-      
+
       setState(() {
         _showCheckIcon = true;
       });
       _animationController.forward();
-      
+
       Future.delayed(const Duration(seconds: 1), () {
         if (mounted) {
           _animationController.reverse().then((_) {

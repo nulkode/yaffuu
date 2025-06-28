@@ -5,7 +5,7 @@ import 'package:yaffuu/infrastructure/ffmpeg/engines/base_engine.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/operations/base.dart';
 
 /// Software-based FFmpeg engine implementation.
-/// 
+///
 /// This is a stateless engine that uses CPU-based encoding and acts as
 /// the universal fallback for all operations. It doesn't maintain any
 /// internal state and operates purely as a strategy for executing
@@ -27,8 +27,10 @@ class SoftwareEngine extends FFmpegEngine {
   }
 
   @override
-  Stream<Progress> execute(Operation operation, XFile inputFile, String outputFilePath) async* {
-    logger.d('Executing operation: ${operation.runtimeType} with software engine');
+  Stream<Progress> execute(
+      Operation operation, XFile inputFile, String outputFilePath) async* {
+    logger.d(
+        'Executing operation: ${operation.runtimeType} with software engine');
 
     // Get the base arguments for the operation
     final arguments = operation.toArguments(this);

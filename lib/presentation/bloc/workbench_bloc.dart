@@ -10,8 +10,6 @@ import 'package:yaffuu/infrastructure/ffmpeg/models/media.dart';
 import 'package:yaffuu/domain/common/logger.dart';
 import 'package:yaffuu/main.dart';
 
-// Events
-
 /// Base class for all workbench events.
 sealed class WorkbenchEvent {}
 
@@ -25,8 +23,6 @@ final class FileAdded extends WorkbenchEvent {
 
 /// Event fired when the user removes the current file from the workbench.
 final class FileCleared extends WorkbenchEvent {}
-
-// States
 
 /// Base class for all workbench states.
 sealed class WorkbenchState {}
@@ -67,14 +63,12 @@ final class WorkbenchReady extends WorkbenchState {
 final class WorkbenchAnalysisFailed extends WorkbenchState {
   /// User-friendly error message describing what went wrong during analysis.
   final String error;
-  
+
   /// Technical details for debugging purposes (optional).
   final String? technicalDetails;
 
   WorkbenchAnalysisFailed(this.error, {this.technicalDetails});
 }
-
-// BLoC
 
 /// BLoC for managing the workbench state and file analysis.
 class WorkbenchBloc extends Bloc<WorkbenchEvent, WorkbenchState> {
@@ -123,18 +117,21 @@ class WorkbenchBloc extends Bloc<WorkbenchEvent, WorkbenchState> {
       ));
     } catch (error) {
       logger.e('File analysis failed: $error');
-      
+
       String userFriendlyMessage;
       String? technicalDetails;
-      
+
       if (error is MultimediaNotFoundOrNotRecognizedException) {
-        userFriendlyMessage = 'The selected file is not a valid media file or cannot be read. Please select a supported video file.';
+        userFriendlyMessage =
+            'The selected file is not a valid media file or cannot be read. Please select a supported video file.';
       } else {
-        userFriendlyMessage = 'An unexpected error occurred while analyzing the file. Please try again.';
+        userFriendlyMessage =
+            'An unexpected error occurred while analyzing the file. Please try again.';
         technicalDetails = error.toString();
       }
-      
-      emit(WorkbenchAnalysisFailed(userFriendlyMessage, technicalDetails: technicalDetails));
+
+      emit(WorkbenchAnalysisFailed(userFriendlyMessage,
+          technicalDetails: technicalDetails));
     }
   }
 

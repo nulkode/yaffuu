@@ -37,10 +37,6 @@ class PreferencesMigration {
       case 1:
         await _migrateToVersion1(prefs);
         break;
-      // Add future migration cases here
-      // case 2:
-      //   await _migrateToVersion2(prefs);
-      //   break;
       default:
         throw UnsupportedError(
             'Migration to version $targetVersion is not supported');
@@ -49,8 +45,7 @@ class PreferencesMigration {
 
   /// Migration to version 1 (baseline - no actual migration needed)
   static Future<void> _migrateToVersion1(SharedPreferences prefs) async {
-    // This is the baseline version, no migration needed
-    // Future migrations will be added as new methods
+    // Empty
   }
 
   /// Get the current migration version

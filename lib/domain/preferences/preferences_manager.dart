@@ -7,7 +7,6 @@ import 'package:yaffuu/domain/preferences/preferences_migration.dart';
 class PreferencesManager {
   SharedPreferences? _preferences;
 
-  // Preference instances
   SettingsPreferences? _settings;
   UxMemoriesPreferences? _uxMemories;
 
@@ -15,10 +14,8 @@ class PreferencesManager {
   Future<void> init() async {
     _preferences = await SharedPreferences.getInstance();
 
-    // Run migrations before initializing preferences
     await PreferencesMigration.runMigrations();
 
-    // Initialize all preference managers
     _settings = SettingsPreferences(_preferences!);
     _uxMemories = UxMemoriesPreferences(_preferences!);
   }

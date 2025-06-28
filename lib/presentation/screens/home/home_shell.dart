@@ -18,7 +18,6 @@ class _HomeShellState extends State<HomeShell> with TickerProviderStateMixin {
   late PageController _pageController;
   bool _isPageViewScrolling = false;
 
-  // Number of tabs/routes in the shell
   static const int _numberOfTabs = 4;
 
   @override
@@ -32,7 +31,6 @@ class _HomeShellState extends State<HomeShell> with TickerProviderStateMixin {
   void didUpdateWidget(HomeShell oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Sync PageController with navigation shell changes
     if (oldWidget.navigationShell.currentIndex !=
         widget.navigationShell.currentIndex) {
       _syncPageController();
@@ -60,13 +58,11 @@ class _HomeShellState extends State<HomeShell> with TickerProviderStateMixin {
 
     final isCurrentTab = widget.navigationShell.currentIndex == index;
 
-    // Navigate using StatefulNavigationShell
     widget.navigationShell.goBranch(
       index,
       initialLocation: isCurrentTab,
     );
 
-    // Animate PageController to the corresponding page
     if (_pageController.hasClients) {
       _pageController.animateToPage(
         index,
@@ -81,7 +77,6 @@ class _HomeShellState extends State<HomeShell> with TickerProviderStateMixin {
 
     _isPageViewScrolling = true;
 
-    // Small delay to avoid conflicts between PageView and GoRouter
     Future.delayed(const Duration(milliseconds: 50), () {
       if (mounted) {
         widget.navigationShell.goBranch(index);
@@ -140,7 +135,7 @@ class _HomeShellState extends State<HomeShell> with TickerProviderStateMixin {
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () {}, // Prevents taps from propagating to PageView
+                  onTap: () {},
                   behavior: HitTestBehavior.translucent,
                   child: const SizedBox.expand(),
                 ),
@@ -154,7 +149,6 @@ class _HomeShellState extends State<HomeShell> with TickerProviderStateMixin {
   }
 }
 
-// Extension to provide easy access to shell navigation from any widget
 extension HomeShellNavigation on BuildContext {
   void navigateToShellTab(int index) {
     final shellState = findAncestorStateOfType<_HomeShellState>();

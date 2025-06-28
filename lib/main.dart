@@ -21,7 +21,7 @@ void main() async {
           create: (context) => ThemeBloc(),
         ),
         BlocProvider(create: (context) => QueueBloc()),
-        BlocProvider(create:  (context) => WorkbenchBloc()),
+        BlocProvider(create: (context) => WorkbenchBloc()),
       ],
       child: const MainApp(),
     ),
