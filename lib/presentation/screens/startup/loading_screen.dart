@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yaffuu/app/router/route_paths.dart';
 import 'package:yaffuu/domain/common/startup_service.dart';
 import 'package:yaffuu/presentation/shared/widgets/logos.dart';
 
@@ -23,12 +24,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
     if (!mounted) return;
 
     if (result.isInitialized) {
-      context.go('/home');
+      context.go('/');
     } else if (result.shouldShowTutorial) {
       // context.go('/tutorial'); TODO: Implement tutorial screen
-      context.go('/home');
+      context.go(RoutePaths.input);
     } else if (result.errorCode == 4) {
-      context.go('/error/ffmpeg-missing');
+      context.go(RoutePaths.ffmpegMissing);
     } else if (result.errorCode != null) {
       final uri = Uri(
         path: '/error-${result.errorCode}',

@@ -2,7 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:yaffuu/domain/common/constants/exception.dart';
 import 'package:yaffuu/domain/common/logger.dart';
 import 'package:yaffuu/domain/preferences/preferences_manager.dart';
-import 'package:yaffuu/presentation/screens/common/error_screen.dart';
+import 'package:yaffuu/presentation/screens/startup/error_screen.dart';
 
 final getIt = GetIt.instance;
 

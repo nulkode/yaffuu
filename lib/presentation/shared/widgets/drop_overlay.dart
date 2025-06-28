@@ -23,7 +23,7 @@ class _DropOverlayState extends State<DropOverlay> {
           return BlocBuilder<WorkbenchBloc, WorkbenchState>(
             builder: (context, state) {
               final canDrop =
-                  state is! WorkbenchAnalysisFailed && route.uri.path == '/home';
+                  state is! WorkbenchAnalysisFailed && route.uri.path == '/';
 
               return DropTarget(
                 onDragEntered: (detail) {

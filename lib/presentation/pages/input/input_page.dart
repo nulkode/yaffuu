@@ -3,17 +3,15 @@ import 'dart:io';
 import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:yaffuu/presentation/bloc/workbench_bloc.dart';
 import 'package:yaffuu/app/theme/typography.dart';
-import 'package:yaffuu/presentation/shared/widgets/appbar.dart';
 import 'package:yaffuu/presentation/shared/widgets/error_dialog.dart';
-import 'package:go_router/go_router.dart';
 
-// TODO: implement pasting files
-
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class InputPage extends StatelessWidget {
+  const InputPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,49 +30,19 @@ class HomePage extends StatelessWidget {
           );
         }
       },
-      child: Scaffold(
-        appBar: YaffuuAppBar(
-          leftChildren: [
-            IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () {
-                context.push('/settings');
-              },
-              tooltip: 'Settings',
-            ),
-            IconButton(
-              icon: const Icon(Icons.folder_open),
-              onPressed: () {
-                context.push('/output-files');
-              },
-              tooltip: 'Output Files',
-            ),
-          ],
-        ),
-        body: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 16),
-                    Text('Input', style: AppTypography.titleStyle),
-                    SizedBox(height: 8),
-                    FilePickerCard(),
-                    SizedBox(height: 16),
-                    Text('Operation', style: AppTypography.titleStyle),
-                    SizedBox(height: 8),
-                    OperationsList(),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Input', style: AppTypography.titleStyle),
+          const SizedBox(height: 8),
+          const FilePickerCard(),
+          const SizedBox(height: 16),
+          Text('Operation', style: AppTypography.titleStyle),
+          const SizedBox(height: 8),
+          const OperationsList(),
+        ],
       ),
     );
   }
@@ -87,7 +55,8 @@ class FilePickerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<WorkbenchBloc, WorkbenchState>(builder: (context, state) {
+    return BlocBuilder<WorkbenchBloc, WorkbenchState>(
+        builder: (context, state) {
       final disabled = state is WorkbenchAnalysisFailed;
       final loading = state is WorkbenchAnalysisInProgress;
       final showFiles = state is WorkbenchReady;
@@ -296,9 +265,7 @@ class OperationsList extends StatelessWidget {
               subtitle: 'Reduce file size while maintaining quality',
               icon: Icons.compress,
               enabled: hasFile,
-              onTap: hasFile
-                  ? () => context.push('/operations/compression')
-                  : null,
+              onTap: hasFile ? () => context.push('/w/compression') : null,
             ),
           ],
         );
