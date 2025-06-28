@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yaffuu/presentation/bloc/workbench_bloc.dart';
 import 'package:yaffuu/app/theme/typography.dart';
+import 'package:yaffuu/presentation/shared/widgets/anti_alert_sound_gesture_on_empty_areas.dart.dart';
 import 'package:yaffuu/presentation/shared/widgets/error_dialog.dart';
 
 class InputPage extends StatelessWidget {
@@ -15,34 +15,36 @@ class InputPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<WorkbenchBloc, WorkbenchState>(
-      listener: (context, state) {
-        if (state is WorkbenchAnalysisFailed) {
-          showDetailedErrorDialog(
-            context: context,
-            title: 'File Analysis Error',
-            message: state.error,
-            technicalDetails: state.technicalDetails,
-            onOk: () {
-              Navigator.of(context).pop();
-              context.read<WorkbenchBloc>().add(FileCleared());
-            },
-          );
-        }
-      },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('Input', style: AppTypography.titleStyle),
-          const SizedBox(height: 8),
-          const FilePickerCard(),
-          const SizedBox(height: 16),
-          Text('Operation', style: AppTypography.titleStyle),
-          const SizedBox(height: 8),
-          const OperationsList(),
-        ],
+    return AntiAlertSoundGestureOnEmptyAreas(
+      child: BlocListener<WorkbenchBloc, WorkbenchState>(
+        listener: (context, state) {
+          if (state is WorkbenchAnalysisFailed) {
+            showDetailedErrorDialog(
+              context: context,
+              title: 'File Analysis Error',
+              message: state.error,
+              technicalDetails: state.technicalDetails,
+              onOk: () {
+                Navigator.of(context).pop();
+                context.read<WorkbenchBloc>().add(FileCleared());
+              },
+            );
+          }
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Input', style: AppTypography.titleStyle),
+            const SizedBox(height: 8),
+            const FilePickerCard(),
+            const SizedBox(height: 16),
+            Text('Operation', style: AppTypography.titleStyle),
+            const SizedBox(height: 8),
+            const OperationsList(),
+          ],
+        ),
       ),
     );
   }

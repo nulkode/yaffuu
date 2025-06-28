@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yaffuu/presentation/shared/widgets/anti_alert_sound_gesture_on_empty_areas.dart.dart';
 import 'constants/compression_option.dart';
 import 'constants/compression_priority.dart';
 import 'widgets/compression_header.dart';
@@ -21,39 +22,41 @@ class _CompressionPageState extends State<CompressionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // HEADER FIJO
-        CompressionHeader(
-          selectedApproach: selectedApproach,
-          onApproachChanged: _onApproachChanged,
-        ),
-        
-        const SizedBox(height: 32),
-        
-        // CONTENIDO CON SCROLL - Usa Expanded para tomar el espacio restante
-        Expanded(
-          child: SingleChildScrollView(
-            child: _buildCompressionContent(),
+    return AntiAlertSoundGestureOnEmptyAreas(
+      child: Column(
+        children: [
+          // HEADER FIJO
+          CompressionHeader(
+            selectedApproach: selectedApproach,
+            onApproachChanged: _onApproachChanged,
           ),
-        ),
-        
-        const SizedBox(height: 16),
-        
-        // BOTÓN FIJO EN LA PARTE INFERIOR
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _canStartCompression() ? _startCompression : null,
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-            ),
-            child: const Text('Start Compression'),
-          ),
-        ),
 
-        const SizedBox(height: 16),
-      ],
+          const SizedBox(height: 32),
+
+          // CONTENIDO CON SCROLL - Usa Expanded para tomar el espacio restante
+          Expanded(
+            child: SingleChildScrollView(
+              child: _buildCompressionContent(),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // BOTÓN FIJO EN LA PARTE INFERIOR
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _canStartCompression() ? _startCompression : null,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: const Text('Start Compression'),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+        ],
+      ),
     );
   }
 
@@ -77,9 +80,7 @@ class _CompressionPageState extends State<CompressionPage> {
     });
   }
 
-  void _onThresholdSelectionChanged(
-      CompressionOption? option,
-      String? size,
+  void _onThresholdSelectionChanged(CompressionOption? option, String? size,
       List<CompressionPriority>? newPriorities) {
     setState(() {
       selectedOption = option;
