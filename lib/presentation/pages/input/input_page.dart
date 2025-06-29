@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yaffuu/presentation/bloc/workbench_bloc.dart';
 import 'package:yaffuu/app/theme/typography.dart';
-import 'package:yaffuu/presentation/shared/widgets/anti_alert_sound_gesture_on_empty_areas.dart.dart';
+import 'package:yaffuu/presentation/screens/home/home_shell.dart';
 import 'package:yaffuu/presentation/shared/widgets/error_dialog.dart';
 
 class InputPage extends StatelessWidget {
@@ -15,7 +15,7 @@ class InputPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AntiAlertSoundGestureOnEmptyAreas(
+    return PageWrapper(
       child: BlocListener<WorkbenchBloc, WorkbenchState>(
         listener: (context, state) {
           if (state is WorkbenchAnalysisFailed) {

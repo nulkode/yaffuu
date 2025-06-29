@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yaffuu/presentation/shared/widgets/anti_alert_sound_gesture_on_empty_areas.dart.dart';
+import 'package:yaffuu/presentation/screens/home/home_shell.dart';
 import 'constants/compression_option.dart';
 import 'constants/compression_priority.dart';
 import 'widgets/compression_header.dart';
@@ -22,7 +22,7 @@ class _CompressionPageState extends State<CompressionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AntiAlertSoundGestureOnEmptyAreas(
+    return PageWrapper(
       child: Column(
         children: [
           CompressionHeader(

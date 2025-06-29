@@ -23,7 +23,7 @@ class SlideTransitionPage extends CustomTransitionPage {
 
             return SlideTransition(
               position: Tween<Offset>(
-                begin: const Offset(1.0, 0.0),
+                begin: const Offset(1.5, 0.0),
                 end: Offset.zero,
               ).animate(CurvedAnimation(
                 parent: animation,
@@ -32,7 +32,7 @@ class SlideTransitionPage extends CustomTransitionPage {
               child: SlideTransition(
                 position: Tween<Offset>(
                   begin: Offset.zero,
-                  end: const Offset(-1.0, 0.0),
+                  end: const Offset(-1.5, 0.0),
                 ).animate(CurvedAnimation(
                   parent: secondaryAnimation,
                   curve: curve,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yaffuu/presentation/shared/widgets/anti_alert_sound_gesture_on_empty_areas.dart.dart';
 import 'package:yaffuu/presentation/shared/widgets/appbar.dart';
 
 class HomeShell extends StatelessWidget {
@@ -24,12 +25,31 @@ class HomeShell extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
+      body: Stack(
+        children: [
+          navigationShell,
+        ],
+      ),
+    );
+  }
+}
+
+class PageWrapper extends StatelessWidget {
+  final Widget child;
+
+  const PageWrapper({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return AntiAlertSoundGestureOnEmptyAreas(
+      child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600),
+          constraints: const BoxConstraints(
+            maxWidth: 600,
+          ),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: navigationShell,
+            child: child,
           ),
         ),
       ),
