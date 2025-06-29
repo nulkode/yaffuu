@@ -142,11 +142,12 @@ class _ThresholdViewState extends State<ThresholdView>
               curve: const Interval(0.0, 0.8, curve: Curves.easeOut),
             );
 
-            return SizeTransition(
-              sizeFactor: sizeAnimation,
-              axis: Axis.vertical,
-              child: FadeTransition(
-                opacity: fadeAnimation,
+            return FadeTransition(
+              opacity: fadeAnimation,
+              child: SizeTransition(
+                sizeFactor: sizeAnimation,
+                axis: Axis.vertical,
+                fixedCrossAxisSizeFactor: 1.0,
                 child: PrioritySelectionWidget(
                   priorities: _priorities,
                   onPrioritiesChanged: _onPrioritiesChanged,

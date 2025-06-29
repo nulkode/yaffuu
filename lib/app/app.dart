@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yaffuu/presentation/bloc/theme_bloc.dart';
@@ -20,12 +18,20 @@ class MainApp extends StatelessWidget {
               seedColor: AppConstants.seedColor,
               brightness: Brightness.light,
             ),
+            cardTheme: const CardThemeData(
+              clipBehavior: Clip.antiAlias,
+              margin: EdgeInsets.zero,
+            )
           ),
           darkTheme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
               seedColor: AppConstants.seedColor,
               brightness: Brightness.dark,
             ),
+            cardTheme: const CardThemeData(
+              clipBehavior: Clip.antiAlias,
+              margin: EdgeInsets.zero,
+            )
           ),
           themeMode: theme,
           routerConfig: AppRouter.router,

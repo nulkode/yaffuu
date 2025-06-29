@@ -48,7 +48,7 @@ class SlideTransitionPage extends CustomTransitionPage {
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/input',
+    initialLocation: '/',
     routes: [
       GoRoute(
         path: RoutePaths.root,

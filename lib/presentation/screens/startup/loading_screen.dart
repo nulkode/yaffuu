@@ -24,7 +24,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     if (!mounted) return;
 
     if (result.isInitialized) {
-      context.go('/');
+      context.go(RoutePaths.input);
     } else if (result.shouldShowTutorial) {
       // context.go('/tutorial'); TODO: Implement tutorial screen
       context.go(RoutePaths.input);

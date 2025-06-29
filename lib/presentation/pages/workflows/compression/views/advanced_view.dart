@@ -12,6 +12,7 @@ class _AdvancedViewState extends State<AdvancedView> {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         const Text(
           'Advanced Compression',
@@ -29,18 +30,14 @@ class _AdvancedViewState extends State<AdvancedView> {
           ),
         ),
         const SizedBox(height: 24),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildCodecSettings(),
-                const SizedBox(height: 16),
-                _buildBitrateSettings(),
-                const SizedBox(height: 16),
-                _buildResolutionSettings(),
-              ],
-            ),
-          ),
+        Column(
+          children: [
+            _buildCodecSettings(),
+            const SizedBox(height: 16),
+            _buildBitrateSettings(),
+            const SizedBox(height: 16),
+            _buildResolutionSettings(),
+          ],
         ),
       ],
     );

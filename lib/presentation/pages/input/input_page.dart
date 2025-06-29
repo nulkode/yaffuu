@@ -67,7 +67,6 @@ class FilePickerCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Card.outlined(
-            clipBehavior: Clip.hardEdge,
             child: InkWell(
               onTap: !disabled && !showFiles
                   ? () async {
@@ -286,7 +285,6 @@ class OperationsList extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Card.outlined(
-        clipBehavior: Clip.hardEdge,
         child: InkWell(
           onTap: enabled ? onTap : null,
           child: Opacity(

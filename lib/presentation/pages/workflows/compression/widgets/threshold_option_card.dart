@@ -27,8 +27,6 @@ class ThresholdOptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card.outlined(
-      margin: EdgeInsets.zero,
-      clipBehavior: Clip.hardEdge,
       child: InkWell(
         onTap: isSelected ? null : onTap,
         child: AnimatedContainer(

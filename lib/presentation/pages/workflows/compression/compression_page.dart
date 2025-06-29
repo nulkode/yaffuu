@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yaffuu/presentation/screens/home/home_shell.dart';
+import 'package:yaffuu/presentation/shared/widgets/single_child_scroll_view_with_padding.dart';
 import 'constants/compression_option.dart';
 import 'constants/compression_priority.dart';
 import 'widgets/compression_header.dart';
@@ -31,7 +32,8 @@ class _CompressionPageState extends State<CompressionPage> {
           ),
           const SizedBox(height: 32),
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollViewWithPadding(
+              sizeTransitionDuration: const Duration(milliseconds: 300),
               child: _buildCompressionContent(),
             ),
           ),
