@@ -139,20 +139,22 @@ class ComplexityAnalyzer {
     try {
       final analysisStartTime = DateTime.now();
       
-      final sceneChanges = await _analyzeSceneChanges(videoFile);
-      logger.d('Scene analysis completed: $sceneChanges changes/sec');
-
-      final motionIntensity = await _analyzeMotion(videoFile);
-      logger.d('Motion analysis completed: ${(motionIntensity * 100).toStringAsFixed(1)}%');
-
-      final signalStats = await _analyzeSignalStats(videoFile);
-      logger.d('Signal analysis completed: variance=${(signalStats * 100).toStringAsFixed(1)}%');
-
-      final noiseLevel = await _analyzeNoise(videoFile);
-      logger.d('Noise analysis completed: ${(noiseLevel * 100).toStringAsFixed(1)}%');
+      final sceneFuture = _analyzeSceneChanges(videoFile);
+      final motionFuture = _analyzeMotion(videoFile);
+      final signalFuture = _analyzeSignalStats(videoFile);
+      final noiseFuture = _analyzeNoise(videoFile);
 
       final bitrateEfficiency = _calculateBitrateEfficiency(mediaInfo);
       logger.d('Bitrate efficiency: ${bitrateEfficiency.toStringAsFixed(2)}x');
+
+      final sceneChanges = await sceneFuture;
+      logger.d('Scene analysis completed: $sceneChanges changes/sec');
+      final motionIntensity = await motionFuture;
+      logger.d('Motion analysis completed: ${(motionIntensity * 100).toStringAsFixed(1)}%');
+      final signalStats = await signalFuture;
+      logger.d('Signal analysis completed: variance=${(signalStats * 100).toStringAsFixed(1)}%');
+      final noiseLevel = await noiseFuture;
+      logger.d('Noise analysis completed: ${(noiseLevel * 100).toStringAsFixed(1)}%');
 
       final analysisTime = DateTime.now().difference(analysisStartTime);
       logger.d('Total analysis time: ${analysisTime.inMilliseconds}ms');
