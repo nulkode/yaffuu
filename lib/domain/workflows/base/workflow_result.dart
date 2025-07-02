@@ -1,11 +1,11 @@
 /// Represents the result of a workflow execution
-class WorkflowResult {
+abstract class WorkflowResult {
   final bool isSuccess;
   final String? errorMessage;
   final Duration? executionTime;
   final Map<String, dynamic>? metadata;
 
-  const WorkflowResult._({
+  const WorkflowResult({
     required this.isSuccess,
     this.errorMessage,
     this.executionTime,
@@ -16,7 +16,7 @@ class WorkflowResult {
   const WorkflowResult.success({
     Duration? executionTime,
     Map<String, dynamic>? metadata,
-  }) : this._(
+  }) : this(
           isSuccess: true,
           executionTime: executionTime,
           metadata: metadata,
@@ -27,7 +27,7 @@ class WorkflowResult {
     required String errorMessage,
     Duration? executionTime,
     Map<String, dynamic>? metadata,
-  }) : this._(
+  }) : this(
           isSuccess: false,
           errorMessage: errorMessage,
           executionTime: executionTime,
@@ -38,7 +38,7 @@ class WorkflowResult {
   const WorkflowResult.cancelled({
     Duration? executionTime,
     Map<String, dynamic>? metadata,
-  }) : this._(
+  }) : this(
           isSuccess: false,
           errorMessage: 'Workflow was cancelled',
           executionTime: executionTime,
