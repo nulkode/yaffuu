@@ -1,21 +1,46 @@
-class FFmpegInfo {
-  final String version;
-  final String copyright;
-  final String builtWith;
-  final List<String> configuration;
-  final Map<String, Map<String, String>> libraries;
-  final List<String>? hardwareAccelerationMethods;
+import 'dart:io';
 
-  FFmpegInfo({
-    required this.version,
-    required this.copyright,
-    required this.builtWith,
-    required this.configuration,
-    required this.libraries,
-    this.hardwareAccelerationMethods,
-  });
+import 'package:yaffuu/domain/media/runtime.dart';
+// TODO: make them infra river events
+import 'package:yaffuu/domain/common/constants/exception.dart';
+import 'package:yaffuu/domain/common/logger.dart';
 
-  static FFmpegInfo parse(
+/// Service for retrieving and caching FFmpeg build information.
+class FFmpegInformationProvider {
+  static const _quietVerbose = ['-v', 'error', '-hide_banner'];
+  RuntimeInformation? _cachedInfo;
+
+  /// Gets FFmpeg information, using cached result if available.
+  Future<RuntimeInformation> getFFmpegInfo() async {
+    if (_cachedInfo != null) {
+      return _cachedInfo!;
+    }
+
+    try {
+      final versionResult = await Process.run('ffmpeg', ['-version']);
+      final hwAccelResult =
+          await Process.run('ffmpeg', [..._quietVerbose, '-hwaccels']);
+
+      if (versionResult.exitCode == 0 && hwAccelResult.exitCode == 0) {
+        final info = parse(
+          versionResult.stdout,
+          hardwareAccelerationMethods: hwAccelResult.stdout,
+        );
+
+        _cachedInfo = info;
+        return info;
+      } else {
+        throw FFmpegException('An unknown error occurred.');
+      }
+    } on ProcessException {
+      throw FFmpegNotFoundException();
+    } on Exception catch (e) {
+      logger.e('An unknown error occurred: $e');
+      throw FFmpegException('An unknown error occurred: $e');
+    }
+  }
+
+  static RuntimeInformation parse(
     String ffmpegHeader, {
     String? hardwareAccelerationMethods,
   }) {
@@ -78,7 +103,7 @@ class FFmpegInfo {
       }
     }
 
-    return FFmpegInfo(
+    return RuntimeInformation(
       version: version,
       copyright: copyright,
       builtWith: builtWith,
@@ -88,30 +113,9 @@ class FFmpegInfo {
     );
   }
 
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! FFmpegInfo) return false;
 
-    return version == other.version &&
-        copyright == other.copyright &&
-        builtWith == other.builtWith &&
-        configuration.toSet().containsAll(other.configuration) &&
-        libraries.length == other.libraries.length &&
-        libraries.keys.every((key) => libraries[key] == other.libraries[key]) &&
-        (hardwareAccelerationMethods?.toSet() ?? {})
-            .containsAll(other.hardwareAccelerationMethods ?? []);
-  }
-
-  @override
-  int get hashCode {
-    return Object.hash(
-      version,
-      copyright,
-      builtWith,
-      configuration,
-      libraries,
-      hardwareAccelerationMethods,
-    );
+  /// Clears the cached FFmpeg information.
+  void clearCache() {
+    _cachedInfo = null;
   }
 }

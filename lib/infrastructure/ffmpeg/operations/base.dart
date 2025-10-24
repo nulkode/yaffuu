@@ -1,4 +1,4 @@
-import 'package:yaffuu/infrastructure/ffmpeg/models/compatibility.dart';
+import 'package:yaffuu/domain/media/context.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/engines/base_engine.dart';
 
 enum ArgumentType {

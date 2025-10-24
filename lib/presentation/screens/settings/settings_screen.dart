@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yaffuu/domain/common/constants/hwaccel.dart';
-import 'package:yaffuu/domain/ffmpeg/ffmpeg_info_service.dart';
-import 'package:yaffuu/infrastructure/ffmpeg/models/ffmpeg_info.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/misc/ffmpeg_info_service.dart';
+import 'package:yaffuu/domain/media/runtime.dart';
 import 'package:yaffuu/domain/preferences/preferences_manager.dart';
 import 'package:yaffuu/domain/queue/queue_service.dart';
 import 'package:yaffuu/main.dart';
@@ -25,8 +25,8 @@ class _SettingsPageState extends State<SettingsPage> {
   late PreferencesManager _preferencesManager;
   HwAccel _selectedHardwareAcceleration = HwAccel.none;
 
-  Future<FFmpegInfo> get _ffmpegInfo {
-    final ffmpegInfoService = getIt<FFmpegInfoService>();
+  Future<RuntimeInformation> get _ffmpegInfo {
+    final ffmpegInfoService = getIt<FFmpegInformationProvider>();
     return ffmpegInfoService.getFFmpegInfo();
   }
 
@@ -260,7 +260,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       const Text('FFmpeg Information',
                           style: AppTypography.titleStyle),
                       const SizedBox(height: 8),
-                      FutureBuilder<FFmpegInfo>(
+                      FutureBuilder<RuntimeInformation>(
                         future: _ffmpegInfo,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
@@ -409,7 +409,7 @@ class LibrariesSection extends StatelessWidget {
     required this.ffmpegInfo,
   });
 
-  final FFmpegInfo ffmpegInfo;
+  final RuntimeInformation ffmpegInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -473,7 +473,7 @@ class ConfigurationSection extends StatefulWidget {
     required this.ffmpegInfo,
   });
 
-  final FFmpegInfo ffmpegInfo;
+  final RuntimeInformation ffmpegInfo;
 
   @override
   State<ConfigurationSection> createState() => _ConfigurationSectionState();

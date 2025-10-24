@@ -2,11 +2,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:yaffuu/domain/common/constants/hwaccel.dart';
 import 'package:yaffuu/domain/common/constants/exception.dart';
-import 'package:yaffuu/domain/ffmpeg/ffmpeg_info_service.dart';
-import 'package:yaffuu/domain/media/media_file_analyzer.dart';
+import 'package:yaffuu/domain/media/container.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/misc/ffmpeg_info_service.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/misc/media_analyzer.dart';
 import 'package:yaffuu/domain/preferences/preferences_manager.dart';
-import 'package:yaffuu/infrastructure/ffmpeg/models/ffmpeg_info.dart';
-import 'package:yaffuu/infrastructure/ffmpeg/models/media.dart';
+import 'package:yaffuu/domain/media/runtime.dart';
 import 'package:yaffuu/domain/common/logger.dart';
 import 'package:yaffuu/main.dart';
 
@@ -38,21 +38,21 @@ final class WorkbenchReady extends WorkbenchState {
   /// The original input file.
   final XFile inputFile;
 
-  /// Metadata of the loaded media file.
-  final MediaFile mediaFile;
+  /// Metadata of the loaded media container.
+  final MediaContainer mediaContainer;
 
   /// Generated thumbnail image (can be null if generation failed).
   final XFile? thumbnail;
 
   /// FFmpeg build information including available codecs and formats.
-  final FFmpegInfo ffmpegInfo;
+  final RuntimeInformation ffmpegInfo;
 
   /// Currently selected hardware acceleration setting.
   final HwAccel currentHwAccel;
 
   WorkbenchReady({
     required this.inputFile,
-    required this.mediaFile,
+    required this.mediaContainer,
     required this.thumbnail,
     required this.ffmpegInfo,
     required this.currentHwAccel,
@@ -72,19 +72,19 @@ final class WorkbenchAnalysisFailed extends WorkbenchState {
 
 /// BLoC for managing the workbench state and file analysis.
 class WorkbenchBloc extends Bloc<WorkbenchEvent, WorkbenchState> {
-  /// Service for analyzing media files and generating thumbnails.
-  late final MediaFileAnalyzer _mediaFileAnalyzer;
+  /// Service for analyzing media containers and generating thumbnails.
+  late final MediaAnalyzer _mediaFileAnalyzer;
 
   /// Service for retrieving FFmpeg build information.
-  late final FFmpegInfoService _ffmpegInfoService;
+  late final FFmpegInformationProvider _ffmpegInfoService;
 
   /// Manager for accessing user preferences.
   late final PreferencesManager _preferencesManager;
 
   /// Creates a new workbench BLoC with the required dependencies.
   WorkbenchBloc() : super(WorkbenchInitial()) {
-    _mediaFileAnalyzer = getIt<MediaFileAnalyzer>();
-    _ffmpegInfoService = getIt<FFmpegInfoService>();
+    _mediaFileAnalyzer = getIt<MediaAnalyzer>();
+    _ffmpegInfoService = getIt<FFmpegInformationProvider>();
     _preferencesManager = getIt<PreferencesManager>();
 
     on<FileAdded>(_onFileAdded);
@@ -110,7 +110,7 @@ class WorkbenchBloc extends Bloc<WorkbenchEvent, WorkbenchState> {
 
       emit(WorkbenchReady(
         inputFile: event.file,
-        mediaFile: mediaFile,
+        mediaContainer: mediaFile,
         thumbnail: thumbnail,
         ffmpegInfo: ffmpegInfo,
         currentHwAccel: currentHwAccel,

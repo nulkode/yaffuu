@@ -4,8 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yaffuu/domain/common/constants/exception.dart';
 import 'package:yaffuu/domain/common/logger.dart';
-import 'package:yaffuu/domain/ffmpeg/ffmpeg_info_service.dart';
-import 'package:yaffuu/domain/media/media_file_analyzer.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/misc/ffmpeg_info_service.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/misc/media_analyzer.dart';
 import 'package:yaffuu/domain/preferences/preferences_manager.dart';
 import 'package:yaffuu/domain/queue/queue_service.dart';
 import 'package:yaffuu/infrastructure/output_files_manager.dart';
@@ -25,12 +25,12 @@ class DependencyInjectionService {
       final outputFileManager = await _setupOutputFileManager();
       getIt.registerSingleton<OutputFileManager>(outputFileManager);
 
-      final ffmpegInfoService = FFmpegInfoService();
+      final ffmpegInfoService = FFmpegInformationProvider();
       await ffmpegInfoService.getFFmpegInfo(); // Pre-cache FFmpeg info
-      getIt.registerSingleton<FFmpegInfoService>(ffmpegInfoService);
+      getIt.registerSingleton<FFmpegInformationProvider>(ffmpegInfoService);
 
-      final mediaFileAnalyzer = MediaFileAnalyzer();
-      getIt.registerSingleton<MediaFileAnalyzer>(mediaFileAnalyzer);
+      final mediaFileAnalyzer = MediaAnalyzer();
+      getIt.registerSingleton<MediaAnalyzer>(mediaFileAnalyzer);
 
       final queueService = QueueService(outputFileManager);
       getIt.registerSingleton<QueueService>(queueService);
