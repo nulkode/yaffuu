@@ -1,5 +1,5 @@
-import 'package:yaffuu/domain/media/container.dart';
-import 'package:yaffuu/domain/media/runtime.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/media/container.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/runtime/runtime.dart';
 
 class CompatibilityContext {
   final RuntimeInformation runtimeInformation;

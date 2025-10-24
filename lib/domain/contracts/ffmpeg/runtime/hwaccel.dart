@@ -7,11 +7,4 @@ enum HwAccel {
   final String value;
   final String displayName;
   final bool implemented;
-
-  static HwAccel fromString(String value) {
-    return HwAccel.values.firstWhere(
-      (hwAccel) => hwAccel.value == value,
-      orElse: () => HwAccel.none,
-    );
-  }
 }

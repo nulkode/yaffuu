@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
-import 'package:yaffuu/domain/common/constants/hwaccel.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/runtime/hwaccel.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/models/progress.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/operations/base.dart';
 import 'package:yaffuu/domain/common/constants/exception.dart';

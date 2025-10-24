@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:yaffuu/domain/common/constants/hwaccel.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/runtime/hwaccel.dart';
 import '../base_preferences.dart';
 
 /// Settings preferences manager
@@ -31,7 +31,10 @@ class SettingsPreferences extends BasePreferences {
   /// Get the current hardware acceleration setting
   Future<HwAccel> getHwAccel() async {
     final value = await getValue(_hwAccelKey);
-    return HwAccel.fromString(value);
+    return HwAccel.values.firstWhere(
+      (hwAccel) => hwAccel.value == value,
+      orElse: () => HwAccel.none,
+    );
   }
 
   /// Set the hardware acceleration setting

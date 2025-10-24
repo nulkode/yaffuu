@@ -1,10 +1,12 @@
+import 'package:yaffuu/domain/contracts/ffmpeg/runtime/hwaccel.dart';
+
 class RuntimeInformation {
   final String version;
   final String copyright;
   final String builtWith;
   final List<String> configuration;
   final Map<String, Map<String, String>> libraries;
-  final List<String>? hardwareAccelerationMethods;
+  final List<HwAccel>? hardwareAccelerationMethods;
 
   RuntimeInformation({
     required this.version,

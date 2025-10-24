@@ -1,4 +1,4 @@
-import 'package:yaffuu/domain/media/codec.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/media/codec.dart';
 
 abstract class MediaStream {
   final int index;

@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:yaffuu/domain/common/constants/hwaccel.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/runtime/hwaccel.dart';
 import 'package:yaffuu/domain/common/constants/exception.dart';
-import 'package:yaffuu/domain/media/container.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/media/container.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/misc/ffmpeg_info_service.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/misc/media_analyzer.dart';
 import 'package:yaffuu/domain/preferences/preferences_manager.dart';
-import 'package:yaffuu/domain/media/runtime.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/runtime/runtime.dart';
 import 'package:yaffuu/domain/common/logger.dart';
 import 'package:yaffuu/main.dart';
 

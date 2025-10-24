@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yaffuu/domain/common/constants/hwaccel.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/runtime/hwaccel.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/misc/ffmpeg_info_service.dart';
-import 'package:yaffuu/domain/media/runtime.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/runtime/runtime.dart';
 import 'package:yaffuu/domain/preferences/preferences_manager.dart';
 import 'package:yaffuu/domain/queue/queue_service.dart';
 import 'package:yaffuu/main.dart';
@@ -308,7 +308,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                       .map((config) {
                                     return Chip(
                                       label: Text(
-                                        config,
+                                        config.name,
                                       ),
                                       padding: const EdgeInsets.all(0),
                                     );

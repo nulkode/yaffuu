@@ -1,4 +1,4 @@
-import 'package:yaffuu/domain/media/stream.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/media/stream.dart';
 
 enum Format {
   mp4('mp4'),

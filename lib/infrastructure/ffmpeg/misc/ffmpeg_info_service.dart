@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'package:yaffuu/domain/media/runtime.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/runtime/hwaccel.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/runtime/runtime.dart';
 // TODO: make them infra river events
 import 'package:yaffuu/domain/common/constants/exception.dart';
 import 'package:yaffuu/domain/common/logger.dart';
@@ -84,7 +85,7 @@ class FFmpegInformationProvider {
       }
     }
 
-    List<String>? hardwareMethods;
+    List<HwAccel>? hardwareMethods;
     if (hardwareAccelerationMethods != null) {
       hardwareMethods ??= [];
       final hwaccelLines =
@@ -98,7 +99,10 @@ class FFmpegInformationProvider {
         }
 
         if (line.isNotEmpty) {
-          hardwareMethods.add(line);
+          hardwareMethods.add(HwAccel.values.firstWhere(
+            (hwAccel) => hwAccel.value == line,
+            orElse: () => HwAccel.none,
+          ));
         }
       }
     }

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:cross_file/cross_file.dart';
 import 'package:uuid/uuid.dart';
-import 'package:yaffuu/domain/common/constants/hwaccel.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/runtime/hwaccel.dart';
 import 'package:yaffuu/domain/queue/queue_status.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/models/progress.dart';
 import 'package:yaffuu/domain/workflows/base/workflow.dart';

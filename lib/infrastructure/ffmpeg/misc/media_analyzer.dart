@@ -3,9 +3,9 @@ import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:path/path.dart' as path;
-import 'package:yaffuu/domain/media/codec.dart';
-import 'package:yaffuu/domain/media/container.dart';
-import 'package:yaffuu/domain/media/stream.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/media/codec.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/media/container.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/media/stream.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/operations/base.dart';
 import 'package:yaffuu/infrastructure/ffmpeg/engines/base_engine.dart';
 // TODO: use infra river events
