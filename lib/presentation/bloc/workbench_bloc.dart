@@ -3,10 +3,10 @@ import 'package:cross_file/cross_file.dart';
 import 'package:yaffuu/domain/contracts/ffmpeg/runtime/hwaccel.dart';
 import 'package:yaffuu/domain/common/constants/exception.dart';
 import 'package:yaffuu/domain/contracts/ffmpeg/media/container.dart';
-import 'package:yaffuu/infrastructure/ffmpeg/misc/ffmpeg_info_service.dart';
-import 'package:yaffuu/infrastructure/ffmpeg/misc/media_analyzer.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/runtime/runtime_info.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/media/media_analyzer.dart';
+import 'package:yaffuu/infrastructure/ffmpeg/runtime/ffmpeg_info.dart';
 import 'package:yaffuu/domain/preferences/preferences_manager.dart';
-import 'package:yaffuu/domain/contracts/ffmpeg/runtime/runtime.dart';
 import 'package:yaffuu/domain/common/logger.dart';
 import 'package:yaffuu/main.dart';
 
@@ -73,6 +73,7 @@ final class WorkbenchAnalysisFailed extends WorkbenchState {
 /// BLoC for managing the workbench state and file analysis.
 class WorkbenchBloc extends Bloc<WorkbenchEvent, WorkbenchState> {
   /// Service for analyzing media containers and generating thumbnails.
+  // TODO: inject, infra is not permitted in presentation
   late final MediaAnalyzer _mediaFileAnalyzer;
 
   /// Service for retrieving FFmpeg build information.

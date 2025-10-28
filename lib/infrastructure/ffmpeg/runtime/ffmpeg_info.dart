@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:yaffuu/domain/contracts/ffmpeg/runtime/hwaccel.dart';
-import 'package:yaffuu/domain/contracts/ffmpeg/runtime/runtime.dart';
 // TODO: make them infra river events
 import 'package:yaffuu/domain/common/constants/exception.dart';
 import 'package:yaffuu/domain/common/logger.dart';
+import 'package:yaffuu/domain/contracts/ffmpeg/runtime/runtime_info.dart';
 
 /// Service for retrieving and caching FFmpeg build information.
 class FFmpegInformationProvider {
@@ -23,7 +23,7 @@ class FFmpegInformationProvider {
           await Process.run('ffmpeg', [..._quietVerbose, '-hwaccels']);
 
       if (versionResult.exitCode == 0 && hwAccelResult.exitCode == 0) {
-        final info = parse(
+        final info = _parse(
           versionResult.stdout,
           hardwareAccelerationMethods: hwAccelResult.stdout,
         );
@@ -41,7 +41,7 @@ class FFmpegInformationProvider {
     }
   }
 
-  static RuntimeInformation parse(
+  static RuntimeInformation _parse(
     String ffmpegHeader, {
     String? hardwareAccelerationMethods,
   }) {
